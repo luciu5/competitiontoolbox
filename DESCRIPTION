@@ -2,7 +2,7 @@ Package: competitiontoolbox
 Type: Package
 Title: Additional Tools for Antitrust and Trade Practitioners
 Version: 0.1.0
-Author: Charles Taragin
+Author: Charles Taragin and Paulette Wolak
 Maintainer: Charles Taragin <ctaragin@ftc.gov>
 Depends: antitrust (>= 0.99.11), trade (>= 0.5.4), shiny
 Description: A package that helps launch a shiny interface for both

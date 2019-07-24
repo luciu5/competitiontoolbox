@@ -1,9 +1,10 @@
 
+
 #'A Shiny Interface to the trade and antitrust Packages
 #'
 #' Launch a shiny interface to simulate the effects of tariffs and mergers
 #'
-
+#' @import antitrust trade shiny
 #' @details
 #'
 #' \code{ct_shiny} launches a shiny interface for the \code{antitrust} and \code{trade} package.
@@ -32,7 +33,7 @@ ct_shiny <- function() {
 #' @details
 #'
 #' \code{trade_shiny} calls \code{ct_shiny}, which is a shiny interface for the \code{antitrust}
-#' and \code{trade} package. See \code{ct_shiny} for further details.
+#' and \code{trade} package. See \code{\link{ct_shiny}} for further details.
 #'
 #' @export
 
@@ -50,7 +51,7 @@ trade_shiny <- function() {
 #' @details
 #'
 #' \code{antitrust_shiny} calls \code{ct_shiny}, which is a shiny interface for the \code{antitrust}
-#' and \code{trade} package. See \code{ct_shiny} for further details.
+#' and \code{trade} package. See \code{\link{ct_shiny}} for further details.
 #'
 #' @export
 
