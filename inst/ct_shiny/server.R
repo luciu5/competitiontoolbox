@@ -2037,7 +2037,7 @@ shinyServer(function(input, output, session) {
     })
 
     output$reference <- renderText({
-        includeHTML(system.file('doc', 'Reference.html', package='trade'))
+        includeHTML(system.file('doc', 'Reference.html', package='antitrust'))
     })
 
 })
