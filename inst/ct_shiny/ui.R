@@ -238,7 +238,7 @@ shinyUI(navbarPage("",id = "menu",
                                                          #tags$head(
                                                          #  tags$style(HTML('#run{color:white;background-color:black}'))
                                                          #),
-                                                         actionButton(inputId ="simulateTariffs" , label = tags$b("Simulate"),style='padding:4px; font-size:125%')
+                                                         actionButton(inputId ="simulateTariffs", label = "", icon = icon("play"), width = '60px', style='padding:4px')
                                                          #)
                                                          ,
                                                          br(), br(),br(),
