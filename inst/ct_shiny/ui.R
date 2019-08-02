@@ -155,7 +155,47 @@ shinyUI(navbarPage("",id = "menu",
                                          titlePanel("Simulate a Vertical Merger"),
                                          p(em("Coming Soon"))
                                          )),
-                              tabPanel("Documentation")
+                              tabPanel("Documentation"),
+                              tabPanel("Simulated Outcomes",
+                                       fluidPage(
+
+                                         titlePanel("Simulated Merger Outcomes") ,
+
+                                         sidebarLayout(
+                                           sidebarPanel(
+                                             h5(tags$b("Directions:")),
+                                             helpText(tags$ul(
+                                               tags$li("Enter the information below to compare the price effects from simulated markets for the supply models included in the 'antitrust' package."),
+                                               tags$li(helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the models used here." ))
+                                             )
+                                             ),
+                                             sliderInput("numFirms", "Number of Firms:", value=5,min=2,max=10,step=1),
+                                             checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                                choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                                selected = "Bertrand ces"),
+                                             selectInput("outcomes", "Outcomes to Report:",
+                                                         choices = c("Price Effect", "Consumer Harm", "Total Harm")),
+                                             fluidRow(
+                                               column(width=12, align = "center",
+                                                      tags$div(
+                                                        HTML("<font size=\"2\"> Supported by </font>"),
+                                                        tags$a(href="https://www.vanderbilt.edu/", tags$img(src="vandy.png",alt="Vanderbilt University",style="height:50px"))
+                                                      )
+                                               )
+                                             )
+                                           ),
+                                           mainPanel(
+                                             h5("Graphical Output"),
+                                             plotOutput('plotMC')
+
+                                           )
+
+                                         )
+
+                                       )
+
+
+                              )
 
                    ),
 
