@@ -1,6 +1,6 @@
 # require(shiny)
 require(rhandsontable)
-
+library(ggplot2)
 
 shinyServer(function(input, output, session) {
 
@@ -30,7 +30,17 @@ shinyServer(function(input, output, session) {
         }
 
 
+    ## render the monte carlo simulation graph (mergers)
+    output$plotMC <- renderPlot({
 
+        #place holder for real data
+        testData <- data.frame(supplyX = factor(rep(c(input$supplyModel), each=1000)), randDraws = c(rnorm(1000),rnorm(1000, mean=1.5),rnorm(1000, mean = 3)))
+
+        ggplot(testData, aes(x=supplyX, y=randDraws)) +
+            labs(title="Price Effects from Simulated Markets for Different Supply Models",  x =NULL, y = "Price Effects", color = "Supply Models") +
+             theme_bw( base_size = 14) + geom_boxplot()
+
+    })
 
     isOverID <-  function(supply, calcElast, inputData){
 
@@ -1215,7 +1225,6 @@ shinyServer(function(input, output, session) {
             rhandsontable(inputData, stretchH = "all", contextMenu = FALSE ) %>% hot_col(col = 1:ncol(inputData), valign = "htMiddle") %>%
             hot_col(col = which (sapply(inputData,is.numeric)),halign = "htCenter" ) %>% hot_cols(columnSorting = TRUE)
     })
-
 
 
 

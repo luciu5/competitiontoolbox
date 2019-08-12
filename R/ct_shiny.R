@@ -62,9 +62,3 @@ antitrust_shiny <- function() {
 
 
 
-
-# _______________
-# trade_shiny + antitrust_shiny are just going to be placeholders that call the
-# competition toolbox (within their own packages, the shiny calls will be replaced
-# with stop functions and calls to download this package). Will need to deal with
-# masking issues.
