@@ -96,7 +96,7 @@ shinyUI(navbarPage("",id = "menu",
                                              #tags$head(
                                              #  tags$style(HTML('#run{color:white;background-color:black}'))
                                              #),
-                                             actionButton(inputId ="simulate" , label = tags$b("Simulate"),style='padding:4px; font-size:125%')
+                                             actionButton(inputId ="simulate" , label = "", icon = icon("play"), width = '60px', style='padding:4px')
                                              #)
                                              ,
                                              br(), br(),br(),
@@ -185,7 +185,7 @@ shinyUI(navbarPage("",id = "menu",
                                              )
                                            ),
                                            mainPanel(
-                                             h5("Graphical Output"),
+                                             br(),
                                              plotOutput('plotMC')
 
                                            )
@@ -405,7 +405,7 @@ shinyUI(navbarPage("",id = "menu",
                                               #tags$head(
                                               #  tags$style(HTML('#run{color:white;background-color:black}'))
                                               #),
-                                              actionButton(inputId ="simulateQuota" , label = tags$b("Simulate"),style='padding:4px; font-size:125%')
+                                              actionButton(inputId ="simulateQuota" , label = "", icon = icon("play"), width = '60px', style='padding:4px')
                                               #)
                                               ,
                                               br(), br(),br(),
