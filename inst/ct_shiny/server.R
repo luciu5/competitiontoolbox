@@ -1,6 +1,7 @@
 # require(shiny)
 require(rhandsontable)
 library(ggplot2)
+library(dplyr)
 
 shinyServer(function(input, output, session) {
 
@@ -30,15 +31,28 @@ shinyServer(function(input, output, session) {
         }
 
 
-    ## render the monte carlo simulation graph (mergers)
-    output$plotMC <- renderPlot({
+    # Creates the graph for the Summary tab of Numerical Simulations (ATR)
+    output$plotSumATR <- renderPlot({
 
-        #place holder for real data
-        testData <- data.frame(supplyX = factor(rep(c(input$supplyModel), each=1000)), randDraws = c(rnorm(1000),rnorm(1000, mean=1.5),rnorm(1000, mean = 3)))
+        ggplot(data = filter(sumdata, Outcome == input$outcomeSumATR & shareOut >= (input$shareOutSumATR / 100)), aes(x=Model, y =value)) +
+            geom_boxplot(outlier.size = 0.5, outlier.alpha = 0.2) +coord_cartesian(ylim = c(0,25)) + theme_bw() + ylab(input$outcomeSumATR)
 
-        ggplot(testData, aes(x=supplyX, y=randDraws)) +
-            labs(title="Price Effects from Simulated Markets for Different Supply Models",  x =NULL, y = "Price Effects", color = "Supply Models") +
-             theme_bw( base_size = 14) + geom_boxplot()
+
+    })
+
+    # Creates the graph for the Indice tab of Numerical Simulations (ATR)
+    output$plotIndATR <- renderPlot({
+
+        plotInd <- ggplot(data = filter(indicdata, Cut_type == input$indexIndATR & shareOut >= (input$shareOutIndATR / 100)),
+               aes(x=Cut_value,y=`Industry Price Change (%)` ))  +   geom_boxplot(outlier.size = 0.5, outlier.alpha = 0.2) +coord_cartesian(ylim = c(0,25)) + theme_bw() + xlab(input$indexIndATR) +
+            theme(axis.text.x  = element_text(angle =45,hjust=1,size=7))+   geom_hline(yintercept=0, col="#d95f02",linetype="dashed") +
+            geom_hline(yintercept=c(1,5,10),linetype="dashed")
+        plot(plotInd)
+
+        if (input$pooledIndATR == "By Demand Model") {
+            plotInd + facet_wrap(supply~demand,scales = "fixed",nrow=1)
+        }
+
 
     })
 
