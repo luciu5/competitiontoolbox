@@ -168,18 +168,19 @@ shinyUI(navbarPage("",id = "menu",
                                                         fluidPage(
                                                           sidebarLayout(
                                                             sidebarPanel(
-                                                              h5(tags$b("Directions:")),
+                                                              h5(tags$b("Overview:")),
                                                               helpText(tags$ul(
-                                                                tags$li("Enter the information below to compare the price effects from simulated markets for the supply models included in the 'antitrust' package."),
-                                                                tags$li(helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the models used here." ))
+                                                                tags$li("Examine the distribution of outcomes from", nrow(sumdata), "simulated horizontal mergers."),
+                                                                tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
+                                                                                                  (Taragin and Loudermilk 2019)"),"for further details." ))
                                                               )
                                                               ),
-                                                              sliderInput("numFirms", "Number of Firms:", value=5,min=2,max=10,step=1),
-                                                              checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                                                 choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                                                 selected = "Bertrand ces"),
-                                                              selectInput("outcomes", "Outcomes to Report:",
-                                                                          choices = c("Price Effect", "Consumer Harm", "Total Harm")),
+                                                              # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                              #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                              #                    selected = "Bertrand ces"),
+                                                              selectInput("outcomeSumATR", "Outcomes to Report:",
+                                                                          choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
+                                                              sliderInput("shareOutSumATR", "Outside Share (%):", value=30,min=10,max=60,step=10),
                                                               fluidRow(
                                                                 column(width=12, align = "center",
                                                                        tags$div(
@@ -191,13 +192,51 @@ shinyUI(navbarPage("",id = "menu",
                                                             ),
                                                             mainPanel(
                                                               br(),
-                                                              plotOutput('plotMC')
+                                                              plotOutput('plotSumATR')
 
                                                             )
 
                                                           )
                                                         )),
-                                               tabPanel("Heuristics")
+                                               tabPanel("Indices",
+                                                        fluidPage(
+                                                          sidebarLayout(
+                                                            sidebarPanel(
+                                                              h5(tags$b("Overview:")),
+                                                              helpText(tags$ul(
+                                                                tags$li("Examine the relationship between industry price changes and commmonly used merger indices from", nrow(indicdata), "simulated horizontal mergers."),
+                                                                tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
+                                                                                                  Using Concentration Mergers for Optimal Screening of Horizontal Mergers (Taragin and Loudermilk 2019"),"for further details." ))
+                                                              )
+                                                              ),
+                                                              # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                              #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                              #                    selected = "Bertrand ces"),
+                                                              radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
+                                                              selectInput("indexIndATR", "Index:",
+                                                                          choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd", "Party Gap")),
+                                                              sliderInput("shareOutIndATR", "Outside Share (%):", value=30,min=30,max=60,step=10),
+                                                              fluidRow(
+                                                                column(width=12, align = "center",
+                                                                       tags$div(
+                                                                         HTML("<font size=\"2\"> Supported by </font>"),
+                                                                         tags$a(href="https://www.vanderbilt.edu/", tags$img(src="vandy.png",alt="Vanderbilt University",style="height:50px"))
+                                                                       )
+                                                                )
+                                                              )
+                                                            ),
+                                                            mainPanel(
+                                                              br(),
+                                                              plotOutput('plotIndATR'),
+                                                              wellPanel(h5(tags$b("Description:")),
+                                                                        textOutput('capIndATR'))
+                                                              )
+
+
+                                                            )
+
+                                                          )
+                                                        )
                                              )
                                            )
 

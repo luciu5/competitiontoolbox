@@ -34,8 +34,10 @@ shinyServer(function(input, output, session) {
     # Creates the graph for the Summary tab of Numerical Simulations (ATR)
     output$plotSumATR <- renderPlot({
 
-        ggplot(data = filter(sumdata, Outcome == input$outcomeSumATR & shareOut >= (input$shareOutSumATR / 100)), aes(x=Model, y =value)) +
-            geom_boxplot(outlier.size = 0.5, outlier.alpha = 0.2) +coord_cartesian(ylim = c(0,25)) + theme_bw() + ylab(input$outcomeSumATR)
+        ggplot(data = filter(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
+            geom_boxplot(stat = "identity") +
+            coord_cartesian(ylim = c(0,25)) + theme_bw() + ylab(input$outcomeSumATR) +
+            ggtitle(paste(input$outcomeSumATR, ", Outside Share Greater Than", input$shareOutSumATR))
 
 
     })
@@ -43,18 +45,50 @@ shinyServer(function(input, output, session) {
     # Creates the graph for the Indice tab of Numerical Simulations (ATR)
     output$plotIndATR <- renderPlot({
 
-        plotInd <- ggplot(data = filter(indicdata, Cut_type == input$indexIndATR & shareOut >= (input$shareOutIndATR / 100)),
-               aes(x=Cut_value,y=`Industry Price Change (%)` ))  +   geom_boxplot(outlier.size = 0.5, outlier.alpha = 0.2) +coord_cartesian(ylim = c(0,25)) + theme_bw() + xlab(input$indexIndATR) +
+        plotInd <- ggplot(filter(indicboxdata, Cut_type == input$indexIndATR & Supply == "Pooled" & shareOutThresh == input$shareOutIndATR),
+               aes(x=Cut_value,ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk)) + geom_boxplot(stat = "identity") +
+            coord_cartesian(ylim = c(0,25)) + theme_bw() + xlab(input$indexIndATR) +
             theme(axis.text.x  = element_text(angle =45,hjust=1,size=7))+   geom_hline(yintercept=0, col="#d95f02",linetype="dashed") +
-            geom_hline(yintercept=c(1,5,10),linetype="dashed")
+            geom_hline(yintercept=c(1,5,10),linetype="dashed") +
+            ggtitle(paste(input$indexIndATR,", Outside Share Greater Than",input$shareOutIndATR,"(",input$pooledIndATR,")"))
+
         plot(plotInd)
 
         if (input$pooledIndATR == "By Demand Model") {
-            plotInd + facet_wrap(supply~demand,scales = "fixed",nrow=1)
+            plotInd %+% filter(indicboxdata, Cut_type == input$indexIndATR & shareOutThresh == input$shareOutIndATR & !Supply == "Pooled") +
+                facet_wrap(Supply~Demand,scales = "fixed",nrow=1)
         }
 
 
     })
+
+    #Generates Captions for ATR Indices Graphs
+    output$capIndATR <- renderText({
+        captionIndATR()
+    })
+
+    captionIndATR <-reactive({
+        switch(input$indexIndATR, 'UPP' = "Upward Pricing Pressure (UPP): Describes the relationship between UPP and industry-wide price changes across the different models, confirming previous findings
+             that UPP's predictive power substantially degrades as demand curvature increases. Second, with the exception of Cournot-log and Bertrand-AIDS specifications,
+             UPP tends to over-predict the price effects from a merger",
+               'HHI' = "Post-Merger Herfindahl-Hirschman Index (HHI): Demonstrates the distribution of estimated industry price changes by the level of the post-merger HHI for each model.
+             Across all models, both the level and the variance of the quantiles of the estimated industry price changes increase with the change post-merger HHI.",
+               'Delta HHI' = "Change in Post-Merger Herfindahl-Hirschman Index (Delta HHI): Presents the distribution of estimated industry price changes by the change in post-merger HHI for each model.
+            Presents nearly identical results to 'HHI' with the added benefit that the change in the post-merger HHI is associated with a stronger negative correlation with a negligible
+            price effect.",
+               'CMCR' =  "Compensating Marginal Cost Reductions (CMCR): Displays the relationship between the Bertrand CMCR and industry-wide price changes across the different models.
+            The range of price effects increases as the CMCR increases, with models having substantial demand curvature (i.e. Cournot, with Log-linear demand and Bertrand with AIDS demand)
+            experiencing the largest increases in price dispersion.",
+               'Firm Count' = "Number of Pre-Merger Firms (Firm Count): Depicts the distribution of industry price changes by Firm Count. Across all models, markets with fewer firms have exponentially larger average effects
+            on industry-wide prices than markets with more firms.",
+               'Party Gap' = "Difference in the Party Rank of the Merging Parties (Party Gap):  Presents Party Gap versus changes in industry-wide prices. As the merging parties grow closer in rank both the average price
+            effects and the variance of the predicted price effects increase.",
+               'Harm2nd' = "2nd Harm: Coming Soon")
+
+    })
+
+
+
 
     isOverID <-  function(supply, calcElast, inputData){
 
