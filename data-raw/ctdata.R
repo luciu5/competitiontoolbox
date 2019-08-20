@@ -45,7 +45,7 @@ calcBoxStatsInd <- function(thresh=0.1, pooled=TRUE){
 
   else{
 
-    filter(indicdata ,shareOut >= thresh & !is.na(Cut_value) ) %>% select(Supply,Demand,Cut_type,Cut_value,`Industry Price Change (%)`) %>%
+    filter(indicdata ,shareOut < thresh & !is.na(Cut_value) ) %>% select(Supply,Demand,Cut_type,Cut_value,`Industry Price Change (%)`) %>%
       group_by(Supply,Demand,Cut_type,Cut_value) %>%
       do(data.frame(bp_stat=c("low_wisk","pct25","pct50","pct75","high_wisk"),
                     bp_value=boxplot.stats(.$`Industry Price Change (%)` )$stats)) %>%
@@ -57,8 +57,8 @@ calcBoxStatsInd <- function(thresh=0.1, pooled=TRUE){
 
 }
 
-indicboxdataPooled <- do.call("rbind",lapply(seq(.1,.6,.1),calcBoxStatsInd))
-indicboxdataModel <- do.call("rbind",lapply(seq(.1,.6,.1),calcBoxStatsInd,pooled=FALSE))
+indicboxdataPooled <- do.call("rbind",lapply(seq(.2,.7,.1),calcBoxStatsInd))
+indicboxdataModel <- do.call("rbind",lapply(seq(.2,.7,.1),calcBoxStatsInd,pooled=FALSE))
 indicboxdata <- rbind(indicboxdataPooled,indicboxdataModel)
 
 
@@ -75,17 +75,19 @@ sumdata <- gather(sumdata, Outcome, value, -Supply, -Demand, -shareOut,factor_ke
 
 calcBoxStatsSum <- function(thresh=0.1){
 
-  filter(sumdata ,shareOut >= thresh & !is.na(value) ) %>% select(Supply,Demand,Outcome,value) %>%
+  res <- filter(sumdata ,shareOut < thresh & !is.na(value) ) %>% select(Supply,Demand,Outcome,value) %>%
     group_by(Supply,Demand,Outcome) %>%
     do(data.frame(bp_stat=c("low_wisk","pct25","pct50","pct75","high_wisk"),
                   bp_value=boxplot.stats(.$value )$stats)) %>%
     mutate(
       shareOutThresh = as.integer(thresh*100))%>% spread(key=bp_stat,value=bp_value)
 
+  res <- mutate(res, Model = interaction(Supply, Demand, sep = ":"),
+         Model = factor(Model, levels = c("cournot:log", "cournot:linear", "bertrand:aids", "bertrand:logit", "bertrand:ces", "auction:logit")))
 
 }
 
-sumboxdata <- lapply(seq(.1,.6,.1),calcBoxStatsSum)
+sumboxdata <- lapply(seq(.2,.7,.1),calcBoxStatsSum)
 sumboxdata <- do.call("rbind",sumboxdata)
 
 #ggplot(filter(indicboxdata,Cut_type=="CMCR" & Supply == "Pooled" & shareOutThresh == 30),
@@ -94,4 +96,4 @@ sumboxdata <- do.call("rbind",sumboxdata)
 
 
 
-usethis::use_data(sumboxdata, indicboxdata)
+usethis::use_data(sumboxdata, indicboxdata,overwrite = TRUE)
