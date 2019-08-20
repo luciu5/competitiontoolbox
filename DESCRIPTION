@@ -5,6 +5,7 @@ Version: 0.1.1
 Author: Charles Taragin and Paulette Wolak
 Maintainer: Charles Taragin <ctaragin@ftc.gov>
 Depends: antitrust (>= 0.99.11), trade (>= 0.5.4), shiny
+Imports: ggplot2, dyplr, rhandsontable
 Description: A package that helps launch a shiny interface for both
     the trade and antitrust packages. The shiny interface provides 
     users with ability to calibrate and simulate horizontal mergers

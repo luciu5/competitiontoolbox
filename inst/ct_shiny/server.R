@@ -2,6 +2,7 @@
 require(rhandsontable)
 library(ggplot2)
 library(dplyr)
+load("../../data/bwplotdata.RData")
 
 shinyServer(function(input, output, session) {
 
@@ -36,7 +37,8 @@ shinyServer(function(input, output, session) {
 
         ggplot(data = filter(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
             geom_boxplot(stat = "identity") +
-            coord_cartesian(ylim = c(0,25)) + theme_bw() + ylab(input$outcomeSumATR) +
+            #coord_cartesian(ylim = c(0,25))+
+            theme_bw() + ylab(input$outcomeSumATR) +
             ggtitle(paste(input$outcomeSumATR, ", Outside Share Greater Than", input$shareOutSumATR))
 
 

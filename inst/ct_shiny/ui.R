@@ -170,7 +170,7 @@ shinyUI(navbarPage("",id = "menu",
                                                             sidebarPanel(
                                                               h5(tags$b("Overview:")),
                                                               helpText(tags$ul(
-                                                                tags$li("Examine the distribution of outcomes from", nrow(sumdata), "simulated horizontal mergers."),
+                                                                tags$li("Examine the distribution of outcomes from FIX NUMBER simulated horizontal mergers."),
                                                                 tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
                                                                                                   (Taragin and Loudermilk 2019)"),"for further details." ))
                                                               )
@@ -192,7 +192,7 @@ shinyUI(navbarPage("",id = "menu",
                                                             ),
                                                             mainPanel(
                                                               br(),
-                                                              plotOutput('plotSumATR')
+                                                              fillPage(plotOutput('plotSumATR'))
 
                                                             )
 
@@ -204,7 +204,7 @@ shinyUI(navbarPage("",id = "menu",
                                                             sidebarPanel(
                                                               h5(tags$b("Overview:")),
                                                               helpText(tags$ul(
-                                                                tags$li("Examine the relationship between industry price changes and commmonly used merger indices from", nrow(indicdata), "simulated horizontal mergers."),
+                                                                tags$li("Examine the relationship between industry price changes and commmonly used merger indices from FIX NUMBER simulated horizontal mergers."),
                                                                 tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
                                                                                                   Using Concentration Mergers for Optimal Screening of Horizontal Mergers (Taragin and Loudermilk 2019"),"for further details." ))
                                                               )
@@ -227,7 +227,7 @@ shinyUI(navbarPage("",id = "menu",
                                                             ),
                                                             mainPanel(
                                                               br(),
-                                                              plotOutput('plotIndATR'),
+                                                              fillPage(plotOutput('plotIndATR')),
                                                               wellPanel(h5(tags$b("Description:")),
                                                                         textOutput('capIndATR'))
                                                               )
@@ -240,38 +240,6 @@ shinyUI(navbarPage("",id = "menu",
                                              )
                                            )
 
-                                         # titlePanel("Simulated Merger Outcomes") ,
-                                         #
-                                         # sidebarLayout(
-                                         #   sidebarPanel(
-                                         #     h5(tags$b("Directions:")),
-                                         #     helpText(tags$ul(
-                                         #       tags$li("Enter the information below to compare the price effects from simulated markets for the supply models included in the 'antitrust' package."),
-                                         #       tags$li(helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the models used here." ))
-                                         #     )
-                                         #     ),
-                                         #     sliderInput("numFirms", "Number of Firms:", value=5,min=2,max=10,step=1),
-                                         #     checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                         #                        choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                         #                        selected = "Bertrand ces"),
-                                         #     selectInput("outcomes", "Outcomes to Report:",
-                                         #                 choices = c("Price Effect", "Consumer Harm", "Total Harm")),
-                                         #     fluidRow(
-                                         #       column(width=12, align = "center",
-                                         #              tags$div(
-                                         #                HTML("<font size=\"2\"> Supported by </font>"),
-                                         #                tags$a(href="https://www.vanderbilt.edu/", tags$img(src="vandy.png",alt="Vanderbilt University",style="height:50px"))
-                                         #              )
-                                         #       )
-                                         #     )
-                                         #   ),
-                                         #   mainPanel(
-                                         #     br(),
-                                         #     plotOutput('plotMC')
-                                         #
-                                         #   )
-                                         #
-                                         # )
 
                                        )
 
