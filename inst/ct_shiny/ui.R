@@ -155,7 +155,9 @@ shinyUI(navbarPage("",id = "menu",
                                          titlePanel("Simulate a Vertical Merger"),
                                          p(em("Coming Soon"))
                                          )),
-                              tabPanel("Documentation"),
+                              tabPanel("Documentation",
+                                       fluidPage(htmlOutput("referenceATR"))
+                                       ),
                               tabPanel("Numerical Simulations",
                                        fluidPage(
                                          titlePanel("Numerical Simulations"),
@@ -170,7 +172,7 @@ shinyUI(navbarPage("",id = "menu",
                                                             sidebarPanel(
                                                               h5(tags$b("Overview:")),
                                                               helpText(tags$ul(
-                                                                tags$li("Examine the distribution of outcomes from FIX NUMBER simulated horizontal mergers."),
+                                                                tags$li("Examine the distribution of outcomes from", textOutput('indicNumMergerATR')  ,"simulated horizontal mergers."),
                                                                 tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
                                                                                                   (Taragin and Loudermilk 2019)"),"for further details." ))
                                                               )
@@ -504,9 +506,10 @@ shinyUI(navbarPage("",id = "menu",
                                         )
 
                               )
-                              ,tabPanel("Documentation",
-                                        fluidPage(htmlOutput("reference")
-                                        )
+                              ,tabPanel("Documentation"
+                                        # ,
+                                        # fluidPage(htmlOutput("referenceTrade")
+                                        # )
                               )
                    )
 )

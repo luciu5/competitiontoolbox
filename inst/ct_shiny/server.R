@@ -2,7 +2,9 @@
 require(rhandsontable)
 library(ggplot2)
 library(dplyr)
-load("../../data/bwplotdata.RData")
+# load("../../data/bwplotdata.RData")
+data("indicboxdata", package = "competitiontoolbox")
+data("sumboxdata", package = "competitiontoolbox")
 
 shinyServer(function(input, output, session) {
 
@@ -2095,8 +2097,16 @@ shinyServer(function(input, output, session) {
 
     })
 
-    output$reference <- renderText({
-        includeHTML(system.file('doc', 'Reference.html', package='trade'))
+    output$referenceATR <- renderText({
+        includeHTML(system.file('doc', 'Reference.html', package='antitrust'))
+    })
+
+    # output$referenceTrade <- renderText({
+    #     includeHTML(system.file('doc', 'Reference.html', package='trade'))
+    # })
+
+    output$indicNumMergerATR <- renderText({
+        prettyNum(nrow(indicboxdata), big.mark=",")
     })
 
 })
