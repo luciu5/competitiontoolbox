@@ -240,7 +240,8 @@ shinyUI(navbarPage("",id = "menu",
                                                             )
 
                                                           )
-                                                        )), style='width: 100%; height: 100%'
+                                                        )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
+
                                            )
 
 

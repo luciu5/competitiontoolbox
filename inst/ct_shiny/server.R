@@ -1,5 +1,6 @@
 # require(shiny)
 require(rhandsontable)
+require(competitiontoolbox)
 library(ggplot2)
 library(dplyr)
 
@@ -41,7 +42,7 @@ shinyServer(function(input, output, session) {
             geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
             #coord_cartesian(ylim = c(0,25))+
             theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45 , hjust=1, size=11, face = "bold")) +  ylab(input$outcomeSumATR) +
-            ggtitle(paste(input$outcomeSumATR, ", Outside Share Less Than", input$shareOutSumATR))
+            ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR))
 
 
     })
@@ -54,7 +55,7 @@ shinyServer(function(input, output, session) {
             coord_cartesian(ylim = c(0,25)) + theme_bw() + xlab(input$indexIndATR) +  ylab("Industry Price Change (%)") +
             theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.text.y  = element_text(size=11), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45,hjust=1,size=12))+   geom_hline(yintercept=0, col="#d95f02",linetype="dashed") +
             geom_hline(yintercept=c(1,5,10),linetype="dashed") +
-            ggtitle(paste(input$indexIndATR,", Outside Share Less Than",input$shareOutIndATR,"(",input$pooledIndATR,")"))
+            ggtitle(paste0(input$indexIndATR,", Outside Share Less Than ",input$shareOutIndATR," (",input$pooledIndATR,")"))
 
         plot(plotInd)
 
