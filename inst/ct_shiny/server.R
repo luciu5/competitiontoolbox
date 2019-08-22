@@ -6,6 +6,8 @@ library(dplyr)
 
 data("indicboxdata", package = "competitiontoolbox")
 data("sumboxdata", package = "competitiontoolbox")
+data("indicboxmktCnt", package = "competitiontoolbox")
+data("sumboxmktCnt", package = "competitiontoolbox")
 
 shinyServer(function(input, output, session) {
 
@@ -2119,11 +2121,14 @@ shinyServer(function(input, output, session) {
     # })
 
     output$indicNumMergerATR <- renderUI({
-        HTML(paste("Examine the relationship between industry price changes and commmonly used merger indices from", prettyNum(nrow(indicboxdata), big.mark=","), "simulated horizontal mergers."))
+        indicNumMerg <- prettyNum(indicboxmktCnt$Cnt[which(indicboxmktCnt$Cut_type == input$indexIndATR & indicboxmktCnt$shareOutThresh == input$shareOutIndATR )], big.mark=",")
+        HTML(paste("Examine the relationship between industry price changes and commmonly used merger indices from", prettyNum((indicNumMerg), big.mark=","), "simulated horizontal mergers."))
     })
 
     output$sumNumMergerATR <- renderUI({
-        HTML(paste("Examine the distribution of outcomes from", prettyNum(nrow(sumboxdata), big.mark=","), "simulated horizontal mergers."))
+        sumNumMerg <- filter(sumboxmktCnt, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR)
+        sumNumMerg <- prettyNum(sum(sumNumMerg$Cnt), big.mark=",")
+        HTML(paste("Examine the distribution of outcomes from", sumNumMerg, "simulated horizontal mergers."))
     })
 
 })
