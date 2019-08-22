@@ -2,7 +2,7 @@
 require(rhandsontable)
 library(ggplot2)
 library(dplyr)
-# load("../../data/bwplotdata.RData")
+
 data("indicboxdata", package = "competitiontoolbox")
 data("sumboxdata", package = "competitiontoolbox")
 
@@ -38,10 +38,10 @@ shinyServer(function(input, output, session) {
     output$plotSumATR <- renderPlot({
 
         ggplot(data = filter(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
-            geom_boxplot(stat = "identity") +
+            geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
             #coord_cartesian(ylim = c(0,25))+
-            theme_bw() + ylab(input$outcomeSumATR) +
-            ggtitle(paste(input$outcomeSumATR, ", Outside Share Greater Than", input$shareOutSumATR))
+            theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45 , hjust=1, size=11, face = "bold")) +  ylab(input$outcomeSumATR) +
+            ggtitle(paste(input$outcomeSumATR, ", Outside Share Less Than", input$shareOutSumATR))
 
 
     })
@@ -50,20 +50,32 @@ shinyServer(function(input, output, session) {
     output$plotIndATR <- renderPlot({
 
         plotInd <- ggplot(filter(indicboxdata, Cut_type == input$indexIndATR & Supply == "Pooled" & shareOutThresh == input$shareOutIndATR),
-               aes(x=Cut_value,ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk)) + geom_boxplot(stat = "identity") +
-            coord_cartesian(ylim = c(0,25)) + theme_bw() + xlab(input$indexIndATR) +
-            theme(axis.text.x  = element_text(angle =45,hjust=1,size=7))+   geom_hline(yintercept=0, col="#d95f02",linetype="dashed") +
+               aes(x=Cut_value,ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk)) + geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
+            coord_cartesian(ylim = c(0,25)) + theme_bw() + xlab(input$indexIndATR) +  ylab("Industry Price Change (%)") +
+            theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.text.y  = element_text(size=11), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45,hjust=1,size=12))+   geom_hline(yintercept=0, col="#d95f02",linetype="dashed") +
             geom_hline(yintercept=c(1,5,10),linetype="dashed") +
-            ggtitle(paste(input$indexIndATR,", Outside Share Greater Than",input$shareOutIndATR,"(",input$pooledIndATR,")"))
+            ggtitle(paste(input$indexIndATR,", Outside Share Less Than",input$shareOutIndATR,"(",input$pooledIndATR,")"))
 
         plot(plotInd)
 
         if (input$pooledIndATR == "By Demand Model") {
             plotInd %+% filter(indicboxdata, Cut_type == input$indexIndATR & shareOutThresh == input$shareOutIndATR & !Supply == "Pooled") +
-                facet_wrap(Supply~Demand,scales = "fixed",nrow=1)
+                facet_wrap(Supply~Demand,scales = "fixed",nrow=1) + theme(axis.text.y  = element_text(size=7))
         }
 
 
+    })
+
+    output$capSumATR <- renderText({
+        captionSumATR()
+    })
+
+    captionSumATR <- reactive({
+        switch(input$outcomeSumATR, 'Consumer Harm ($)' = "Consumer Harm Measured in Dollars.",
+               'Producer Benefit ($)' = "Producer Benefit Measured in Dollars.",
+               'Net Harm ($)' = "Net Harm Caused to Consumer Measured in Dollars.",
+               'Industry Price Change (%)' = "Industry Price Change Measured as a Percent Change from Pre-Merger Price",
+               'Merging Party Price Change (%)' = "Merging Party Price Change as a Percent Change from Pre-Merger Price")
     })
 
     #Generates Captions for ATR Indices Graphs
@@ -2105,8 +2117,12 @@ shinyServer(function(input, output, session) {
     #     includeHTML(system.file('doc', 'Reference.html', package='trade'))
     # })
 
-    output$indicNumMergerATR <- renderText({
-        prettyNum(nrow(indicboxdata), big.mark=",")
+    output$indicNumMergerATR <- renderUI({
+        HTML(paste("Examine the relationship between industry price changes and commmonly used merger indices from", prettyNum(nrow(indicboxdata), big.mark=","), "simulated horizontal mergers."))
+    })
+
+    output$sumNumMergerATR <- renderUI({
+        HTML(paste("Examine the distribution of outcomes from", prettyNum(nrow(sumboxdata), big.mark=","), "simulated horizontal mergers."))
     })
 
 })

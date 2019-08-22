@@ -8,7 +8,7 @@ shinyUI(navbarPage("",id = "menu",
 
                             fluidPage(
                               titlePanel("Introduction"),
-                              HTML("<ul><li>For Merger analysis, click the Merger tab above.
+                              HTML("<ul><li>For Merger analysis, click the Mergers tab above.
                                    </li><li>To analyze the implications of a tariff, click the Trade tab above.</li>
                               <li>You can extend the game to include a quota by choosing Quota from the drop-down menu.</li></ul>")
                             ),
@@ -172,7 +172,7 @@ shinyUI(navbarPage("",id = "menu",
                                                             sidebarPanel(
                                                               h5(tags$b("Overview:")),
                                                               helpText(tags$ul(
-                                                                tags$li("Examine the distribution of outcomes from", textOutput('indicNumMergerATR')  ,"simulated horizontal mergers."),
+                                                                tags$li(htmlOutput('sumNumMergerATR')),
                                                                 tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
                                                                                                   (Taragin and Loudermilk 2019)"),"for further details." ))
                                                               )
@@ -182,7 +182,7 @@ shinyUI(navbarPage("",id = "menu",
                                                               #                    selected = "Bertrand ces"),
                                                               selectInput("outcomeSumATR", "Outcomes to Report:",
                                                                           choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                              sliderInput("shareOutSumATR", "Outside Share (%):", value=30,min=10,max=60,step=10),
+                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value=30,min=20,max=70,step=10),
                                                               fluidRow(
                                                                 column(width=12, align = "center",
                                                                        tags$div(
@@ -194,7 +194,9 @@ shinyUI(navbarPage("",id = "menu",
                                                             ),
                                                             mainPanel(
                                                               br(),
-                                                              fillPage(plotOutput('plotSumATR'))
+                                                              fillPage(plotOutput('plotSumATR')),
+                                                              wellPanel(h5(tags$b("Description:")),
+                                                                        textOutput('capSumATR'))
 
                                                             )
 
@@ -206,9 +208,9 @@ shinyUI(navbarPage("",id = "menu",
                                                             sidebarPanel(
                                                               h5(tags$b("Overview:")),
                                                               helpText(tags$ul(
-                                                                tags$li("Examine the relationship between industry price changes and commmonly used merger indices from FIX NUMBER simulated horizontal mergers."),
-                                                                tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
-                                                                                                  Using Concentration Mergers for Optimal Screening of Horizontal Mergers (Taragin and Loudermilk 2019"),"for further details." ))
+                                                                tags$li(htmlOutput('indicNumMergerATR')),
+                                                                tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                                "(Taragin and Loudermilk 2019)"),"for further details." ))
                                                               )
                                                               ),
                                                               # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
@@ -217,7 +219,7 @@ shinyUI(navbarPage("",id = "menu",
                                                               radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
                                                               selectInput("indexIndATR", "Index:",
                                                                           choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd", "Party Gap")),
-                                                              sliderInput("shareOutIndATR", "Outside Share (%):", value=30,min=30,max=60,step=10),
+                                                              sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=20,max=70,step=10),
                                                               fluidRow(
                                                                 column(width=12, align = "center",
                                                                        tags$div(
@@ -238,8 +240,7 @@ shinyUI(navbarPage("",id = "menu",
                                                             )
 
                                                           )
-                                                        )
-                                             )
+                                                        )), style='width: 100%; height: 100%'
                                            )
 
 

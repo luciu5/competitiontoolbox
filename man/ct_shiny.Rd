@@ -16,3 +16,6 @@ tariff effects using many of the supply and demand models included in the \code{
 also provides users with the ability to calibrate different consumer demand systems and simulate the
 effects of mergers under different competitive regimes included in the \code{antitrust} package.
 }
+\author{
+Charles Taragin, Paulette Wolak
+}
