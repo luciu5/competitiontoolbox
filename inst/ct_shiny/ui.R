@@ -3,6 +3,11 @@ require(rhandsontable)
 # require(antitrust)
 # require(trade)
 
+logoURL <- "https://cran.r-project.org/web/packages/antitrust/index.html"
+logoSrc <- "logo.png"
+logoAlt <- "Insert Logo Here"
+logo <- HTML(paste(tags$a(href=logoURL, tags$img(src= logoSrc,alt= logoAlt,style='height:40px'))))
+
 shinyUI(navbarPage("",id = "menu",
                    tabPanel("Introduction",
 
@@ -17,7 +22,7 @@ shinyUI(navbarPage("",id = "menu",
                               column(width = 12, align = "center",
                                      tags$div(
                                        HTML("<font size=\"2\"> Supported by </font>"),
-                                       tags$a(href="https://www.vanderbilt.edu/", tags$img(src="vandy2.png",alt="Vanderbilt University",style="height:40px"))
+                                       HTML(logo)
                                      )
                               )
                             )
@@ -69,7 +74,7 @@ shinyUI(navbarPage("",id = "menu",
                                                column(width=12, align = "center",
                                                       tags$div(
                                                         HTML("<font size=\"2\"> Supported by </font>"),
-                                                        tags$a(href="https://www.vanderbilt.edu/", tags$img(src="vandy.png",alt="Vanderbilt University",style="height:50px"))
+                                                        HTML(logo)
                                                       )
                                                )
                                              ),
@@ -156,8 +161,8 @@ shinyUI(navbarPage("",id = "menu",
                                          p(em("Coming Soon"))
                                          )),
                               tabPanel("Documentation",
-                                       fluidPage(htmlOutput("referenceATR"))
-                                       ),
+                                       HTML(paste("<iframe frameborder='0' width='100%' height='800' src='ReferenceATR.html'> </iframe>"))
+                              ),
                               tabPanel("Numerical Simulations",
                                        fluidPage(
                                          titlePanel("Numerical Simulations"),
@@ -187,7 +192,7 @@ shinyUI(navbarPage("",id = "menu",
                                                                 column(width=12, align = "center",
                                                                        tags$div(
                                                                          HTML("<font size=\"2\"> Supported by </font>"),
-                                                                         tags$a(href="https://www.vanderbilt.edu/", tags$img(src="vandy.png",alt="Vanderbilt University",style="height:50px"))
+                                                                         HTML(logo)
                                                                        )
                                                                 )
                                                               )
@@ -224,7 +229,7 @@ shinyUI(navbarPage("",id = "menu",
                                                                 column(width=12, align = "center",
                                                                        tags$div(
                                                                          HTML("<font size=\"2\"> Supported by </font>"),
-                                                                         tags$a(href="https://www.vanderbilt.edu/", tags$img(src="vandy.png",alt="Vanderbilt University",style="height:50px"))
+                                                                         HTML(logo)
                                                                        )
                                                                 )
                                                               )
@@ -304,7 +309,7 @@ shinyUI(navbarPage("",id = "menu",
                                                            column(width=12, align = "center",
                                                                   tags$div(
                                                                     HTML("<font size=\"2\"> Supported by </font>"),
-                                                                    tags$a(href="https://www.vanderbilt.edu/", tags$img(src="vandy.png",alt="Vanderbilt University",style="height:50px"))
+                                                                    HTML(logo)
                                                                   )
                                                            )
                                                          ),
@@ -431,7 +436,7 @@ shinyUI(navbarPage("",id = "menu",
                                                 column(width=12, align = "center",
                                                        tags$div(
                                                          HTML("<font size=\"2\"> Supported by </font>"),
-                                                         tags$a(href="https://www.vanderbilt.edu/", tags$img(src="vandy.png",alt="Vanderbilt University",style="height:50px"))
+                                                         HTML(logo)
                                                        )
                                                 )
                                               ),
@@ -509,9 +514,8 @@ shinyUI(navbarPage("",id = "menu",
 
                               )
                               ,tabPanel("Documentation"
-                                        # ,
-                                        # fluidPage(htmlOutput("referenceTrade")
-                                        # )
+                                        ,
+                                        HTML(paste("<iframe frameborder='0' width='100%' height='800' src='Reference.html'> </iframe>"))
                               )
                    )
 )

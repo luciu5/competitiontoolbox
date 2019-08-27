@@ -2112,13 +2112,18 @@ shinyServer(function(input, output, session) {
 
     })
 
+    # output$referenceATR <- renderText({
+    #     includeHTML(system.file('doc', 'Reference.html', package='antitrust'))
+    # })
+
     output$referenceATR <- renderText({
-        includeHTML(system.file('doc', 'Reference.html', package='antitrust'))
+        includeHTML(system.file('doc','Reference.html', package='antitrust'))
     })
 
-    # output$referenceTrade <- renderText({
-    #     includeHTML(system.file('doc', 'Reference.html', package='trade'))
-    # })
+    output$markdown <- renderUI({
+        # HTML(markdown::markdownToHTML(knit('Reference.Rmd', quiet = TRUE), fragment.only=TRUE))
+        includeHTML(bookdown::render_book("Reference.Rmd", new_session = FALSE))
+    })
 
     output$indicNumMergerATR <- renderUI({
         indicNumMerg <- prettyNum(indicboxmktCnt$Cnt[which(indicboxmktCnt$Cut_type == input$indexIndATR & indicboxmktCnt$shareOutThresh == input$shareOutIndATR )], big.mark=",")
@@ -2130,6 +2135,9 @@ shinyServer(function(input, output, session) {
         sumNumMerg <- prettyNum(sum(sumNumMerg$Cnt), big.mark=",")
         HTML(paste("Examine the distribution of outcomes from", sumNumMerg, "simulated horizontal mergers."))
     })
+
+
+
 
 })
 
