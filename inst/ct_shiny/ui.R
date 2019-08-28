@@ -28,7 +28,7 @@ shinyUI(navbarPage("",id = "menu",
                             )
                             ),
                    navbarMenu("Mergers",
-                              tabPanel("Horizontal",
+                              tabPanel("Horizontal", style = "overflow-y:scroll; max-height: 90vh",
 
                                        fluidPage(
 
@@ -141,7 +141,7 @@ shinyUI(navbarPage("",id = "menu",
                                                                   h4("Parameters"),verbatimTextOutput("parameters"),
                                                                   helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the parameters displayed here." )
                                                          ),
-                                                         tabPanel("R Code", value = "codepanel", br(),verbatimTextOutput("results_code")),
+                                                         tabPanel("R Code",  value = "codepanel", br(),verbatimTextOutput("results_code")),
                                                          tabPanel("Messages", value = "msgpanel", br(),h4("Warnings"),  span(textOutput("warnings"), style="color:orange"), br(),
                                                                   h4("Errors"),
                                                                   span(textOutput("errors"), style="color:red"))
@@ -163,7 +163,7 @@ shinyUI(navbarPage("",id = "menu",
                               tabPanel("Documentation",
                                        HTML(paste("<iframe frameborder='0' width='100%' height='800' src='ReferenceATR.html'> </iframe>"))
                               ),
-                              tabPanel("Numerical Simulations",
+                              tabPanel("Numerical Simulations", style = "overflow-y:scroll; max-height: 90vh",
                                        fluidPage(
                                          titlePanel("Numerical Simulations"),
 
@@ -261,7 +261,7 @@ shinyUI(navbarPage("",id = "menu",
 
 
 
-                              tabPanel("Tariffs",
+                              tabPanel("Tariffs", style = "overflow-y:scroll; max-height: 90vh",
 
                                        fluidPage(
 
@@ -387,7 +387,7 @@ shinyUI(navbarPage("",id = "menu",
 
                               )
 
-                              ,tabPanel("Quotas",
+                              ,tabPanel("Quotas", style = "overflow-y:scroll; max-height: 90vh",
 
                                         fluidPage(
 
@@ -513,9 +513,10 @@ shinyUI(navbarPage("",id = "menu",
                                         )
 
                               )
-                              ,tabPanel("Documentation"
-                                        ,
-                                        HTML(paste("<iframe frameborder='0' width='100%' height='800' src='Reference.html'> </iframe>"))
+                              ,tabPanel("Documentation",
+                                        # vignette(topic = "Reference", package = "antitrust")
+
+                                        HTML(paste("<iframe frameborder='0' width='100%' height='800' src='Reference.html> </iframe>"))
                               )
                    )
 )

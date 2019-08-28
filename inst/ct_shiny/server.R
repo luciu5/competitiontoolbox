@@ -69,6 +69,21 @@ shinyServer(function(input, output, session) {
 
     })
 
+
+    # Number of Simulated Mergers for Indices and Summary Tab of ATR Numerical Simulations
+    output$sumNumMergerATR <- renderUI({
+        sumNumMerg <- filter(sumboxmktCnt, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR)
+        sumNumMerg <- prettyNum(sum(sumNumMerg$Cnt), big.mark=",")
+        HTML(paste("Examine the distribution of outcomes from", sumNumMerg, "simulated horizontal mergers."))
+    })
+
+    output$indicNumMergerATR <- renderUI({
+        indicNumMerg <- prettyNum(indicboxmktCnt$Cnt[which(indicboxmktCnt$Cut_type == input$indexIndATR & indicboxmktCnt$shareOutThresh == input$shareOutIndATR )], big.mark=",")
+        HTML(paste("Examine the relationship between industry price changes and commmonly used merger indices from", prettyNum((indicNumMerg), big.mark=","), "simulated horizontal mergers."))
+    })
+
+
+    #Generates Captions for Summary and Indices Graphs of ATR Numerical Simulations
     output$capSumATR <- renderText({
         captionSumATR()
     })
@@ -81,7 +96,7 @@ shinyServer(function(input, output, session) {
                'Merging Party Price Change (%)' = "Merging Party Price Change as a Percent Change from Pre-Merger Price")
     })
 
-    #Generates Captions for ATR Indices Graphs
+
     output$capIndATR <- renderText({
         captionIndATR()
     })
@@ -2110,30 +2125,6 @@ shinyServer(function(input, output, session) {
         paste(values[["msg"]]$error,collapse="\n")
 
 
-    })
-
-    # output$referenceATR <- renderText({
-    #     includeHTML(system.file('doc', 'Reference.html', package='antitrust'))
-    # })
-
-    output$referenceATR <- renderText({
-        includeHTML(system.file('doc','Reference.html', package='antitrust'))
-    })
-
-    output$markdown <- renderUI({
-        # HTML(markdown::markdownToHTML(knit('Reference.Rmd', quiet = TRUE), fragment.only=TRUE))
-        includeHTML(bookdown::render_book("Reference.Rmd", new_session = FALSE))
-    })
-
-    output$indicNumMergerATR <- renderUI({
-        indicNumMerg <- prettyNum(indicboxmktCnt$Cnt[which(indicboxmktCnt$Cut_type == input$indexIndATR & indicboxmktCnt$shareOutThresh == input$shareOutIndATR )], big.mark=",")
-        HTML(paste("Examine the relationship between industry price changes and commmonly used merger indices from", prettyNum((indicNumMerg), big.mark=","), "simulated horizontal mergers."))
-    })
-
-    output$sumNumMergerATR <- renderUI({
-        sumNumMerg <- filter(sumboxmktCnt, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR)
-        sumNumMerg <- prettyNum(sum(sumNumMerg$Cnt), big.mark=",")
-        HTML(paste("Examine the distribution of outcomes from", sumNumMerg, "simulated horizontal mergers."))
     })
 
 
