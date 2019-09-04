@@ -12,13 +12,14 @@
 #' tariff effects using many of the supply and demand models included in the \code{trade} package. It
 #' also provides users with the ability to calibrate different consumer demand systems and simulate the
 #' effects of mergers under different competitive regimes included in the \code{antitrust} package.
+#' @examples
+#' \dontrun{ct_shiny()}
 #'
 #' @author Charles Taragin, Paulette Wolak
 #' @export
 
 
 ct_shiny <- function() {
-  #requireNamespace("rhandsontable")
   shiny::runApp(system.file('ct_shiny', package='competitiontoolbox'))
 }
 
@@ -34,6 +35,7 @@ ct_shiny <- function() {
 #'
 #' \code{trade_shiny} calls \code{ct_shiny}, which is a shiny interface for the \code{antitrust}
 #' and \code{trade} package. See \code{\link{ct_shiny}} for further details.
+#'
 #'
 #' @export
 
@@ -52,6 +54,7 @@ trade_shiny <- function() {
 #'
 #' \code{antitrust_shiny} calls \code{ct_shiny}, which is a shiny interface for the \code{antitrust}
 #' and \code{trade} package. See \code{\link{ct_shiny}} for further details.
+#'
 #'
 #' @export
 
