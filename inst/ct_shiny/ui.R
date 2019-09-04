@@ -185,7 +185,7 @@ shinyUI(navbarPage("",id = "menu",
                                                               #                    selected = "Bertrand ces"),
                                                               selectInput("outcomeSumATR", "Outcomes to Report:",
                                                                           choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value=30,min=20,max=70,step=10),
+                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
                                                               fluidRow(
                                                                 column(width=12, align = "center",
                                                                        tags$div(
@@ -213,7 +213,7 @@ shinyUI(navbarPage("",id = "menu",
                                                               helpText(tags$ul(
                                                                 tags$li(htmlOutput('indicNumMergerATR')),
                                                                 tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                                                                "(Taragin and Loudermilk 2019)"),"for further details." ))
+                                                                                                "(Taragin and Loudermilk 1019)"),"for further details." ))
                                                               )
                                                               ),
                                                               # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
@@ -222,7 +222,7 @@ shinyUI(navbarPage("",id = "menu",
                                                               radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
                                                               selectInput("indexIndATR", "Index:",
                                                                           choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd", "Party Gap")),
-                                                              sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=20,max=70,step=10),
+                                                              sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
                                                               fluidRow(
                                                                 column(width=12, align = "center",
                                                                        tags$div(

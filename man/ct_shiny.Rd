@@ -17,7 +17,7 @@ also provides users with the ability to calibrate different consumer demand syst
 effects of mergers under different competitive regimes included in the \code{antitrust} package.
 }
 \examples{
-\dontrun{ct_shiny(x)}
+\dontrun{ct_shiny()}
 
 }
 \author{
