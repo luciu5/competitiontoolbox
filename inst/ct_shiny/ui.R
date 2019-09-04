@@ -1,8 +1,5 @@
-# require(shiny)
-require(rhandsontable)
-# require(antitrust)
-# require(trade)
 
+# Sponsor Footer for Shiny Interface
 logoURL <- "https://cran.r-project.org/web/packages/antitrust/index.html"
 logoSrc <- "logo.png"
 logoAlt <- "Insert Logo Here"
@@ -160,8 +157,9 @@ shinyUI(navbarPage("",id = "menu",
                                          titlePanel("Simulate a Vertical Merger"),
                                          p(em("Coming Soon"))
                                          )),
-                              tabPanel("Documentation",
-                                       HTML(paste("<iframe frameborder='0' width='100%' height='800' src='ReferenceATR.html'> </iframe>"))
+                              tabPanel("Documentation"
+                                       # ,
+                                       # HTML(paste("<iframe frameborder='0' width='100%' height='800' src='ReferenceATR.html'> </iframe>"))
                               ),
                               tabPanel("Numerical Simulations", style = "overflow-y:scroll; max-height: 90vh",
                                        fluidPage(
@@ -513,10 +511,9 @@ shinyUI(navbarPage("",id = "menu",
                                         )
 
                               )
-                              ,tabPanel("Documentation",
-                                        # vignette(topic = "Reference", package = "antitrust")
-
-                                        HTML(paste("<iframe frameborder='0' width='100%' height='800' src='Reference.html> </iframe>"))
+                              ,tabPanel("Documentation"
+                                        # ,
+                                        # HTML(paste("<iframe frameborder='0' width='100%' height='800' src='Reference.html> </iframe>"))
                               )
                    )
 )

@@ -6,12 +6,10 @@ Author: Charles Taragin and Paulette Wolak
 Maintainer: Charles Taragin <ctaragin@ftc.gov>
 Depends: R (>= 2.10), antitrust (>= 0.99.11), trade (>= 0.5.4), shiny
 Imports: ggplot2, dplyr, rhandsontable
-Description: A package that helps launch a shiny interface for both
-    the trade and antitrust packages. The shiny interface provides 
-    users with ability to calibrate and simulate horizontal mergers
-    using many of the supply and demand models included in the 
-    antitrust package as well as the simulate the effects of 
-    tariffs as demonstrated in the trade package.
+Description: A shiny interface for both trade and antitrust. 
+    The shiny interface provides users with the ability to calibrate 
+    and simulate horizontal mergers using different supply and demand 
+    models as well as the simulate the effects of tariffs.
 License: Unlimited
 Encoding: UTF-8
 LazyData: true

@@ -13,3 +13,7 @@ Launch a shiny interface to simulate the effects of tariffs and mergers
 \code{antitrust_shiny} calls \code{ct_shiny}, which is a shiny interface for the \code{antitrust}
 and \code{trade} package. See \code{\link{ct_shiny}} for further details.
 }
+\examples{
+\dontrun{antitrust_shiny()}
+
+}
