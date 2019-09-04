@@ -4,17 +4,21 @@
 \name{indicboxmktCnt}
 \alias{indicboxmktCnt}
 \title{Data on Number of Monte Carlo Simulations Performed in "Indices" Tab}
-\format{A data frame with 35 rows and 3 variables:
+\format{A data frame with 35 rows and 3 variables
 \describe{
-  \item{Cut_type}{price in US dollars (\$326--\$18,823)}
-  \item{Cnt}{weight of the diamond (0.2--5.01)}
-  \item{shareOutThresh}{quality of the cut (Fair, Good, Very Good, Premium, Ideal)}
+  \item{Cut_type}{Firm Count, HHI, Delta HHI, UPP, CMCR, Harm 2nd, Party Gap}
+  \item{Cnt}{number of horizontal merger simulations (25,890 -- 184,254)}
+  \item{shareOutThresh}{outside share threshold in percent (20--70)}
 }}
 \usage{
 indicboxmktCnt
 }
 \description{
 A dataset containing the information necessary to calculate the number of merger
-simulations used to generate the plots for the "Indices" tab of "Numerical Simulations"
+simulations used to generate the plots for the "Indices" tab of "Numerical Simulations" for
+Horizontal Mergers
+}
+\references{
+\href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 }
 \keyword{datasets}

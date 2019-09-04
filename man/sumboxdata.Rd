@@ -4,26 +4,28 @@
 \name{sumboxdata}
 \alias{sumboxdata}
 \title{Box Plot Statistics for "Summary" Tab}
-\format{A data frame with 180 rows and 10 variables:
+\format{A data frame with 180 rows and 10 variables
 \describe{
-  \item{Demand}{price in US dollars (\$326--\$18,823)}
-  \item{Model}{weight of the diamond (0.2--5.01)}
-  \item{Outcome}{quality of the cut (Fair, Good, Very Good, Premium, Ideal)}
-  \item{Supply}{diamond colour, from D (best) to J (worst)}
-  \item{high_wisk}{a measurement of how clear the diamond is (I1 (worst), SI2,
-    SI1, VS2, VS1, VVS2, VVS1, IF (best))}
-  \item{low_wisk}{length in mm (0--10.74)}
-  \item{pct25}{width in mm (0--58.9)}
-  \item{pct50}{depth in mm (0--31.8)}
-  \item{pct75}{depth in mm (0--31.8)}
-  \item{shareOutThresh}{depth in mm (0--31.8)}
+  \item{Demand}{log, logit, aids, ces, linear}
+  \item{Model}{cournot:log, cournot: linear, bertrand:aids, bertrand:logit, bertrand:ces, auction:logit}
+  \item{Outcome}{post-Merger indice of interest (Industry Price Change (\%), Merging Party Price Change (\%), Consumer Harm (\$), Producer Benefit (\$), Net Harm (\$)}
+  \item{Supply}{betrand, cournot, auction}
+  \item{high_wisk}{maximum}
+  \item{low_wisk}{minimum}
+  \item{pct25}{25th percentile boxplot line}
+  \item{pct50}{50th percentile boxplot line}
+  \item{pct75}{75th percentile boxplot line}
+  \item{shareOutThresh}{outside share threshold in percent (20--70) }
 }}
 \usage{
 sumboxdata
 }
 \description{
-A dataset the summary statistics necessary to make boxplots according to supply, demand,
-and percent of outside share for horizontal mergers in  order to examine the
-relationship between industry price changes and commmonly used merger indices.
+A dataset containing the summary statistics necessary to make boxplots according to supply, demand,
+and percent of outside share for horizontal mergers so as to examine the
+distribution of outcomes.
+}
+\references{
+\href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 }
 \keyword{datasets}

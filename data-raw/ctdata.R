@@ -89,7 +89,7 @@ calcBoxStatsSum <- function(thresh=0.1,reportN=FALSE){
 
 
     res <-   filter(sumdata ,shareOut >= thresh & !is.na(value) ) %>% select(Supply,Demand,Outcome) %>%
-        group_by(Supply,Demand,Outcome) %>% summarise(Cnt=n()) %>%
+        group_by(Outcome) %>% summarise(Cnt=n()) %>%
         mutate(
           shareOutThresh = as.integer(thresh*100))
 

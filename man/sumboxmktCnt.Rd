@@ -3,22 +3,24 @@
 \docType{data}
 \name{sumboxmktCnt}
 \alias{sumboxmktCnt}
-\title{Data on Number of Monte Carlo Simulations Performed in "Summary"}
-\format{A data frame with 151 rows and 6 variables:
+\title{Data on Number of Monte Carlo Simulations Performed in "Summary" Tab}
+\format{A data frame with 151 rows and 6 variables
 \describe{
-  \item{Supply}{price in US dollars (\$326--\$18,823)}
-  \item{Demand}{weight of the diamond (0.2--5.01)}
-  \item{Outcome}{quality of the cut (Fair, Good, Very Good, Premium, Ideal)}
-  \item{Cnt}{diamond colour, from D (best) to J (worst)}
-  \item{shareOutThresh}{a measurement of how clear the diamond is (I1 (worst), SI2,
-    SI1, VS2, VS1, VVS2, VVS1, IF (best))}
-  \item{Model}{length in mm (0--10.74)}
+  \item{Supply}{betrand, cournot, auction}
+  \item{Demand}{log, logit, aids, ces, linear}
+  \item{Outcome}{post-Merger indice of interest (Industry Price Change (\%), Merging Party Price Change (\%), Consumer Harm (\$), Producer Benefit (\$), Net Harm (\$)}
+  \item{Cnt}{number of horizontal merger simulations}
+  \item{shareOutThresh}{outside share threshold in percent (20--70)}
+  \item{Model}{cournot:log, cournot: linear, bertrand:aids, bertrand:logit, bertrand:ces, auction:logit}
 }}
 \usage{
 sumboxmktCnt
 }
 \description{
 A dataset containing the information necessary to calculate the number of merger
-simulations used to generate the plots for the "Summary" tab of "Numerical Simulations"
+simulations used to generate the plots for the Summary tab of Numerical Simulations
+}
+\references{
+\href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 }
 \keyword{datasets}

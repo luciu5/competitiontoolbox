@@ -4,26 +4,28 @@
 \name{indicboxdata}
 \alias{indicboxdata}
 \title{Box Plot Statistics for "Indices" Tab}
-\format{A data frame with 2,303 rows and 10 variables:
+\format{A data frame with 2,303 rows and 10 variables
 \describe{
-  \item{Cut_type}{price in US dollars (\$326--\$18,823)}
-  \item{Cut_value}{weight of the diamond (0.2--5.01)}
-  \item{shareOutThresh}{quality of the cut (Fair, Good, Very Good, Premium, Ideal)}
-  \item{Supply}{diamond colour, from D (best) to J (worst)}
-  \item{Demand}{a measurement of how clear the diamond is (I1 (worst), SI2,
-    SI1, VS2, VS1, VVS2, VVS1, IF (best))}
-  \item{high_wisk}{length in mm (0--10.74)}
-  \item{low_wisk}{width in mm (0--58.9)}
-  \item{pct25}{depth in mm (0--31.8)}
-  \item{pct50}{depth in mm (0--31.8)}
-  \item{pct75}{depth in mm (0--31.8)}
+  \item{Cut_type}{Firm Count, HHI, Delta HHI, UPP, CMCR, Harm 2nd, Party Gap}
+  \item{Cut_value}{axis units depending on Cut_type}
+  \item{shareOutThresh}{outside share threshold in percent (20--70)}
+  \item{Supply}{pooled, betrand, cournot, auction}
+  \item{Demand}{pooled, log, logit, aids, ces, linear}
+  \item{high_wisk}{maximum}
+  \item{low_wisk}{minimum}
+  \item{pct25}{25th percentile boxplot line}
+  \item{pct50}{50th percentile boxplot line}
+  \item{pct75}{75th percentile boxplot line}
 }}
 \usage{
 indicboxdata
 }
 \description{
-A dataset the summary statistics necessary to make boxplots according to supply, demand,
-and percent of outside share for horizontal mergers in  order to examine the
+A dataset containing the summary statistics necessary to make boxplots according to supply, demand,
+and percent of outside share for horizontal mergers so as to examine the
 relationship between industry price changes and commmonly used merger indices.
+}
+\references{
+\href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 }
 \keyword{datasets}
