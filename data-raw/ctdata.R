@@ -67,10 +67,19 @@ calcBoxStatsInd <- function(thresh=0.1, pooled=TRUE,reportN=FALSE){
 
 }
 
-indicboxdataPooled <- do.call("rbind",lapply(seq(.2,.7,.1),calcBoxStatsInd))
-indicboxdataModel <- do.call("rbind",lapply(seq(.2,.7,.1),calcBoxStatsInd,pooled=FALSE))
+indicboxdataPooled <- do.call("rbind",lapply(seq(.1,.6,.1),calcBoxStatsInd))
+indicboxdataModel <- do.call("rbind",lapply(seq(.1,.6,.1),calcBoxStatsInd,pooled=FALSE))
 indicboxdata <- rbind(indicboxdataPooled,indicboxdataModel)
-indicboxmktCnt <-  do.call("rbind",lapply(seq(.2,.7,.1),calcBoxStatsInd,reportN=TRUE))
+indicboxdata <- filter(indicboxdata,!is.na(Cut_value))
+
+Cut_order <-unique(indicboxdata$Cut_value)
+
+Cut_order <- Cut_order[order(as.numeric(gsub("\\[|,.*","",Cut_order,perl=TRUE)))]
+
+indicboxdata <- ungroup(indicboxdata) %>%
+  mutate(Cut_value=factor(Cut_value,levels=Cut_order))
+
+indicboxmktCnt <-  do.call("rbind",lapply(seq(.1,.6,.1),calcBoxStatsInd,reportN=TRUE))
 
 ## summarize simulation outcomes
 sumdata <- ungroup(res_flat) %>% select(supply,demand,`Industry Price Change (%)`,
@@ -89,31 +98,32 @@ calcBoxStatsSum <- function(thresh=0.1,reportN=FALSE){
 
 
     res <-   filter(sumdata ,shareOut >= thresh & !is.na(value) ) %>% select(Supply,Demand,Outcome) %>%
-        group_by(Supply,Demand,Outcome) %>% summarise(Cnt=n()) %>%
+        group_by(Outcome) %>% summarise(Cnt=n()) %>%
         mutate(
           shareOutThresh = as.integer(thresh*100))
 
   }
 
 else{
-  res <- filter(sumdata ,shareOut < thresh & !is.na(value) ) %>% select(Supply,Demand,Outcome,value) %>%
+  res <- filter(sumdata ,shareOut >= thresh & !is.na(value) ) %>% select(Supply,Demand,Outcome,value) %>%
     group_by(Supply,Demand,Outcome) %>%
     do(data.frame(bp_stat=c("low_wisk","pct25","pct50","pct75","high_wisk"),
                   bp_value=boxplot.stats(.$value )$stats)) %>%
     mutate(
+      Model = interaction(Supply, Demand, sep = ":"),
+      Model = factor(Model, levels = c("cournot:log", "cournot:linear", "bertrand:aids", "bertrand:logit", "bertrand:ces", "auction:logit")),
       shareOutThresh = as.integer(thresh*100))%>% spread(key=bp_stat,value=bp_value)
 }
 
-  res <- mutate(res, Model = interaction(Supply, Demand, sep = ":"),
-         Model = factor(Model, levels = c("cournot:log", "cournot:linear", "bertrand:aids", "bertrand:logit", "bertrand:ces", "auction:logit")))
+
 
 }
 
-sumboxdata <- lapply(seq(.2,.7,.1),calcBoxStatsSum)
+sumboxdata <- lapply(seq(.1,.6,.1),calcBoxStatsSum)
 sumboxdata <- do.call("rbind",sumboxdata)
-sumboxmktCnt <-  do.call("rbind",lapply(seq(.2,.7,.1),calcBoxStatsSum,reportN=TRUE))
+sumboxmktCnt <-  do.call("rbind",lapply(seq(.1,.6,.1),calcBoxStatsSum,reportN=TRUE))
 
-#ggplot(filter(indicboxdata,Cut_type=="CMCR" & Supply == "Pooled" & shareOutThresh == 30),
+#ggplot(filter(indicboxdata,Cut_type=="UPP" & Supply == "Pooled" & shareOutThresh == 30),
 #       aes(x=Cut_value,ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+geom_boxplot(stat = "identity")
 
 
