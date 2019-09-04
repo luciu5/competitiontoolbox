@@ -509,9 +509,9 @@ shinyUI(navbarPage("",id = "menu",
 
                               )
                               ,tabPanel("Documentation"
-                                        # ,
-                                        # fluidPage(htmlOutput("referenceTrade")
-                                        # )
+                                         ,
+                                         fluidPage(htmlOutput("referenceTrade")
+                                         )
                               )
                    )
 )

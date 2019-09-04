@@ -4,6 +4,23 @@ require(competitiontoolbox)
 library(ggplot2)
 library(dplyr)
 
+get_vignette_link <- function(...) {
+  x <- vignette(...)
+  if (nzchar(out <- x$PDF)) {
+    ext <- tools::file_ext(out)
+    port <- if (tolower(ext) == "html")
+      tools::startDynamicHelp(NA)
+    else 0L
+    if (port > 0L) {
+      out <- sprintf("http://127.0.0.1:%d/library/%s/doc/%s",
+                     port, basename(x$Dir), out)
+      return(out)
+    }
+  }
+  stop("no html help found")
+}
+
+
 data("indicboxdata", package = "competitiontoolbox")
 data("sumboxdata", package = "competitiontoolbox")
 data("indicboxmktCnt", package = "competitiontoolbox")
@@ -2112,13 +2129,28 @@ shinyServer(function(input, output, session) {
 
     })
 
-    output$referenceATR <- renderText({
-        includeHTML(system.file('doc', 'Reference.html', package='antitrust'))
-    })
+    output$referenceATR <-
+      renderUI({
+        tags$iframe(id = "referenceATR",
+                    src = get_vignette_link("Reference",package="antitrust"),
+                    width = 1024,
+                    height = 768,
+                    frameborder = 0,
+                    marginheight = 0
+        )
+      })
 
-    # output$referenceTrade <- renderText({
-    #     includeHTML(system.file('doc', 'Reference.html', package='trade'))
-    # })
+     output$referenceTrade <-
+       renderUI({
+         tags$iframe(id = "referenceTrade",
+                     src = get_vignette_link("Reference",package="trade"),
+                     width = 1024,
+                     height = 768,
+                     frameborder = 0,
+                     marginheight = 0
+                     )
+       })
+
 
     output$indicNumMergerATR <- renderUI({
         indicNumMerg <- prettyNum(indicboxmktCnt$Cnt[which(indicboxmktCnt$Cut_type == input$indexIndATR & indicboxmktCnt$shareOutThresh == input$shareOutIndATR )], big.mark=",")
