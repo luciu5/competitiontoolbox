@@ -157,9 +157,8 @@ shinyUI(navbarPage("",id = "menu",
                                          titlePanel("Simulate a Vertical Merger"),
                                          p(em("Coming Soon"))
                                          )),
-                              tabPanel("Documentation"
-                                       # ,
-                                       # HTML(paste("<iframe frameborder='0' width='100%' height='800' src='ReferenceATR.html'> </iframe>"))
+                              tabPanel("Documentation",
+                                       fluidPage(htmlOutput("referenceATR"))
                               ),
                               tabPanel("Numerical Simulations", style = "overflow-y:scroll; max-height: 90vh",
                                        fluidPage(
@@ -511,9 +510,8 @@ shinyUI(navbarPage("",id = "menu",
                                         )
 
                               )
-                              ,tabPanel("Documentation"
-                                        # ,
-                                        # HTML(paste("<iframe frameborder='0' width='100%' height='800' src='Reference.html> </iframe>"))
+                              ,tabPanel("Documentation",
+                                        fluidPage(htmlOutput("referenceTrade"))
                               )
                    )
 )

@@ -22,7 +22,7 @@ indicboxdata
 }
 \description{
 A dataset containing the summary statistics necessary to make boxplots according to supply, demand,
-and percent of outside share for horizontal mergers so as to examine the
+and percent of outside share for horizontal mergers. This allows for examination of the
 relationship between industry price changes and commmonly used merger indices.
 }
 \references{

@@ -3,7 +3,7 @@
 \docType{data}
 \name{indicboxmktCnt}
 \alias{indicboxmktCnt}
-\title{Data on Number of Monte Carlo Simulations Performed in "Indices" Tab}
+\title{Number of Monte Carlo Simulations Performed in "Indices" Tab}
 \format{A data frame with 35 rows and 3 variables
 \describe{
   \item{Cut_type}{Firm Count, HHI, Delta HHI, UPP, CMCR, Harm 2nd, Party Gap}
@@ -16,7 +16,7 @@ indicboxmktCnt
 \description{
 A dataset containing the information necessary to calculate the number of merger
 simulations used to generate the plots for the "Indices" tab of "Numerical Simulations" for
-Horizontal Mergers
+Horizontal Mergers based on the index of interest.
 }
 \references{
 \href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}

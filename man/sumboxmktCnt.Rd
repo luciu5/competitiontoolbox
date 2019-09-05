@@ -3,7 +3,7 @@
 \docType{data}
 \name{sumboxmktCnt}
 \alias{sumboxmktCnt}
-\title{Data on Number of Monte Carlo Simulations Performed in "Summary" Tab}
+\title{Number of Monte Carlo Simulations Performed in "Summary" Tab}
 \format{A data frame with 151 rows and 6 variables
 \describe{
   \item{Supply}{betrand, cournot, auction}
@@ -18,7 +18,7 @@ sumboxmktCnt
 }
 \description{
 A dataset containing the information necessary to calculate the number of merger
-simulations used to generate the plots for the Summary tab of Numerical Simulations
+simulations used to generate the plots for the Summary tab of Numerical Simulations.
 }
 \references{
 \href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}

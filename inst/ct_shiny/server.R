@@ -1,3 +1,18 @@
+get_vignette_link <- function(...) {
+    x <- vignette(...)
+    if (nzchar(out <- x$PDF)) {
+        ext <- tools::file_ext(out)
+        port <- if (tolower(ext) == "html")
+            tools::startDynamicHelp(NA)
+        else 0L
+        if (port > 0L) {
+            out <- sprintf("http://127.0.0.1:%d/library/%s/doc/%s",
+                           port, basename(x$Dir), out)
+            return(out)
+        }
+    }
+    stop("no html help found")
+}
 
 data("indicboxdata", package = "competitiontoolbox")
 data("sumboxdata", package = "competitiontoolbox")
@@ -1079,6 +1094,28 @@ shinyServer(function(input, output, session) {
                'Harm2nd' = "2nd Harm: Coming Soon")
 
     })
+
+    output$referenceATR <-
+        renderUI({
+            tags$iframe(id = "referenceATR",
+                        src = get_vignette_link("Reference",package="antitrust"),
+                        width = "100%",
+                        height = 768,
+                        frameborder = 0,
+                        marginheight = 0
+            )
+        })
+
+    output$referenceTrade <-
+        renderUI({
+            tags$iframe(id = "referenceTrade",
+                        src = get_vignette_link("Reference",package="trade"),
+                        width = "100%",
+                        height = 768,
+                        frameborder = 0,
+                        marginheight = 0
+            )
+        })
 
 
     # ## create a reactive object that tracks which demand is being used

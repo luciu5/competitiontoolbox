@@ -2,7 +2,7 @@
 #' Box Plot Statistics for "Indices" Tab
 #'
 #' A dataset containing the summary statistics necessary to make boxplots according to supply, demand,
-#' and percent of outside share for horizontal mergers so as to examine the
+#' and percent of outside share for horizontal mergers. This allows for examination of the
 #' relationship between industry price changes and commmonly used merger indices.
 #'
 #' @format A data frame with 2,303 rows and 10 variables
@@ -22,11 +22,11 @@
 "indicboxdata"
 
 
-#' Data on Number of Monte Carlo Simulations Performed in "Indices" Tab
+#' Number of Monte Carlo Simulations Performed in "Indices" Tab
 #'
 #' A dataset containing the information necessary to calculate the number of merger
 #' simulations used to generate the plots for the "Indices" tab of "Numerical Simulations" for
-#' Horizontal Mergers
+#' Horizontal Mergers based on the index of interest.
 #'
 #' @format A data frame with 35 rows and 3 variables
 #' \describe{
@@ -61,10 +61,10 @@
 "sumboxdata"
 
 
-#' Data on Number of Monte Carlo Simulations Performed in "Summary" Tab
+#' Number of Monte Carlo Simulations Performed in "Summary" Tab
 #'
 #' A dataset containing the information necessary to calculate the number of merger
-#' simulations used to generate the plots for the Summary tab of Numerical Simulations
+#' simulations used to generate the plots for the Summary tab of Numerical Simulations.
 #'
 #' @format A data frame with 151 rows and 6 variables
 #' \describe{
