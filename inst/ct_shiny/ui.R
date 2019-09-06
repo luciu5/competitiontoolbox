@@ -184,7 +184,7 @@ shinyUI(navbarPage("",id = "menu",
                                                               #                    selected = "Bertrand ces"),
                                                               selectInput("outcomeSumATR", "Outcomes to Report:",
                                                                           choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
+                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value=30,min=20,max=70,step=10),
                                                               fluidRow(
                                                                 column(width=12, align = "center",
                                                                        tags$div(
@@ -221,7 +221,7 @@ shinyUI(navbarPage("",id = "menu",
                                                               radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
                                                               selectInput("indexIndATR", "Index:",
                                                                           choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd", "Party Gap")),
-                                                              sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
+                                                              sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=20,max=70,step=10),
                                                               fluidRow(
                                                                 column(width=12, align = "center",
                                                                        tags$div(
