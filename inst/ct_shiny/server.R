@@ -1,3 +1,5 @@
+
+
 get_vignette_link <- function(...) {
     x <- vignette(...)
     if (nzchar(out <- x$PDF)) {
@@ -1014,11 +1016,13 @@ shinyServer(function(input, output, session) {
     # Creates the graph for the Summary tab of Numerical Simulations (ATR)
     output$plotSumATR <- renderPlot({
 
+        if(grepl("%",input$outcomeSumATR)) ylimSumATR <- c(0,50)
+        else{ylimSumATR <- c(0,350)}
         ggplot(data = filter(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
             geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
-            #coord_cartesian(ylim = c(0,25))+
+            coord_cartesian(ylim = ylimSumATR)+
             theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45 , hjust=1, size=11, face = "bold")) +  ylab(input$outcomeSumATR) +
-            ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR))
+            ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR,"%"))
 
 
     })
@@ -1028,10 +1032,10 @@ shinyServer(function(input, output, session) {
 
         plotInd <- ggplot(filter(indicboxdata, Cut_type == input$indexIndATR & Supply == "Pooled" & shareOutThresh == input$shareOutIndATR),
                           aes(x=Cut_value,ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk)) + geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
-            coord_cartesian(ylim = c(0,25)) + theme_bw() + xlab(input$indexIndATR) +  ylab("Industry Price Change (%)") +
+            coord_cartesian(ylim = c(0,30)) + theme_bw() + xlab(input$indexIndATR) +  ylab("Industry Price Change (%)") +
             theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.text.y  = element_text(size=11), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45,hjust=1,size=12))+   geom_hline(yintercept=0, col="#d95f02",linetype="dashed") +
             geom_hline(yintercept=c(1,5,10),linetype="dashed") +
-            ggtitle(paste0(input$indexIndATR,", Outside Share Less Than ",input$shareOutIndATR," (",input$pooledIndATR,")"))
+            ggtitle(paste0(input$indexIndATR,", Outside Share Less Than ",input$shareOutIndATR,"% (",input$pooledIndATR,")"))
 
         plot(plotInd)
 
