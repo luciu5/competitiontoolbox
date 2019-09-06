@@ -5,7 +5,7 @@ Version: 0.1.1
 Author: Charles Taragin and Paulette Wolak
 Maintainer: Charles Taragin <ctaragin@ftc.gov>
 Depends: R (>= 2.10), antitrust (>= 0.99.11), trade (>= 0.5.4), shiny, rhandsontable
-Imports: ggplot2, dplyr
+Imports: ggplot2
 Description: A shiny interface for both trade and antitrust. 
     The shiny interface provides users with the ability to calibrate 
     and simulate horizontal mergers using different supply and demand 
