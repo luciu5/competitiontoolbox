@@ -11,8 +11,8 @@ shinyUI(navbarPage("",id = "menu",
                             fluidPage(
                               titlePanel("Introduction"),
                               HTML("<ul><li>For Merger analysis, click the Mergers tab above.
-                                   </li><li>To analyze the implications of a tariff, click the Trade tab above.</li>
-                              <li>You can extend the game to include a quota by choosing Quota from the drop-down menu.</li></ul>")
+                                   </li><li>To analyze the implications of a tariff or quota, click the Trade tab above.</li>
+                              </ul>")
                             ),
                             hr(),
                             fluidRow(
