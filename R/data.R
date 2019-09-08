@@ -3,14 +3,14 @@
 #'
 #' A dataset containing the summary statistics necessary to make boxplots according to supply, demand,
 #' and percent of outside share for horizontal mergers. This allows for examination of the
-#' relationship between industry price changes and commmonly used merger indices.
+#' relationship between industry price changes and commonly used merger indices.
 #'
 #' @format A data frame with 2,303 rows and 10 variables
 #' \describe{
 #'   \item{Cut_type}{Firm Count, HHI, Delta HHI, UPP, CMCR, Harm 2nd, Party Gap}
 #'   \item{Cut_value}{axis units depending on Cut_type}
 #'   \item{shareOutThresh}{outside share threshold in percent (20--70)}
-#'   \item{Supply}{pooled, betrand, cournot, auction}
+#'   \item{Supply}{pooled, bertrand, cournot, auction}
 #'   \item{Demand}{pooled, log, logit, aids, ces, linear}
 #'   \item{high_wisk}{maximum}
 #'   \item{low_wisk}{minimum}
@@ -48,8 +48,8 @@
 #' \describe{
 #'   \item{Demand}{log, logit, aids, ces, linear}
 #'   \item{Model}{cournot:log, cournot: linear, bertrand:aids, bertrand:logit, bertrand:ces, auction:logit}
-#'   \item{Outcome}{post-Merger indice of interest (Industry Price Change (\%), Merging Party Price Change (\%), Consumer Harm (\$), Producer Benefit (\$), Net Harm (\$)}
-#'   \item{Supply}{betrand, cournot, auction}
+#'   \item{Outcome}{post-Merger index of interest (Industry Price Change (\%), Merging Party Price Change (\%), Consumer Harm (\$), Producer Benefit (\$), Net Harm (\$)}
+#'   \item{Supply}{bertrand, cournot, auction}
 #'   \item{high_wisk}{maximum}
 #'   \item{low_wisk}{minimum}
 #'   \item{pct25}{25th percentile boxplot line}

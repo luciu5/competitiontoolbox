@@ -7,13 +7,13 @@
 #' @import antitrust trade shiny rhandsontable
 #' @details
 #'
-#' \code{ct_shiny} launches a shiny interface for the \code{antitrust} and \code{trade} package.
+#' \code{ct_shiny} launches a shiny interface for the \code{antitrust} and \code{trade} packages.
 #' The shiny interface provides users with the ability to calibrate model parameters and simulate
 #' tariff effects using many of the supply and demand models included in the \code{trade} package. It
 #' also provides users with the ability to calibrate different consumer demand systems and simulate the
 #' effects of mergers under different competitive regimes included in the \code{antitrust} package.
 #' @examples
-#' \dontrun{ct_shiny()}
+#' if(interactive()){ct_shiny()}
 #'
 #' @author Charles Taragin, Paulette Wolak
 #' @export
