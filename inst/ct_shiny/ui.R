@@ -5,14 +5,15 @@ logoSrc <- "logo.png"
 logoAlt <- "Insert Logo Here"
 logo <- HTML(paste(tags$a(href=logoURL, tags$img(src= logoSrc,alt= logoAlt,style='height:40px'))))
 
-shinyUI(navbarPage("",id = "menu",
-                   tabPanel("Introduction",
 
+shinyUI(navbarPage("", id = "menu",
+                   tabPanel("Introduction",
                             fluidPage(
                               titlePanel("Introduction"),
-                              HTML("<ul><li>For Merger analysis, click the Mergers tab above.
-                                   </li><li>To analyze the implications of a tariff or quota, click the Trade tab above.</li>
-                              </ul>")
+                              HTML("<ul>
+                                      <li>For Merger analysis, click the Mergers tab above.</li>
+                                      <li>To analyze the implications of a tariff or quota, click the Trade tab above.</li>
+                                   </ul>")
                             ),
                             hr(),
                             fluidRow(
@@ -23,13 +24,14 @@ shinyUI(navbarPage("",id = "menu",
                                      )
                               )
                             )
-                            ),
+                    ),
+
+
                    navbarMenu("Mergers",
+
+
                               tabPanel("Horizontal", style = "overflow-y:scroll; max-height: 90vh",
-
                                        fluidPage(
-
-
                                          titlePanel("Simulate a Horizontal Merger") ,
 
                                          sidebarLayout(
@@ -47,10 +49,10 @@ shinyUI(navbarPage("",id = "menu",
                                              ),hr(),
                                              radioButtons("calcElast", "Calibrate model parameters using:",
                                                           choices = c("market elasticity and 1 or more margins",
-                                                                      "2 or more margins"), selected="market elasticity and 1 or more margins"
+                                                                      "2 or more margins")
                                              ),
                                              conditionalPanel(
-                                               condition = "input.calcElast.includes('elasticity') == true ",
+                                               condition = "input.calcElast.includes('elasticity') == true",
                                                numericInput("enterElast", "Enter Market Elasticity:", value=-1,min=-Inf,max=0,step=.1#, width='75%'
                                                )
                                              ),hr(),
@@ -62,10 +64,45 @@ shinyUI(navbarPage("",id = "menu",
                                                                       "Cournot"
                                                           )),
 
-                                             selectInput("demand", "Demand Specification:",
-                                                         choices = c("logit", "ces",
-                                                                     #"linear",
-                                                                     "aids")),
+                                             #selectInput("demand", "Demand Specification:", choices = c("logit (unknown elasticity)", "ces", "aids")),
+
+
+                                             ## Use conditionalPanel() to select appropriate demand forms for each pair of competitive environment and margin information
+                                             conditionalPanel(
+                                               condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == true",
+                                               selectInput("demand", "Demand Specification:",
+                                                           choices = c("logit", "ces", "aids"))
+                                             ),
+                                             conditionalPanel(
+                                               condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == false",
+                                               selectInput("demand", "Demand Specification:",
+                                                           choices = c("logit (unknown elasticity)", "ces (unknown elasticity)", "aids (unknown elasticity)"))
+                                             ),
+                                             conditionalPanel(
+                                               condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == true",
+                                               selectInput("demand", "Demand Specification:", choices = "logit")
+                                             ),
+                                             conditionalPanel(
+                                               condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == false",
+                                               selectInput("demand", "Demand Specification:", choices = "logit (unknown elasticity)")
+                                             ),
+                                             # conditionalPanel(
+                                             #   condition = "input.supply == 'Cournot'",
+                                             #   helpText(tags$b("Note:"), "only the first non-missing inputted price and product name is used for Cournot.")
+                                             # ),
+                                             # conditionalPanel(
+                                             #   condition = "input.supply == '2nd Score Auction' && input.calcElast.includes('elasticity') == true",
+                                             #   helpText(tags$b("Note:"), "2nd score Auction only requires a single price.")
+                                             # ),
+                                             # conditionalPanel(
+                                             #   condition = "input.supply == '2nd Score Auction' && input.calcElast.includes('elasticity') == false",
+                                             #   helpText(tags$b("Note:"), "2nd Score Auction does not require prices.")
+                                             # ),
+                                             # conditionalPanel(
+                                             #   condition = "input.supply == 'Bertrand' && input.demand == 'aids'",
+                                             #   helpText(tags$b("Note:"), "aids does not require pricing information.")
+                                             # ),
+
                                              hr(),
                                              fluidRow(
                                                column(width=12, align = "center",
@@ -74,24 +111,10 @@ shinyUI(navbarPage("",id = "menu",
                                                         HTML(logo)
                                                       )
                                                )
-                                             ),
-                                             conditionalPanel(
-                                               condition = "input.supply == 'Cournot'",
-                                               helpText(tags$b("Note:"), "only the first non-missing inputted price and product name is used for Cournot.")
-                                             ),
-                                             conditionalPanel(
-                                               condition = "input.supply == '2nd Score Auction' && input.calcElast.includes('elasticity') == true",
-                                               helpText(tags$b("Note:"), "2nd score Auction only requires a single price.")
-                                             ),
-                                             conditionalPanel(
-                                               condition = "input.supply == '2nd Score Auction' && input.calcElast.includes('elasticity') == false",
-                                               helpText(tags$b("Note:"), "2nd Score Auction does not require prices.")
-                                             ),
-                                             conditionalPanel(
-                                               condition = "input.supply == 'Bertrand' && input.demand == 'aids'",
-                                               helpText(tags$b("Note:"), "aids does not require pricing information.")
                                              )
                                            ),
+
+
                                            mainPanel(
                                              h2("Enter Inputs"),
                                              rHandsontableOutput("hot"), br(),
@@ -152,19 +175,23 @@ shinyUI(navbarPage("",id = "menu",
 
                                        )
                               ),
+
+
                               tabPanel("Vertical",
                                        fluidPage(
                                          titlePanel("Simulate a Vertical Merger"),
                                          p(em("Coming Soon"))
                                          )),
+
+
                               tabPanel("Documentation",
                                        fluidPage(htmlOutput("referenceATR"))
                               ),
+
+
                               tabPanel("Numerical Simulations", style = "overflow-y:scroll; max-height: 90vh",
                                        fluidPage(
                                          titlePanel("Numerical Simulations"),
-
-
 
                                            mainPanel(
                                              tabsetPanel(

@@ -602,12 +602,6 @@ shinyServer(function(input, output, session) {
                                             ownerPost= ownerPost,
                                             insideSize = insideSize ,
                                             mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast),
-                              linear=linear(prices= prices,
-                                            quantities= indata[,"Output"],
-                                            margins= margins,
-                                            ownerPre= ownerPre,
-                                            ownerPost= ownerPost,
-                                            mcDelta = indata$mcDelta, labels=indata$Name),
                               pcaids=pcaids(prices= prices,
                                             shares= shares_revenue,
                                             knownElast = -1/margins[firstMargin],
@@ -914,9 +908,9 @@ shinyServer(function(input, output, session) {
         switch(supply,
                Bertrand =
                    switch(demand,
-                          `logit (unknown elasticity)`= logit.alm(prices= prices,
+                          `logit (unknown elasticity)` = logit.alm(prices= prices,
                                                                   shares= shares_quantity,
-                                                                  margins= margins,
+                                                                  margins= c(.5, .5, NA, NA),
                                                                   ownerPre= ownerPre,
                                                                   ownerPost= ownerPost,
                                                                   insideSize = insideSize ,
@@ -962,12 +956,6 @@ shinyServer(function(input, output, session) {
                                         ownerPost= ownerPost,
                                         insideSize = insideSize ,
                                         mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast),
-                          linear=linear(prices= prices,
-                                        quantities= indata[,"Output"],
-                                        margins= margins,
-                                        ownerPre= ownerPre,
-                                        ownerPost= ownerPost,
-                                        mcDelta = indata$mcDelta, labels=indata$Name),
                           pcaids=pcaids(prices= prices,
                                         shares= shares_revenue,
                                         knownElast = -1/margins[firstMargin],
@@ -995,14 +983,14 @@ shinyServer(function(input, output, session) {
                `2nd Score Auction`= switch(demand,
                                            `logit (unknown elasticity)` = auction2nd.logit.alm(prices= prices,
                                                                                                shares= shares_quantity,
-                                                                                               margins= margins,
+                                                                                               margins= c(5, 5, NA, NA),
                                                                                                ownerPre= ownerPre,
                                                                                                ownerPost= ownerPost,
                                                                                                insideSize = insideSize,
                                                                                                mcDelta = indata$mcDelta, labels=indata$Name),
                                            logit = auction2nd.logit.alm(prices= prices,
                                                                         shares= shares_quantity,
-                                                                        margins= margins,
+                                                                        margins= c(5, 5, NA, NA),
                                                                         ownerPre= ownerPre,
                                                                         ownerPost= ownerPost,
                                                                         insideSize = insideSize,
@@ -1018,11 +1006,11 @@ shinyServer(function(input, output, session) {
 
         if(grepl("%",input$outcomeSumATR)) ylimSumATR <- c(0,50)
         else{ylimSumATR <- c(0,350)}
-        ggplot(data = subset(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
-            geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
-            coord_cartesian(ylim = ylimSumATR)+
-            theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45 , hjust=1, size=11, face = "bold")) +  ylab(input$outcomeSumATR) +
-            ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR,"%"))
+        ggplot2::ggplot(data = subset(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
+          ggplot2::geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
+          ggplot2::coord_cartesian(ylim = ylimSumATR)+
+          ggplot2::theme_bw() + ggplot2::theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45 , hjust=1, size=11, face = "bold")) +  ylab(input$outcomeSumATR) +
+          ggplot2::ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR,"%"))
 
 
     })
@@ -1141,7 +1129,7 @@ shinyServer(function(input, output, session) {
 
 
 
-    ## initialize  inputData
+    ## initialize inputData
     observeEvent((input$menu == "Tariffs") | input$addRowsTariffs,{
 
         valuesTariffs[["inputData"]] <- genInputData(nrow = input$addRowsTariffs ,type = "Tariffs")}
@@ -1158,12 +1146,15 @@ shinyServer(function(input, output, session) {
     })
 
 
+
     ## update reactive list whenever changes are made to input
     observe({
         if (input$menu == "Merger"){
+            #provElast <- grepl('elasticity', input$calcElast)
             supply <- input$supply
-            demand <- gsub("\\s*(unknown elasticity)","",input$demand,perl=TRUE)
-            provElast <- grepl('elasticity',input$calcElast)
+            #demand <- gsub("\\s*(unknown elasticity)","",input$demand,perl=TRUE)
+            #demand <- gsub("( \\(unknown elasticity\\))", "", input$demand,perl=TRUE)
+            demand <- input$demand
         } else if (input$menu == "Quotas"){
             supply <- input$supplyQuota
             demand <- gsub("\\s*(unknown elasticity)","",input$demandQuota,perl=TRUE)
@@ -1174,7 +1165,7 @@ shinyServer(function(input, output, session) {
             provElast <- grepl('elasticity',input$calcElastTariffs)
         }
 
-
+        provElast <- grepl('elasticity', input$calcElast)
         defElast <- ifelse(provElast, 1 , 2)
 
         if(supply == 'Cournot'){
@@ -1188,20 +1179,31 @@ shinyServer(function(input, output, session) {
         }
 
         else{
+
             theseChoices <- c("market elasticity and 1 or more margins",
-                              "2 or more margins"
-            )
+                              "2 or more margins")
+
             updateRadioButtons(session = session, "calcElast", "Calibrate model parameters using:",
                                choices = theseChoices , selected = theseChoices[defElast])
 
-            if(supply == 'Bertrand' & input$menu != "Quotas"){demandChoices<- c('logit','ces','aids')}
-            else{demandChoices<- c('logit')}
 
-
+            if(supply == 'Bertrand' & input$menu != "Quotas" & provElast){
+              demandChoices <- c('logit','ces','aids')
+            } else if (supply == 'Bertrand' & input$menu != "Quotas" & !provElast) {
+              demandChoices <- paste(c('logit','ces','aids'), "(unknown elasticity)")
+              #input$enterElast <- NA
+            } else if (supply == '2nd Score Auction' & input$menu != "Quotas" & provElast) {
+              demandChoices <- "logit"
+            } else if (supply == '2nd Score Auction' & input$menu != "Quotas" & !provElast) {
+              demandChoices <- paste("logit", "(unknown elasticity)")
+              #input$enterElast <- NA
+            }
+            # if(supply == 'Bertrand' & input$menu != "Quotas"){demandChoices<- c('logit','ces','aids')}
+            # else{demandChoices<- c('logit')}
 
         }
 
-        if( !provElast ){ demandChoices <- paste(demandChoices,"(unknown elasticity)")}
+        #if( !provElast ){ demandChoices <- paste(demandChoices,"(unknown elasticity)")}
 
         if (input$menu == "Merger"){
             updateRadioButtons(session = session, "calcElast", "Calibrate model parameters using:",
@@ -1232,6 +1234,8 @@ shinyServer(function(input, output, session) {
                               choices = demandChoices, selected = demandChoices[provDemand])
         }
 
+        demand <<- input$demand
+        supply <<- input$supply
 
 
 
@@ -1407,10 +1411,11 @@ shinyServer(function(input, output, session) {
 
             indata$'Pre-merger\n Owner' <- factor(indata$'Pre-merger\n Owner',levels=unique(indata$'Pre-merger\n Owner') )
             indata$'Post-merger\n Owner' <- factor(indata$'Post-merger\n Owner',levels=unique(indata$'Post-merger\n Owner'))
-
+            print(c(input$supply, input$demand, input$enterElast))
             thisSim <- msgCatcher(
                 runSimsMergers(supply = input$supply,demand = input$demand, indata = indata, mktElast = input$enterElast )
             )
+            thisSim <<- thisSim
         }
 
 
