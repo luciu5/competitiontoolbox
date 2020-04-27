@@ -917,14 +917,14 @@ shinyServer(function(input, output, session) {
                                                                   mcDelta = indata$mcDelta, labels=indata$Name),
                           `aids (unknown elasticity)` = aids(prices= prices,
                                                              shares= shares_revenue,
-                                                             margins= margins,
+                                                             margins= c(.25, .25, .25, .25),
                                                              ownerPre= ownerPre,
                                                              ownerPost= ownerPost,
                                                              insideSize = insideSize ,
                                                              mcDelta = indata$mcDelta, labels=indata$Name),
                           `ces (unknown elasticity)`= ces.alm(prices= prices,
                                                               shares= shares_revenue,
-                                                              margins= margins,
+                                                              margins= c(.1, .1, .5, .5),
                                                               ownerPre= ownerPre,
                                                               ownerPost= ownerPost,
                                                               insideSize = insideSize ,
@@ -966,20 +966,50 @@ shinyServer(function(input, output, session) {
                                         ownerPost= ownerPost,
                                         mcDelta = indata$mcDelta, labels=indata$Name)
                    ),
-               Cournot =
-
-                   cournot(prices= prices[firstPrice],
-                           demand = gsub("\\s+\\(.*","",demand,perl=TRUE),
+               Cournot = switch(demand,
+                   linear = cournot(prices= prices[firstPrice],
+                           demand = rep("linear", nrow(indata)),
                            cost= rep("linear", nrow(indata)),
                            quantities = as.matrix(indata[,"Output"]),
                            margins= as.matrix(margins),
                            ownerPre= ownerPre,
                            ownerPost= ownerPost,
-                           mktElast = ifelse( grepl("unknown elasticity", demand),
-                                              NA_real_, mktElast),
+                           mktElast = mktElast,
                            mcDelta = indata$mcDelta,
-                           labels=list(as.character(indata$Name),indata$Name[firstPrice]))
-               ,
+                           labels=list(as.character(indata$Name),indata$Name[firstPrice])),
+                    log = cournot(prices= prices,
+                                  demand = rep("log", 4),
+                                  cost= rep("log", nrow(indata)),
+                                  quantities = as.matrix(indata[,"Output"]),
+                                  margins= as.matrix(margins),
+                                  ownerPre= ownerPre,
+                                  ownerPost= ownerPost,
+                                  mktElast = mktElast,
+                                  mcDelta = indata$mcDelta,
+                                  labels=list(as.character(indata$Name),indata$Name[firstPrice])),
+
+                   `linear (unknown elasticity)` = cournot(prices= prices,
+                                    demand = rep('linear', 4),
+                                    cost= rep("linear", nrow(indata)),
+                                    quantities = as.matrix(indata[,"Output"]),
+                                    margins= as.matrix(margins),
+                                    ownerPre= ownerPre,
+                                    ownerPost= ownerPost,
+                                    mktElast = NA_real_,
+                                    mcDelta = indata$mcDelta,
+                                    labels=list(as.character(indata$Name),indata$Name[firstPrice])),
+                   `log (unknown elasticity)` = cournot(prices= prices,
+                                 demand = rep('log', 4),
+                                 cost= rep("log", nrow(indata)),
+                                 quantities = as.matrix(indata[,"Output"]),
+                                 margins= as.matrix(margins),
+                                 ownerPre= ownerPre,
+                                 ownerPost= ownerPost,
+                                 mktElast = NA_real_,
+                                 mcDelta = indata$mcDelta,
+                                 labels=list(as.character(indata$Name),indata$Name[firstPrice]))
+                   ),
+
                `2nd Score Auction`= switch(demand,
                                            `logit (unknown elasticity)` = auction2nd.logit.alm(prices= prices,
                                                                                                shares= shares_quantity,
@@ -1141,101 +1171,131 @@ shinyServer(function(input, output, session) {
 
     })
 
-    observeEvent(input$menu == "Merger",{
+    #observeEvent(input$menu == "Merger",{
         values[["inputData"]] <- genInputDataMergers()
-    })
+    #})
 
 
 
     ## update reactive list whenever changes are made to input
+    # observeEvent(input$calcElast, {
+    #   if (input$menu == "Merger"){
+    #     parame
+    #   }
+    # })
+    ###########
     observe({
-        if (input$menu == "Merger"){
+        #if (input$menu == "Merger"){
             #provElast <- grepl('elasticity', input$calcElast)
             supply <- input$supply
             #demand <- gsub("\\s*(unknown elasticity)","",input$demand,perl=TRUE)
             #demand <- gsub("( \\(unknown elasticity\\))", "", input$demand,perl=TRUE)
-            demand <- input$demand
-        } else if (input$menu == "Quotas"){
-            supply <- input$supplyQuota
-            demand <- gsub("\\s*(unknown elasticity)","",input$demandQuota,perl=TRUE)
-            provElast <- grepl('elasticity',input$calcElastQuota)
-        } else {
-            supply <- input$supplyTariffs
-            demand <- gsub("\\s*(unknown elasticity)","",input$demandTariffs,perl=TRUE)
-            provElast <- grepl('elasticity',input$calcElastTariffs)
-        }
-
-        provElast <- grepl('elasticity', input$calcElast)
-        defElast <- ifelse(provElast, 1 , 2)
-
-        if(supply == 'Cournot'){
-            theseChoices <- c("market elasticity and 0 or more margins",
-                              "1 or more margins"
-            )
-
-
-            demandChoices<- c("linear","log")
-
-        }
-
-        else{
-
-            theseChoices <- c("market elasticity and 1 or more margins",
-                              "2 or more margins")
-
-            updateRadioButtons(session = session, "calcElast", "Calibrate model parameters using:",
-                               choices = theseChoices , selected = theseChoices[defElast])
-
-
-            if(supply == 'Bertrand' & input$menu != "Quotas" & provElast){
-              demandChoices <- c('logit','ces','aids')
-            } else if (supply == 'Bertrand' & input$menu != "Quotas" & !provElast) {
-              demandChoices <- paste(c('logit','ces','aids'), "(unknown elasticity)")
-              #input$enterElast <- NA
-            } else if (supply == '2nd Score Auction' & input$menu != "Quotas" & provElast) {
-              demandChoices <- "logit"
-            } else if (supply == '2nd Score Auction' & input$menu != "Quotas" & !provElast) {
-              demandChoices <- paste("logit", "(unknown elasticity)")
-              #input$enterElast <- NA
+            if (input$supply == "Bertrand" & grepl('elasticity', input$calcElast)){
+              demand <- input$demand1
             }
-            # if(supply == 'Bertrand' & input$menu != "Quotas"){demandChoices<- c('logit','ces','aids')}
-            # else{demandChoices<- c('logit')}
+            if (input$supply == "Bertrand" & !grepl('elasticity', input$calcElast)){
+              demand <- input$demand2
+            }
+            if (input$supply == "2nd Score Auction" & grepl('elasticity', input$calcElast)){
+              demand <- input$demand3
+            }
+            if (input$supply == "2nd Score Auction" & !grepl('elasticity', input$calcElast)){
+              demand <- input$demand4
+            }
+            if (input$supply == "Cournot" & grepl('elasticity', input$calcElast)){
+              demand <- input$demand5
+            }
+            if (input$supply == "Cournot" & !grepl('elasticity', input$calcElast)){
+              demand <- input$demand6
+            }
 
-        }
+        # } else if (input$menu == "Quotas"){
+        #     supply <- input$supplyQuota
+        #     demand <- gsub("\\s*(unknown elasticity)","",input$demandQuota,perl=TRUE)
+        #     provElast <- grepl('elasticity',input$calcElastQuota)
+        # } else {
+        #     supply <- input$supplyTariffs
+        #     demand <- gsub("\\s*(unknown elasticity)","",input$demandTariffs,perl=TRUE)
+        #     provElast <- grepl('elasticity',input$calcElastTariffs)
+        # }
 
-        #if( !provElast ){ demandChoices <- paste(demandChoices,"(unknown elasticity)")}
+        # provElast <- grepl('elasticity', input$calcElast)
+        # defElast <- ifelse(provElast, 1 , 2)
 
-        if (input$menu == "Merger"){
-            updateRadioButtons(session = session, "calcElast", "Calibrate model parameters using:",
-                               choices = theseChoices , selected = theseChoices[defElast])
+        # if(supply == 'Cournot'){
+        #     theseChoices <- c("market elasticity and 0 or more margins",
+        #                       "1 or more margins"
+        #     )
+        #
+        #
+        #     demandChoices<- c("linear","log")
+        #
+        # }
 
-            provDemand <- grep(demand, demandChoices)
-            provDemand <- ifelse(length(provDemand) > 0 , provDemand, 1)
+        #else{
 
-            updateSelectInput(session=session, "demand", "Demand Specification:",
-                              choices = demandChoices, selected = demandChoices[provDemand])
-        } else if (input$menu == "Quotas"){
-            updateRadioButtons(session = session, "calcElastQuota", "Calibrate model parameters using:",
-                               choices = theseChoices , selected = theseChoices[defElast])
+        # theseChoices <- c("market elasticity and 1 or more margins",
+        #                   "2 or more margins")
+        #
+        # updateRadioButtons(session = session, "calcElast", "Calibrate model parameters using:",
+        #                    choices = theseChoices , selected = theseChoices[defElast])
+        #
+        #
+        # if(supply == 'Bertrand' & input$menu != "Quotas" & provElast){
+        #   demandChoices <- c('logit','ces','aids')
+        # } else if (supply == 'Bertrand' & input$menu != "Quotas" & !provElast) {
+        #   demandChoices <- paste(c('logit','ces','aids'), "(unknown elasticity)")
+        #   #input$enterElast <- NA
+        # } else if (supply == '2nd Score Auction' & input$menu != "Quotas" & provElast) {
+        #   demandChoices <- "logit"
+        # } else if (supply == '2nd Score Auction' & input$menu != "Quotas" & !provElast) {
+        #   demandChoices <- paste("logit", "(unknown elasticity)")
+        #   #input$enterElast <- NA
+        # } else if (supply == 'Cournot' & input$menu != "Quotas" & provElast) {
+        #   demandChoices <- paste("linear", "log")
+        # } else if (supply == 'Cournot' & input$menu != "Quotas" & !provElast) {
+        #   demandChoices <- paste(c("linear", "log"), "(unknown elastcity")
+        # }
+        # # if(supply == 'Bertrand' & input$menu != "Quotas"){demandChoices<- c('logit','ces','aids')}
+        # # else{demandChoices<- c('logit')}
+        #
+        # #}
+        #
+        # #if( !provElast ){ demandChoices <- paste(demandChoices,"(unknown elasticity)")}
+        #
+        # if (input$menu == "Merger"){
+        #     updateRadioButtons(session = session, "calcElast", "Calibrate model parameters using:",
+        #                        choices = theseChoices , selected = theseChoices[defElast])
+        #
+        #     provDemand <- grep(demand, demandChoices)
+        #     provDemand <- ifelse(length(provDemand) > 0 , provDemand, 1)
+        #
+        #     updateSelectInput(session=session, "demand", "Demand Specification:",
+        #                       choices = demandChoices, selected = demandChoices[provDemand])
+        #
+        # } else if (input$menu == "Quotas"){
+        #     updateRadioButtons(session = session, "calcElastQuota", "Calibrate model parameters using:",
+        #                        choices = theseChoices , selected = theseChoices[defElast])
+        #
+        #     provDemand <- grep(demand, demandChoices)
+        #     provDemand <- ifelse(length(provDemand) > 0 , provDemand, 1)
+        #
+        #     updateSelectInput(session=session, "demandQuota", "Demand Specification:",
+        #                       choices = demandChoices, selected = demandChoices[provDemand])
+        # } else {
+        #     updateRadioButtons(session = session, "calcElastTariffs", "Calibrate model parameters using:",
+        #                        choices = theseChoices , selected = theseChoices[defElast])
+        #
+        #     provDemand <- grep(demand, demandChoices)
+        #     provDemand <- ifelse(length(provDemand) > 0 , provDemand, 1)
+        #
+        #     updateSelectInput(session=session, "demandTariffs", "Demand Specification:",
+        #                       choices = demandChoices, selected = demandChoices[provDemand])
+        # }
 
-            provDemand <- grep(demand, demandChoices)
-            provDemand <- ifelse(length(provDemand) > 0 , provDemand, 1)
 
-            updateSelectInput(session=session, "demandQuota", "Demand Specification:",
-                              choices = demandChoices, selected = demandChoices[provDemand])
-        } else {
-            updateRadioButtons(session = session, "calcElastTariffs", "Calibrate model parameters using:",
-                               choices = theseChoices , selected = theseChoices[defElast])
-
-            provDemand <- grep(demand, demandChoices)
-            provDemand <- ifelse(length(provDemand) > 0 , provDemand, 1)
-
-            updateSelectInput(session=session, "demandTariffs", "Demand Specification:",
-                              choices = demandChoices, selected = demandChoices[provDemand])
-        }
-
-        demand <<- input$demand
-        supply <<- input$supply
+        demand <<- demand
+        supply <<- supply
 
 
 
@@ -1252,6 +1312,8 @@ shinyServer(function(input, output, session) {
         }
 
         if(!is.null(input$hot)){
+            values[["inputData"]] <- genInputDataMergers()
+
             values$inputData = hot_to_r(input$hot)
             values$inputData[!is.na(values$inputData$Name) & values$inputData$Name != '',]
         }
@@ -1411,10 +1473,12 @@ shinyServer(function(input, output, session) {
 
             indata$'Pre-merger\n Owner' <- factor(indata$'Pre-merger\n Owner',levels=unique(indata$'Pre-merger\n Owner') )
             indata$'Post-merger\n Owner' <- factor(indata$'Post-merger\n Owner',levels=unique(indata$'Post-merger\n Owner'))
-            print(c(input$supply, input$demand, input$enterElast))
+            print(c(supply, demand, input$enterElast))
+
             thisSim <- msgCatcher(
-                runSimsMergers(supply = input$supply,demand = input$demand, indata = indata, mktElast = input$enterElast )
+                runSimsMergers(supply = supply, demand = demand, indata = indata, mktElast = input$enterElast )
             )
+
             thisSim <<- thisSim
         }
 

@@ -70,21 +70,27 @@ shinyUI(navbarPage("", id = "menu",
                                              ## Use conditionalPanel() to select appropriate demand forms for each pair of competitive environment and margin information
                                              conditionalPanel(
                                                condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == true",
-                                               selectInput("demand", "Demand Specification:",
+                                               selectInput("demand1", "Demand Specification:",
                                                            choices = c("logit", "ces", "aids"))
                                              ),
                                              conditionalPanel(
                                                condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == false",
-                                               selectInput("demand", "Demand Specification:",
+                                               selectInput("demand2", "Demand Specification:",
                                                            choices = c("logit (unknown elasticity)", "ces (unknown elasticity)", "aids (unknown elasticity)"))
                                              ),
                                              conditionalPanel(
                                                condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == true",
-                                               selectInput("demand", "Demand Specification:", choices = "logit")
+                                               selectInput("demand3", "Demand Specification:", choices = "logit")
                                              ),
                                              conditionalPanel(
                                                condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == false",
-                                               selectInput("demand", "Demand Specification:", choices = "logit (unknown elasticity)")
+                                               selectInput("demand4", "Demand Specification:", choices = "logit (unknown elasticity)")
+                                             ),conditionalPanel(
+                                               condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == true",
+                                               selectInput("demand5", "Demand Specification:", choices = c("linear", "log"))
+                                             ),conditionalPanel(
+                                               condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == false",
+                                               selectInput("demand6", "Demand Specification:", choices = c("linear (unknown elasticity)", "log (unknown elasticity)"))
                                              ),
                                              # conditionalPanel(
                                              #   condition = "input.supply == 'Cournot'",
@@ -145,7 +151,7 @@ shinyUI(navbarPage("", id = "menu",
                                                                   br(),
                                                                   tableOutput("results_mktelast"),br(),
                                                                   tableOutput("results_elast"),
-                                                                  conditionalPanel("input.supply !=='Cournot'",
+                                                                  conditionalPanel("input.supply != 'Cournot'",
                                                                                    checkboxInput("diversions", "Report diversion ratios", value =FALSE),
                                                                                    helpText(tags$b("Note:"), "diagonal elements are own-price elasticities.","Off-diagonal elements are the cross-price elasticities of row with respect to column.")
                                                                   ),
