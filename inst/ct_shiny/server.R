@@ -948,15 +948,15 @@ shinyServer(function(input, output, session) {
                                            ownerPre= ownerPre,
                                            ownerPost= ownerPost,
                                            insideSize = insideSize ,
-                                           mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast ),
+                                           mcDelta = indata$mcDelta, labels=indata$Name, mktElast = mktElast),
                           ces = ces.alm(prices= prices,
                                         shares= shares_revenue,
                                         margins= margins,
                                         ownerPre= ownerPre,
                                         ownerPost= ownerPost,
                                         insideSize = insideSize ,
-                                        mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast),
-                          pcaids=pcaids(prices= prices,
+                                        mcDelta = indata$mcDelta, labels=indata$Name, mktElast = mktElast),
+                        pcaids = pcaids(prices= prices,
                                         shares= shares_revenue,
                                         knownElast = -1/margins[firstMargin],
                                         knownElastIndex = firstMargin,
@@ -967,16 +967,16 @@ shinyServer(function(input, output, session) {
                                         mcDelta = indata$mcDelta, labels=indata$Name)
                    ),
                Cournot = switch(demand,
-                   linear = cournot(prices= prices[firstPrice],
-                           demand = rep("linear", nrow(indata)),
-                           cost= rep("linear", nrow(indata)),
-                           quantities = as.matrix(indata[,"Output"]),
-                           margins= as.matrix(margins),
-                           ownerPre= ownerPre,
-                           ownerPost= ownerPost,
-                           mktElast = mktElast,
-                           mcDelta = indata$mcDelta,
-                           labels=list(as.character(indata$Name),indata$Name[firstPrice])),
+                   linear = cournot(prices = prices[firstPrice],
+                                    demand = rep("linear", nrow(indata)),
+                                    cost= rep("linear", nrow(indata)),
+                                    quantities = as.matrix(indata[,"Output"]),
+                                    margins= as.matrix(margins),
+                                    ownerPre= ownerPre,
+                                    ownerPost= ownerPost,
+                                    mktElast = mktElast,
+                                    mcDelta = indata$mcDelta,
+                                    labels=list(as.character(indata$Name),indata$Name[firstPrice])),
                     log = cournot(prices= prices,
                                   demand = rep("log", 4),
                                   cost= rep("log", nrow(indata)),
@@ -989,7 +989,7 @@ shinyServer(function(input, output, session) {
                                   labels=list(as.character(indata$Name),indata$Name[firstPrice])),
 
                    `linear (unknown elasticity)` = cournot(prices= prices,
-                                    demand = rep('linear', 4),
+                                    demand = rep('linear', nrow(indata)),
                                     cost= rep("linear", nrow(indata)),
                                     quantities = as.matrix(indata[,"Output"]),
                                     margins= as.matrix(margins),
@@ -999,7 +999,7 @@ shinyServer(function(input, output, session) {
                                     mcDelta = indata$mcDelta,
                                     labels=list(as.character(indata$Name),indata$Name[firstPrice])),
                    `log (unknown elasticity)` = cournot(prices= prices,
-                                 demand = rep('log', 4),
+                                 demand = rep('log', nrow(indata)),
                                  cost= rep("log", nrow(indata)),
                                  quantities = as.matrix(indata[,"Output"]),
                                  margins= as.matrix(margins),
@@ -1036,24 +1036,26 @@ shinyServer(function(input, output, session) {
 
         if(grepl("%",input$outcomeSumATR)) ylimSumATR <- c(0,50)
         else{ylimSumATR <- c(0,350)}
-        ggplot2::ggplot(data = subset(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
+        ggplot2::ggplot(data = subset(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), ggplot2::aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
           ggplot2::geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
           ggplot2::coord_cartesian(ylim = ylimSumATR)+
-          ggplot2::theme_bw() + ggplot2::theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45 , hjust=1, size=11, face = "bold")) +  ylab(input$outcomeSumATR) +
+          ggplot2::theme_bw() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 16, face = "bold"), axis.title=ggplot2::element_text(size=13), axis.text.x  = ggplot2::element_text(angle =45 , hjust=1, size=11, face = "bold")) +
+          ggplot2::ylab(input$outcomeSumATR) +
           ggplot2::ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR,"%"))
-
-
     })
 
     # Creates the graph for the Indice tab of Numerical Simulations (ATR)
     output$plotIndATR <- renderPlot({
 
-        plotInd <- ggplot(subset(indicboxdata, Cut_type == input$indexIndATR & Supply == "Pooled" & shareOutThresh == input$shareOutIndATR),
-                          aes(x=Cut_value,ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk)) + geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
-            coord_cartesian(ylim = c(0,30)) + theme_bw() + xlab(input$indexIndATR) +  ylab("Industry Price Change (%)") +
-            theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.text.y  = element_text(size=11), axis.title=element_text(size=13), axis.text.x  = element_text(angle =45,hjust=1,size=12))+   geom_hline(yintercept=0, col="#d95f02",linetype="dashed") +
-            geom_hline(yintercept=c(1,5,10),linetype="dashed") +
-            ggtitle(paste0(input$indexIndATR,", Outside Share Less Than ",input$shareOutIndATR,"% (",input$pooledIndATR,")"))
+        plotInd <- ggplot2::ggplot(subset(indicboxdata, Cut_type == input$indexIndATR & Supply == "Pooled" & shareOutThresh == input$shareOutIndATR),
+                          ggplot2::aes(x=Cut_value,ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk)) +
+            ggplot2::geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
+            ggplot2::coord_cartesian(ylim = c(0,30)) + ggplot2::theme_bw() +
+            ggplot2::xlab(input$indexIndATR) + ggplot2::ylab("Industry Price Change (%)") +
+            ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 16, face = "bold"), axis.text.y = ggplot2::element_text(size=11), axis.title = ggplot2::element_text(size=13), axis.text.x = ggplot2::element_text(angle = 45,hjust = 1, size = 12)) +
+            ggplot2::geom_hline(yintercept=0, col = "#d95f02",linetype = "dashed") +
+            ggplot2::geom_hline(yintercept=c(1,5,10),linetype="dashed") +
+            ggplot2::ggtitle(paste0(input$indexIndATR,", Outside Share Less Than ",input$shareOutIndATR,"% (",input$pooledIndATR,")"))
 
         plot(plotInd)
 
@@ -1120,7 +1122,7 @@ shinyServer(function(input, output, session) {
     output$referenceATR <-
         renderUI({
             tags$iframe(id = "referenceATR",
-                        src = get_vignette_link("Reference",package="antitrust"),
+                        src = get_vignette_link("Reference", package = "antitrust"),
                         width = "100%",
                         height = 768,
                         frameborder = 0,
@@ -1131,7 +1133,7 @@ shinyServer(function(input, output, session) {
     output$referenceTrade <-
         renderUI({
             tags$iframe(id = "referenceTrade",
-                        src = get_vignette_link("Reference",package="trade"),
+                        src = get_vignette_link("Reference", package = "trade"),
                         width = "100%",
                         height = 768,
                         frameborder = 0,
@@ -1185,11 +1187,13 @@ shinyServer(function(input, output, session) {
     # })
     ###########
     observe({
-        #if (input$menu == "Merger"){
+        if (req(input$menu) == "Horizontal"){
+
             #provElast <- grepl('elasticity', input$calcElast)
             supply <- input$supply
             #demand <- gsub("\\s*(unknown elasticity)","",input$demand,perl=TRUE)
             #demand <- gsub("( \\(unknown elasticity\\))", "", input$demand,perl=TRUE)
+
             if (input$supply == "Bertrand" & grepl('elasticity', input$calcElast)){
               demand <- input$demand1
             }
@@ -1207,6 +1211,13 @@ shinyServer(function(input, output, session) {
             }
             if (input$supply == "Cournot" & !grepl('elasticity', input$calcElast)){
               demand <- input$demand6
+            }}
+
+
+            if (grepl('elasticity', input$calcElast)){
+              elasticity <- input$enterElast
+            } else {
+              elasticity <- NA_real_
             }
 
         # } else if (input$menu == "Quotas"){
@@ -1293,10 +1304,10 @@ shinyServer(function(input, output, session) {
         #                       choices = demandChoices, selected = demandChoices[provDemand])
         # }
 
-
+        ## Export competitive interaction, demand form, and supplied market elasticity to the global environment
         demand <<- demand
         supply <<- supply
-
+        elasticity <<- elasticity
 
 
         if(!is.null(input$hotTariffs)){
@@ -1409,24 +1420,25 @@ shinyServer(function(input, output, session) {
 
 
     ## simulate merger when the "simulate" button is clicked
-    observeEvent(input$simulateTariffs | input$simulateQuota | input$simulate,{
-
+    observeEvent(input$simulateTariffs | input$simulateQuota | input$simulate, {
 
         if(input$menu == "Tariffs"){
+
             valuesTariffs[["sim"]] <- valuesTariffs[["msg"]] <-  NULL
             updateTabsetPanel(session,inputId  = "inTabsetTariffs", selected = "respanelTariffs")
             indata <- valuesTariffs[["inputData"]]
+
         }
         else if (input$menu == "Quotas"){
 
             valuesQuota[["sim"]] <- valuesQuota[["msg"]] <-  NULL
             updateTabsetPanel(session,inputId  = "inTabsetQuota", selected = "respanelQuota")
             indata <-   valuesQuota[["inputData"]]
+
         } else{
+
             values[["sim"]] <- values[["msg"]] <-  NULL
-
             updateTabsetPanel(session,inputId  = "inTabset", selected = "respanel")
-
             indata <- values[["inputData"]]
         }
 
@@ -1452,34 +1464,53 @@ shinyServer(function(input, output, session) {
             indata$mcDelta <-  indata$mcDelta/(1 - tariffPost)
         }
 
-        if (input$menu == "Tariffs"){
-            indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner) )
+        ##### IMPORTANT!!: The two if/else if blocks below can be factored out to modulated scripts
+        if (req(input$menu) == "Tariffs") {
+            indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
+
+            ## Very useful, output the three information types for the merger simulation
+            print(c(input$supplyTariffs, input$demandTariffs))
+
             thisSim <- msgCatcher(
+
                 runSims(supply = input$supplyTariffs,demand = input$demandTariffs,
                         indata = indata, mktElast = input$enterElastTariffs,
                         type = input$menu)
-            )
-        } else if (input$menu == "Quotas"){
-            indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner) )
+
+                )
+        } else if (input$menu == "Quotas") {
+            indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
+
+            ## Very useful, output the three information types for the merger simulation
+            print(c(input$supplyQuota, input$demandQuota))
+
             thisSim <- msgCatcher(
+
                 runSims(supply = input$supplyQuota,demand = input$demandQuota,
                         indata = indata, mktElast = input$enterElastQuota,
-                        type = input$menu))
-        }
-        else{
+                        type = input$menu)
+
+                )
+        #####
+        } else {
 
             indata$mcDelta <- indata[,grep('Cost Changes',colnames(indata))]
             indata$mcDelta[is.na(indata$mcDelta)] <- 0
 
             indata$'Pre-merger\n Owner' <- factor(indata$'Pre-merger\n Owner',levels=unique(indata$'Pre-merger\n Owner') )
             indata$'Post-merger\n Owner' <- factor(indata$'Post-merger\n Owner',levels=unique(indata$'Post-merger\n Owner'))
-            print(c(supply, demand, input$enterElast))
+
+            ## Very useful, output the three information types for the merger simulation
+            print(c(supply, demand, as.character(elasticity)))
 
             thisSim <- msgCatcher(
-                runSimsMergers(supply = supply, demand = demand, indata = indata, mktElast = input$enterElast )
-            )
 
-            thisSim <<- thisSim
+                # Run merger simulation
+                runSimsMergers(supply = supply, demand = demand, indata = indata, mktElast = elasticity)
+
+                )
+
+            thisSim <<- thisSim  # Delete later...
         }
 
 
