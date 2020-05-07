@@ -1173,9 +1173,9 @@ shinyServer(function(input, output, session) {
 
     })
 
-    #observeEvent(input$menu == "Merger",{
+    observeEvent(input$menu == "Merger",{
         values[["inputData"]] <- genInputDataMergers()
-    #})
+    })
 
 
 
@@ -1211,7 +1211,10 @@ shinyServer(function(input, output, session) {
             }
             if (input$supply == "Cournot" & !grepl('elasticity', input$calcElast)){
               demand <- input$demand6
-            }}
+            }
+
+            demand <<- demand
+            supply <<- supply
 
 
             if (grepl('elasticity', input$calcElast)){
@@ -1219,6 +1222,10 @@ shinyServer(function(input, output, session) {
             } else {
               elasticity <- NA_real_
             }
+
+            elasticity <<- elasticity
+
+        }
 
         # } else if (input$menu == "Quotas"){
         #     supply <- input$supplyQuota
@@ -1305,9 +1312,7 @@ shinyServer(function(input, output, session) {
         # }
 
         ## Export competitive interaction, demand form, and supplied market elasticity to the global environment
-        demand <<- demand
-        supply <<- supply
-        elasticity <<- elasticity
+
 
 
         if(!is.null(input$hotTariffs)){
@@ -1501,7 +1506,9 @@ shinyServer(function(input, output, session) {
             indata$'Post-merger\n Owner' <- factor(indata$'Post-merger\n Owner',levels=unique(indata$'Post-merger\n Owner'))
 
             ## Very useful, output the three information types for the merger simulation
-            print(c(supply, demand, as.character(elasticity)))
+            if(exists("supply") & exists("demand") & exists("elasticity")){
+              print(c(supply, demand, as.character(elasticity)))
+            }
 
             thisSim <- msgCatcher(
 
