@@ -1177,7 +1177,50 @@ shinyServer(function(input, output, session) {
         values[["inputData"]] <- genInputDataMergers()
     })
 
+    demand <- reactive({
 
+      if (req(input$menu) == "Horizontal"){
+
+        if (input$supply == "Bertrand" & grepl('elasticity', input$calcElast)){
+          return(input$demand1)
+        }
+        if (input$supply == "Bertrand" & !grepl('elasticity', input$calcElast)){
+          return(input$demand2)
+        }
+        if (input$supply == "2nd Score Auction" & grepl('elasticity', input$calcElast)){
+          return(input$demand3)
+        }
+        if (input$supply == "2nd Score Auction" & !grepl('elasticity', input$calcElast)){
+          return(input$demand4)
+        }
+        if (input$supply == "Cournot" & grepl('elasticity', input$calcElast)){
+          return(input$demand5)
+        }
+        if (input$supply == "Cournot" & !grepl('elasticity', input$calcElast)){
+          return(input$demand6)
+        }
+      }
+    })
+
+    ## Do same thing for supply and elasticity
+    supply <- reactive({
+
+      if (req(input$menu) == "Horizontal"){
+        return(input$supply)
+      }
+    })
+
+    elasticity <- reactive({
+
+      if (req(input$menu) == "Horizontal"){
+
+        if (grepl('elasticity', input$calcElast)){
+          return(input$enterElast)
+        } else {
+          return(NA_real_)
+        }
+      }
+    })
 
     ## update reactive list whenever changes are made to input
     # observeEvent(input$calcElast, {
@@ -1188,44 +1231,12 @@ shinyServer(function(input, output, session) {
     ###########
     observe({
         if (req(input$menu) == "Horizontal"){
-
-            #provElast <- grepl('elasticity', input$calcElast)
-            supply <- input$supply
-            #demand <- gsub("\\s*(unknown elasticity)","",input$demand,perl=TRUE)
-            #demand <- gsub("( \\(unknown elasticity\\))", "", input$demand,perl=TRUE)
-
-            if (input$supply == "Bertrand" & grepl('elasticity', input$calcElast)){
-              demand <- input$demand1
-            }
-            if (input$supply == "Bertrand" & !grepl('elasticity', input$calcElast)){
-              demand <- input$demand2
-            }
-            if (input$supply == "2nd Score Auction" & grepl('elasticity', input$calcElast)){
-              demand <- input$demand3
-            }
-            if (input$supply == "2nd Score Auction" & !grepl('elasticity', input$calcElast)){
-              demand <- input$demand4
-            }
-            if (input$supply == "Cournot" & grepl('elasticity', input$calcElast)){
-              demand <- input$demand5
-            }
-            if (input$supply == "Cournot" & !grepl('elasticity', input$calcElast)){
-              demand <- input$demand6
-            }
-
-            demand <<- demand
-            supply <<- supply
-
-
-            if (grepl('elasticity', input$calcElast)){
-              elasticity <- input$enterElast
-            } else {
-              elasticity <- NA_real_
-            }
-
-            elasticity <<- elasticity
-
         }
+
+        #provElast <- grepl('elasticity', input$calcElast)
+        #demand <- gsub("\\s*(unknown elasticity)","",input$demand,perl=TRUE)
+        #demand <- gsub("( \\(unknown elasticity\\))", "", input$demand,perl=TRUE)
+
 
         # } else if (input$menu == "Quotas"){
         #     supply <- input$supplyQuota
@@ -1310,8 +1321,6 @@ shinyServer(function(input, output, session) {
         #     updateSelectInput(session=session, "demandTariffs", "Demand Specification:",
         #                       choices = demandChoices, selected = demandChoices[provDemand])
         # }
-
-        ## Export competitive interaction, demand form, and supplied market elasticity to the global environment
 
 
 
@@ -1507,13 +1516,13 @@ shinyServer(function(input, output, session) {
 
             ## Very useful, output the three information types for the merger simulation
             if(exists("supply") & exists("demand") & exists("elasticity")){
-              print(c(supply, demand, as.character(elasticity)))
+              print(c(supply(), demand(), as.character(elasticity())))
             }
 
             thisSim <- msgCatcher(
 
                 # Run merger simulation
-                runSimsMergers(supply = supply, demand = demand, indata = indata, mktElast = elasticity)
+                runSimsMergers(supply = supply(), demand = demand(), indata = indata, mktElast = elasticity())
 
                 )
 

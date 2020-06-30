@@ -7,7 +7,7 @@ logo <- HTML(paste(tags$a(href=logoURL, tags$img(src= logoSrc,alt= logoAlt,style
 
 
 navbarPage("", id = "menu",
-                   tabPanel("Introduction", value = "Introduction",
+                   tabPanel("Introduction",
                             fluidPage(
                               titlePanel("Introduction"),
                               HTML("<ul>
