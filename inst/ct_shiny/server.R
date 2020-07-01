@@ -612,19 +612,27 @@ shinyServer(function(input, output, session) {
                                             ownerPost= ownerPost,
                                             mcDelta = indata$mcDelta, labels=indata$Name)
                        ),
-                   Cournot =
-
-                       cournot(prices= prices[firstPrice],
-                               demand = gsub("\\s+\\(.*","",demand,perl=TRUE),
-                               cost= rep("linear", nrow(indata)),
-                               quantities = as.matrix(indata[,"Output"]),
-                               margins= as.matrix(margins),
-                               ownerPre= ownerPre,
-                               ownerPost= ownerPost,
-                               mktElast = ifelse( grepl("unknown elasticity", demand),
-                                                  NA_real_, mktElast),
-                               mcDelta = indata$mcDelta,
-                               labels=list(as.character(indata$Name),indata$Name[firstPrice]))
+                   Cournot = switch(demand,
+                     linear = cournot(prices = prices[firstPrice],
+                                      demand = rep("linear", nrow(indata)),
+                                      cost= rep("linear", nrow(indata)),
+                                      quantities = as.matrix(indata[,"Output"]),
+                                      margins= as.matrix(margins),
+                                      ownerPre= ownerPre,
+                                      ownerPost= ownerPost,
+                                      mktElast = mktElast,
+                                      mcDelta = indata$mcDelta,
+                                      labels=list(as.character(indata$Name),indata$Name[firstPrice])),
+                   log = cournot(prices= prices,
+                                 demand = rep("log", 4),
+                                 cost= rep("log", nrow(indata)),
+                                 quantities = as.matrix(indata[,"Output"]),
+                                 margins= as.matrix(margins),
+                                 ownerPre= ownerPre,
+                                 ownerPost= ownerPost,
+                                 mktElast = mktElast,
+                                 mcDelta = indata$mcDelta,
+                                 labels=list(as.character(indata$Name),indata$Name[firstPrice])))
                    ,
                    `2nd Score Auction`= switch(demand,
                                                `logit (unknown elasticity)` = auction2nd.logit.alm(prices= prices,
@@ -1483,7 +1491,7 @@ shinyServer(function(input, output, session) {
             indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
 
             ## Very useful, output the three information types for the merger simulation
-            print(c(input$supplyTariffs, input$demandTariffs))
+            print(c(input$supplyTariffs, input$demandTariffs, as.character(input$enterElastTariffs)))
 
             thisSim <- msgCatcher(
 

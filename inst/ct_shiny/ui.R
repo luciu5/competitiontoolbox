@@ -217,7 +217,7 @@ navbarPage("", id = "menu",
                                                               #                    selected = "Bertrand ces"),
                                                               selectInput("outcomeSumATR", "Outcomes to Report:",
                                                                           choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
+                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30,min = 10, max = 60, step = 5),
                                                               fluidRow(
                                                                 column(width=12, align = "center",
                                                                        tags$div(
@@ -327,10 +327,34 @@ navbarPage("", id = "menu",
                                                                                   "Cournot"
                                                                       )),
 
-                                                         selectInput("demandTariffs", "Demand Specification:",
-                                                                     choices = c("logit", "ces",
-                                                                                 #"linear",
-                                                                                 "aids")),
+                                                         # selectInput("demandTariffs", "Demand Specification:",
+                                                         #             choices = c("logit", "ces",
+                                                         #                         #"linear",
+                                                         #                         "aids")),
+                                                         ## Use conditionalPanel() to select appropriate demand forms for each unique pair of competitive interaction and margin information
+                                                         # Bertrand
+                                                         conditionalPanel(
+                                                           condition = "input.supplyTariffs == 'Bertrand' & input.calcElastTariffs.includes('elasticity') == true",
+                                                           selectInput("demandTariffs", "Demand Specification:",
+                                                                       choices = c("logit", "ces", "aids"))
+                                                         ),
+                                                         conditionalPanel(
+                                                           condition = "input.supplyTariffs == 'Bertrand' & input.calcElastTariffs.includes('elasticity') == false",
+                                                           selectInput("demandTariffs2", "Demand Specification:",
+                                                                       choices = c("logit (unknown elasticity)", "ces (unknown elasticity)", "aids (unknown elasticity)"))
+                                                         ),
+                                                         # Cournot
+                                                         conditionalPanel(
+                                                           condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == true",
+                                                           selectInput("demandTariffs3", "Demand Specification:",
+                                                                       choices = c("linear", "log")),
+                                                           helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
+                                                         ),conditionalPanel(
+                                                           condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == false",
+                                                           selectInput("demandTariffs4", "Demand Specification:",
+                                                                       choices = c("linear (unknown elasticity)", "log (unknown elasticity)")),
+                                                           helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
+                                                         ),
                                                          hr(),
                                                          fluidRow(
                                                            column(width=12, align = "center",
