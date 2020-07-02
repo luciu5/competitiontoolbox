@@ -78,7 +78,7 @@ shinyServer(function(input, output, session) {
         res
     }
 
-
+    ##### This function is just the "Tariffs"/"Quotas" version of genInputDataMergers for "Horizontal". This entire thing needs to be desperately refactored...
     genInputData <- function(nrows,type = c("Tariffs","Quotas")){
         # a function to generate default input data set for simulations
 
@@ -547,7 +547,23 @@ shinyServer(function(input, output, session) {
             ownerPre =ownerPre*(1-tariffPre)
         }
 
+        ## Cournot
+        # Quantities
+        quantities <- matrix(NA, nrow = length(unique(indata[[2]])), ncol = length(prices))
+        for (row in 1:nrow(indata)){
+          quantities[as.integer(gsub("\\D", "", as.character(indata[row, 2]))), as.integer(gsub("\\D", "", as.character(indata[row, 1])))] <- indata[row, 'Output']
+        }
 
+        # Margins
+        marginsCournot <- matrix(NA, nrow = length(unique(indata[[2]])), ncol = length(prices))
+        for (row in 1:nrow(indata)){
+          marginsCournot[as.integer(gsub("\\D", "", as.character(indata[row, 2]))), as.integer(gsub("\\D", "", as.character(indata[row, 1])))] <- indata[row, 'Margins']
+        }
+
+        # Ownership matrices
+        ownerPreCournot <- diag(length(unique(indata[[2]])))
+        ownerPostCournot <- ownerPreCournot
+        ownerPostCournot[1,2] <- ownerPostCournot[2,1] <- 1
 
 
         if( type == "Tariffs"){
@@ -594,7 +610,7 @@ shinyServer(function(input, output, session) {
                                                ownerPre= ownerPre,
                                                ownerPost= ownerPost,
                                                insideSize = insideSize ,
-                                               mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast ),
+                                               mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast),
                               ces = ces.alm(prices= prices,
                                             shares= shares_revenue,
                                             margins= margins,
@@ -613,26 +629,47 @@ shinyServer(function(input, output, session) {
                                             mcDelta = indata$mcDelta, labels=indata$Name)
                        ),
                    Cournot = switch(demand,
-                     linear = cournot(prices = prices[firstPrice],
-                                      demand = rep("linear", nrow(indata)),
-                                      cost= rep("linear", nrow(indata)),
-                                      quantities = as.matrix(indata[,"Output"]),
-                                      margins= as.matrix(margins),
-                                      ownerPre= ownerPre,
-                                      ownerPost= ownerPost,
-                                      mktElast = mktElast,
-                                      mcDelta = indata$mcDelta,
-                                      labels=list(as.character(indata$Name),indata$Name[firstPrice])),
-                   log = cournot(prices= prices,
-                                 demand = rep("log", 4),
-                                 cost= rep("log", nrow(indata)),
-                                 quantities = as.matrix(indata[,"Output"]),
-                                 margins= as.matrix(margins),
-                                 ownerPre= ownerPre,
-                                 ownerPost= ownerPost,
-                                 mktElast = mktElast,
-                                 mcDelta = indata$mcDelta,
-                                 labels=list(as.character(indata$Name),indata$Name[firstPrice])))
+                                    linear = cournot(prices = prices,
+                                                     demand = rep("linear", length(prices)),
+                                                     #cost= rep("linear", nrow(indata)),
+                                                     quantities = quantities,
+                                                     margins= marginsCournot,
+                                                     ownerPre= ownerPreCournot,
+                                                     ownerPost= ownerPostCournot,
+                                                     mktElast = mktElast,
+                                                     #mcDelta = indata$mcDelta,
+                                                     labels=list(sort(unique(indata[[2]])),indata$Name)),
+                                    loglinear = cournot(prices = prices,
+                                                        demand = rep("log", length(prices)),
+                                                        #cost= rep("linear", nrow(indata)),
+                                                        quantities = quantities,
+                                                        margins= marginsCournot,
+                                                        ownerPre= ownerPreCournot,
+                                                        ownerPost= ownerPostCournot,
+                                                        mktElast = mktElast,
+                                                        #mcDelta = indata$mcDelta,
+                                                        labels=list(sort(unique(indata[[2]])),indata$Name)),
+                                    `linear (unknown elasticity)` = cournot(prices = prices,
+                                                                            demand = rep("linear", length(prices)),
+                                                                            #cost= rep("linear", nrow(indata)),
+                                                                            quantities = quantities,
+                                                                            margins= marginsCournot,
+                                                                            ownerPre= ownerPreCournot,
+                                                                            ownerPost= ownerPostCournot,
+                                                                            mktElast = NA_real_,
+                                                                            #mcDelta = indata$mcDelta,
+                                                                            labels=list(sort(unique(indata[[2]])),indata$Name)),
+                                    `loglinear (unknown elasticity)` = cournot(prices = prices,
+                                                                               demand = rep("log", length(prices)),
+                                                                               #cost= rep("linear", nrow(indata)),
+                                                                               quantities = quantities,
+                                                                               margins= marginsCournot,
+                                                                               ownerPre= ownerPreCournot,
+                                                                               ownerPost= ownerPostCournot,
+                                                                               mktElast = NA_real_,
+                                                                               #mcDelta = indata$mcDelta,
+                                                                               labels=list(sort(unique(indata[[2]])),indata$Name))
+                   )
                    ,
                    `2nd Score Auction`= switch(demand,
                                                `logit (unknown elasticity)` = auction2nd.logit.alm(prices= prices,
@@ -706,8 +743,8 @@ shinyServer(function(input, output, session) {
             'Pre-merger\n Owner'  = c("Firm1","Firm2","Firm3","Firm3"),
             'Post-merger\n Owner' = c("Firm1","Firm1","Firm3","Firm3"),
             'Prices \n($/unit)'    = rep(10,4),
-            'Quantities'   =c(0.4,.3,.2,.1)*100,
-            'Margins\n(p-c)/p' =c(0.5,NA,NA,NA),
+            'Quantities'   = c(0.4,.3,.2,.1)*100,
+            'Margins\n(p-c)/p' = c(0.5,NA,NA,NA),
             'Post-merger\n Cost Changes\n(Proportion)' = rep(0,4),
             stringsAsFactors = FALSE,
             check.names=FALSE
@@ -750,7 +787,9 @@ shinyServer(function(input, output, session) {
 
             capture.output( s <- summary(res, market = FALSE))
             theseshares <- drop(res@quantities/sum(res@quantities))
-
+            #####
+            # Fix HHI share calculations for Cournot results! (talk to Charles to confirm...)
+            print(res@quantities)
             totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
             s$sharesPost <- s$quantityPost/totQuantPost*100
 
@@ -910,7 +949,23 @@ shinyServer(function(input, output, session) {
         }
         else{ownerPost <- matrix(1, ncol=length(indata$Output), nrow = length(indata$Output))}
 
+        ## Cournot
+        # Quantities
+        quantities <- matrix(NA, nrow = length(unique(indata[[2]])), ncol = length(prices))
+        for (row in 1:nrow(indata)){
+          quantities[as.integer(gsub("\\D", "", as.character(indata[row, 2]))), as.integer(gsub("\\D", "", as.character(indata[row, 1])))] <- indata[row, 'Output']
+        }
 
+        # Margins
+        marginsCournot <- matrix(NA, nrow = length(unique(indata[[2]])), ncol = length(prices))
+        for (row in 1:nrow(indata)){
+          marginsCournot[as.integer(gsub("\\D", "", as.character(indata[row, 2]))), as.integer(gsub("\\D", "", as.character(indata[row, 1])))] <- indata[row, 'Margins']
+        }
+
+        # Ownership matrices
+        ownerPreCournot <- diag(length(unique(indata[[2]])))
+        ownerPostCournot <- ownerPreCournot
+        ownerPostCournot[1,2] <- ownerPostCournot[2,1] <- 1
 
 
         switch(supply,
@@ -975,47 +1030,46 @@ shinyServer(function(input, output, session) {
                                         mcDelta = indata$mcDelta, labels=indata$Name)
                    ),
                Cournot = switch(demand,
-                   linear = cournot(prices = prices[firstPrice],
-                                    demand = rep("linear", nrow(indata)),
-                                    cost= rep("linear", nrow(indata)),
-                                    quantities = as.matrix(indata[,"Output"]),
-                                    margins= as.matrix(margins),
-                                    ownerPre= ownerPre,
-                                    ownerPost= ownerPost,
+                   linear = cournot(prices = prices,
+                                    demand = rep("linear", length(prices)),
+                                    #cost= rep("linear", nrow(indata)),
+                                    quantities = quantities,
+                                    margins= marginsCournot,
+                                    ownerPre= ownerPreCournot,
+                                    ownerPost= ownerPostCournot,
                                     mktElast = mktElast,
-                                    mcDelta = indata$mcDelta,
-                                    labels=list(as.character(indata$Name),indata$Name[firstPrice])),
-                    log = cournot(prices= prices,
-                                  demand = rep("log", 4),
-                                  cost= rep("log", nrow(indata)),
-                                  quantities = as.matrix(indata[,"Output"]),
-                                  margins= as.matrix(margins),
-                                  ownerPre= ownerPre,
-                                  ownerPost= ownerPost,
-                                  mktElast = mktElast,
-                                  mcDelta = indata$mcDelta,
-                                  labels=list(as.character(indata$Name),indata$Name[firstPrice])),
-
-                   `linear (unknown elasticity)` = cournot(prices= prices,
-                                    demand = rep('linear', nrow(indata)),
-                                    cost= rep("linear", nrow(indata)),
-                                    quantities = as.matrix(indata[,"Output"]),
-                                    margins= as.matrix(margins),
-                                    ownerPre= ownerPre,
-                                    ownerPost= ownerPost,
-                                    mktElast = NA_real_,
-                                    mcDelta = indata$mcDelta,
-                                    labels=list(as.character(indata$Name),indata$Name[firstPrice])),
-                   `log (unknown elasticity)` = cournot(prices= prices,
-                                 demand = rep('log', nrow(indata)),
-                                 cost= rep("log", nrow(indata)),
-                                 quantities = as.matrix(indata[,"Output"]),
-                                 margins= as.matrix(margins),
-                                 ownerPre= ownerPre,
-                                 ownerPost= ownerPost,
-                                 mktElast = NA_real_,
-                                 mcDelta = indata$mcDelta,
-                                 labels=list(as.character(indata$Name),indata$Name[firstPrice]))
+                                    #mcDelta = indata$mcDelta,
+                                    labels=list(sort(unique(indata[[2]])),indata$Name)),
+                    loglinear = cournot(prices = prices,
+                                        demand = rep("log", length(prices)),
+                                        #cost= rep("linear", nrow(indata)),
+                                        quantities = quantities,
+                                        margins= marginsCournot,
+                                        ownerPre= ownerPreCournot,
+                                        ownerPost= ownerPostCournot,
+                                        mktElast = mktElast,
+                                        #mcDelta = indata$mcDelta,
+                                        labels=list(sort(unique(indata[[2]])),indata$Name)),
+                   `linear (unknown elasticity)` = cournot(prices = prices,
+                                                           demand = rep("linear", length(prices)),
+                                                           #cost= rep("linear", nrow(indata)),
+                                                           quantities = quantities,
+                                                           margins= marginsCournot,
+                                                           ownerPre= ownerPreCournot,
+                                                           ownerPost= ownerPostCournot,
+                                                           mktElast = NA_real_,
+                                                           #mcDelta = indata$mcDelta,
+                                                           labels=list(sort(unique(indata[[2]])),indata$Name)),
+                   `loglinear (unknown elasticity)` = cournot(prices = prices,
+                                                              demand = rep("log", length(prices)),
+                                                              #cost= rep("linear", nrow(indata)),
+                                                              quantities = quantities,
+                                                              margins= marginsCournot,
+                                                              ownerPre= ownerPreCournot,
+                                                              ownerPost= ownerPostCournot,
+                                                              mktElast = NA_real_,
+                                                              #mcDelta = indata$mcDelta,
+                                                              labels=list(sort(unique(indata[[2]])),indata$Name))
                    ),
 
                `2nd Score Auction`= switch(demand,
@@ -1162,7 +1216,6 @@ shinyServer(function(input, output, session) {
     #
 
     ## create a reactive list of objects
-
     valuesQuota <-   reactiveValues(inputData = genInputData(nPossProds), sim =NULL, msg = NULL)
     valuesTariffs <-  reactiveValues(inputData = genInputData(nPossProds), sim =NULL, msg = NULL)
     values <- reactiveValues(inputData = genInputDataMergers(), sim = NULL, msg = NULL)
@@ -1185,6 +1238,10 @@ shinyServer(function(input, output, session) {
         values[["inputData"]] <- genInputDataMergers()
     })
 
+    #####
+    # Create reactive demand object depending on merger type
+    # Instead of running nested reactive calls for Horizontal and Vertical and Tariffs, etc. for demand/supply/elasticity,
+    # I want to refactor this out into modulated scripts (I understand this code, but too unwieldly). Talk to Charles.
     demand <- reactive({
 
       if (req(input$menu) == "Horizontal"){
@@ -1230,13 +1287,6 @@ shinyServer(function(input, output, session) {
       }
     })
 
-    ## update reactive list whenever changes are made to input
-    # observeEvent(input$calcElast, {
-    #   if (input$menu == "Merger"){
-    #     parame
-    #   }
-    # })
-    ###########
     observe({
         if (req(input$menu) == "Horizontal"){
         }
@@ -1486,7 +1536,8 @@ shinyServer(function(input, output, session) {
             indata$mcDelta <-  indata$mcDelta/(1 - tariffPost)
         }
 
-        ##### IMPORTANT!!: The two if/else if blocks below can be factored out to modulated scripts
+        #####
+        # IMPORTANT: The two if/else if blocks below can be factored out to modulated scripts!! (e.g. input$demand -> demand())
         if (req(input$menu) == "Tariffs") {
             indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
 
@@ -1513,7 +1564,7 @@ shinyServer(function(input, output, session) {
                         type = input$menu)
 
                 )
-        #####
+
         } else {
 
             indata$mcDelta <- indata[,grep('Cost Changes',colnames(indata))]
@@ -2283,8 +2334,4 @@ shinyServer(function(input, output, session) {
 
     })
 
-
-
-
 })
-

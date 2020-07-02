@@ -92,12 +92,12 @@ navbarPage("", id = "menu",
                                              conditionalPanel(
                                                condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == true",
                                                selectInput("demand5", "Demand Specification:",
-                                                           choices = c("linear", "log")),
+                                                           choices = c("linear", "loglinear")),
                                                helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
                                              ),conditionalPanel(
                                                condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == false",
                                                selectInput("demand6", "Demand Specification:",
-                                                           choices = c("linear (unknown elasticity)", "log (unknown elasticity)")),
+                                                           choices = c("linear (unknown elasticity)", "loglinear (unknown elasticity)")),
                                                helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
                                              ),
                                              # Output additional note for aids/aids (unknown elasticity) demand forms under Bertrand pricing
@@ -217,7 +217,7 @@ navbarPage("", id = "menu",
                                                               #                    selected = "Bertrand ces"),
                                                               selectInput("outcomeSumATR", "Outcomes to Report:",
                                                                           choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30,min = 10, max = 60, step = 5),
+                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),  # Ask Charles if we should go from step == 10 to step == 5
                                                               fluidRow(
                                                                 column(width=12, align = "center",
                                                                        tags$div(
@@ -347,12 +347,12 @@ navbarPage("", id = "menu",
                                                          conditionalPanel(
                                                            condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == true",
                                                            selectInput("demandTariffs3", "Demand Specification:",
-                                                                       choices = c("linear", "log")),
+                                                                       choices = c("linear", "loglinear")),
                                                            helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
                                                          ),conditionalPanel(
                                                            condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == false",
                                                            selectInput("demandTariffs4", "Demand Specification:",
-                                                                       choices = c("linear (unknown elasticity)", "log (unknown elasticity)")),
+                                                                       choices = c("linear (unknown elasticity)", "loglinear (unknown elasticity)")),
                                                            helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
                                                          ),
                                                          hr(),
