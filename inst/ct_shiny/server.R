@@ -789,6 +789,8 @@ shinyServer(function(input, output, session) {
             theseshares <- drop(res@quantities/sum(res@quantities))
             #####
             # Fix HHI share calculations for Cournot results! (talk to Charles to confirm...)
+            # Also relevant for Cournot-linear with no market elasticity needing a margin for each product (check...)
+            print(theseshares)
             print(res@quantities)
             totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
             s$sharesPost <- s$quantityPost/totQuantPost*100
@@ -1608,6 +1610,7 @@ shinyServer(function(input, output, session) {
             values[["sim"]] <-  thisSim$value
 
             values[["msg"]] <-  list(error=thisSim$error,warning=thisSim$warning)
+            #print(values[["msg"]])
         }
 
         if(!is.null(thisSim$error) || !is.null(thisSim$warning)){
@@ -1618,7 +1621,7 @@ shinyServer(function(input, output, session) {
 
             else  if(input$menu == "Quotas" ){
                 updateTabsetPanel(session,inputId  = "inTabsetQuota", selected = "msgpanelQuota")
-            } else{
+            } else if(input$menu == "Horizontal" ){
                 updateTabsetPanel(session,inputId  = "inTabset", selected = "msgpanel")
             }
 
