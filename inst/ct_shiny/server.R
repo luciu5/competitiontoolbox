@@ -750,6 +750,16 @@ shinyServer(function(input, output, session) {
             check.names=FALSE
         )
 
+        # if(input$menu == "Mergers"){
+        #   if (supply() == "Bertrand" & (demand() == "logit (unknown elasticity)" | demand() == "aids (unknown elasticity)")){
+        #     #inputData[['Margins\n(p-c)/p']] <- c(0.5, 0.5, NA, NA)
+        #     x <<- inputData[['Margins\n(p-c)/p']]
+        #   }
+        #   if (supply() == "Bertrand" & demand() == "ces (unknown elasticity)"){
+        #     #inputData[['Margins\n(p-c)/p']] <- c(0.5, 0.5, 0.25, 0.25)
+        #     y <<- inputData[['Margins\n(p-c)/p']]
+        #   }
+        # }
 
 
         nDefProd <- nrow(inputData)
@@ -975,21 +985,21 @@ shinyServer(function(input, output, session) {
                    switch(demand,
                           `logit (unknown elasticity)` = logit.alm(prices= prices,
                                                                   shares= shares_quantity,
-                                                                  margins= c(.5, .5, NA, NA),
+                                                                  margins= margins,
                                                                   ownerPre= ownerPre,
                                                                   ownerPost= ownerPost,
                                                                   insideSize = insideSize ,
                                                                   mcDelta = indata$mcDelta, labels=indata$Name),
                           `aids (unknown elasticity)` = aids(prices= prices,
                                                              shares= shares_revenue,
-                                                             margins= c(.25, .25, .25, .25),
+                                                             margins= margins,
                                                              ownerPre= ownerPre,
                                                              ownerPost= ownerPost,
                                                              insideSize = insideSize ,
                                                              mcDelta = indata$mcDelta, labels=indata$Name),
                           `ces (unknown elasticity)`= ces.alm(prices= prices,
                                                               shares= shares_revenue,
-                                                              margins= c(.1, .1, .5, .5),
+                                                              margins= margins,
                                                               ownerPre= ownerPre,
                                                               ownerPost= ownerPost,
                                                               insideSize = insideSize ,
@@ -1077,14 +1087,14 @@ shinyServer(function(input, output, session) {
                `2nd Score Auction`= switch(demand,
                                            `logit (unknown elasticity)` = auction2nd.logit.alm(prices= prices,
                                                                                                shares= shares_quantity,
-                                                                                               margins= c(5, 5, NA, NA),
+                                                                                               margins= margins,
                                                                                                ownerPre= ownerPre,
                                                                                                ownerPost= ownerPost,
                                                                                                insideSize = insideSize,
                                                                                                mcDelta = indata$mcDelta, labels=indata$Name),
                                            logit = auction2nd.logit.alm(prices= prices,
                                                                         shares= shares_quantity,
-                                                                        margins= c(5, 5, NA, NA),
+                                                                        margins= margins,
                                                                         ownerPre= ownerPre,
                                                                         ownerPost= ownerPost,
                                                                         insideSize = insideSize,
