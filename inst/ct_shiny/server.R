@@ -1110,12 +1110,14 @@ shinyServer(function(input, output, session) {
 
         if(grepl("%",input$outcomeSumATR)) ylimSumATR <- c(0,50)
         else{ylimSumATR <- c(0,350)}
+
         ggplot2::ggplot(data = subset(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), ggplot2::aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
           ggplot2::geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
           ggplot2::coord_cartesian(ylim = ylimSumATR)+
           ggplot2::theme_bw() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 16, face = "bold"), axis.title=ggplot2::element_text(size=13), axis.text.x  = ggplot2::element_text(angle =45 , hjust=1, size=11, face = "bold")) +
           ggplot2::ylab(input$outcomeSumATR) +
           ggplot2::ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR,"%"))
+
     })
 
     # Creates the graph for the Indice tab of Numerical Simulations (ATR)
