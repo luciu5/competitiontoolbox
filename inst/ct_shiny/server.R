@@ -788,8 +788,8 @@ shinyServer(function(input, output, session) {
             capture.output( s <- summary(res, market = FALSE))
             theseshares <- drop(res@quantities/sum(res@quantities))
             #####
-            # Fix HHI share calculations for Cournot results! (talk to Charles to confirm...)
-            # Also relevant for Cournot-linear with no market elasticity needing a margin for each product (check...)
+            # Fix HHI share calculations for Cournot results! (but talk to Charles to confirm...)
+            # Also relevant for Cournot-linear with no market elasticity after inputting a margin for each product (check...)
             print(theseshares)
             print(res@quantities)
             totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
@@ -2203,7 +2203,7 @@ shinyServer(function(input, output, session) {
                             "NA_real_"
         )
 
-        if(grepl("logit", input$demand, ignore.case =TRUE)){
+        if(grepl("logit", demand(), ignore.case =TRUE)){
             thisSize <- "sum(simdata$`Quantities`)"
         }
         else if(all(is.na(indata[,grepl("price",cnames, ignore.case = TRUE)]))){
@@ -2218,7 +2218,7 @@ shinyServer(function(input, output, session) {
 
         }
 
-        thisdemand <- gsub("\\s*\\(.*","",input$demand,perl=TRUE)
+        thisdemand <- gsub("\\s*\\(.*","", demand() ,perl=TRUE)
 
         argvalues[1] <- paste(c("demand = ", shQuote(thisdemand)), collapse = "")
 
@@ -2232,16 +2232,16 @@ shinyServer(function(input, output, session) {
 
 
 
-        if(input$supply == "Cournot"){
+        if(supply() == "Cournot"){
             atrfun <- "cournot"
             argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
             argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
             argvalues[grep("margins", argvalues)] <- paste0("margins = as.matrix(simdata$`",grep("Margin",cnames,value = TRUE),"`)")
 
             argvalues[grep("labels", argvalues)] <- sprintf("labels = list(as.character(simdata$Name),as.character(simdata$Name[%d]))",firstPrice)
-            argvalues[grep("insideSize", argvalues)] <- NULL
+            #argvalues[grep("insideSize", argvalues)] <- NULL
         }
-        else if( input$supply =="Bertrand"){atrfun <- "bertrand.alm"}
+        else if(supply() =="Bertrand"){atrfun <- "bertrand.alm"}
         else{atrfun <- "auction2nd.logit.alm"
         argvalues <- argvalues[-1]
         argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum( simdata$`Quantities` ) "
