@@ -750,14 +750,13 @@ shinyServer(function(input, output, session) {
             check.names=FALSE
         )
 
-        # if(input$menu == "Mergers"){
-        #   if (supply() == "Bertrand" & (demand() == "logit (unknown elasticity)" | demand() == "aids (unknown elasticity)")){
-        #     #inputData[['Margins\n(p-c)/p']] <- c(0.5, 0.5, NA, NA)
-        #     x <<- inputData[['Margins\n(p-c)/p']]
+
+        # if(req(input$menu) == "Horizontal"){
+        #   if (req(supply()) == "Bertrand" & (req(demand()) == "logit (unknown elasticity)" | req(demand()) == "aids (unknown elasticity)")){
+        #     inputData[['Margins\n(p-c)/p']] <- c(0.5, 0.5, NA, NA)
         #   }
-        #   if (supply() == "Bertrand" & demand() == "ces (unknown elasticity)"){
-        #     #inputData[['Margins\n(p-c)/p']] <- c(0.5, 0.5, 0.25, 0.25)
-        #     y <<- inputData[['Margins\n(p-c)/p']]
+        #   if (req(supply()) == "Bertrand" & req(demand()) == "ces (unknown elasticity)"){
+        #     inputData[['Margins\n(p-c)/p']] <- c(0.5, 0.5, 0.25, 0.25)
         #   }
         # }
 
