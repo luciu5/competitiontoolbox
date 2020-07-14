@@ -337,7 +337,7 @@ navbarPage("", id = "menu",
                                                          # Bertrand
                                                          conditionalPanel(
                                                            condition = "input.supplyTariffs == 'Bertrand' & input.calcElastTariffs.includes('elasticity') == true",
-                                                           selectInput("demandTariffs", "Demand Specification:",
+                                                           selectInput("demandTariffs1", "Demand Specification:",
                                                                        choices = c("logit", "ces", "aids"))
                                                          ),
                                                          conditionalPanel(
