@@ -475,15 +475,28 @@ navbarPage("", id = "menu",
 
                                               radioButtons("supplyQuota", "Competitive Interaction:",
                                                            choices = c("Bertrand"
-                                                                       #,"2nd Score Auction"
-                                                                       #,"Cournot"
+                                                                       #, "2nd Score Auction"
+                                                                       #, "Cournot"
                                                            )),
 
-                                              selectInput("demandQuota", "Demand Specification:",
-                                                          choices = c("logit"#, "ces",
-                                                                      #"linear",
-                                                                      #"aids"
-                                                          )),
+                                              # selectInput("demandQuota1", "Demand Specification:",
+                                              #             choices = c("logit"
+                                              #                         #, "ces"
+                                              #                         #, "linear"
+                                              #                         #, "aids"
+                                              #             )),
+                                              ## Use conditionalPanel() to select appropriate demand forms for each unique pair of competitive interaction and margin information
+                                              # Bertrand
+                                              conditionalPanel(
+                                                condition = "input.supplyQuota == 'Bertrand' & input.calcElastQuota.includes('elasticity') == true",
+                                                selectInput("demandQuota1", "Demand Specification:",
+                                                            choices = c("logit"))
+                                              ),
+                                              conditionalPanel(
+                                                condition = "input.supplyQuota == 'Bertrand' & input.calcElastQuota.includes('elasticity') == false",
+                                                selectInput("demandQuota2", "Demand Specification:",
+                                                            choices = c("logit (unknown elasticity)"))
+                                              ),
                                               hr(),
                                               fluidRow(
                                                 column(width=12, align = "center",
