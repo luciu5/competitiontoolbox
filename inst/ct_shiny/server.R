@@ -51,12 +51,7 @@ shinyServer(function(input, output, session) {
 
     isOverID <-  function(supply, calcElast, inputData){
 
-
-
-
         provElast <- grepl('elasticity',calcElast)
-
-
 
         nMargins <- inputData[,grepl("Margins",colnames(inputData))]
         nMargins <- length(nMargins[!is.na(nMargins)])
@@ -78,7 +73,7 @@ shinyServer(function(input, output, session) {
         res
     }
 
-    ##### This function is just the "Tariffs"/"Quotas" version of genInputDataMergers for "Horizontal". This entire thing needs to be desperately refactored...
+    ##### This function is just the "Tariffs"/"Quotas" version of genInputDataMergers() for "Horizontal". This entire thing needs to be desperately refactored...
     genInputData <- function(nrows,type = c("Tariffs","Quotas")){
         # a function to generate default input data set for simulations
 
@@ -849,9 +844,6 @@ shinyServer(function(input, output, session) {
             colnames(result) <- gsub('(?<=Price Change\\s)\\(%\\)',"($/unit)",colnames(result), perl=TRUE)
         }
 
-
-
-
         if(all(is.na(result[,"Compensating Marginal Cost Reduction (%)"]))) result[,"Compensating Marginal Cost Reduction (%)"] <- NULL
 
         return(result)
@@ -899,12 +891,9 @@ shinyServer(function(input, output, session) {
 
             #rmThese <- colSums(abs(res),na.rm=TRUE)
 
-
-
             if(isCournot)  res[-1,grepl('Prices',colnames(res))] <- NA
 
             #res <- res[,rmThese >1e-3,drop=FALSE]
-
 
             if(!isCournot) rownames(res) <- labels
 
@@ -1207,17 +1196,6 @@ shinyServer(function(input, output, session) {
         })
 
 
-    # ## create a reactive object that tracks which demand is being used
-    # demand <- eventReactive(input$simulate, {
-    #                                         ifelse(input$supply =="Bertrand",
-    #
-    #                                            ifelse(input$calcElast == "2 or more margins",input$demand_bert_alm,input$demand_bert),
-    #                                                    ifelse(input$supply == "Cournot",
-    #                                                   ifelse(input$calcElast == "1 or more margins",input$demand_cournot_alm, input$demand_cournot),
-    #                                                   ifelse(input$calcElast == "2 or more margins",input$demand_2nd_alm, input$demand_2nd)))
-    #                    })
-    #
-
     ## create a reactive list of objects
     valuesQuota <-   reactiveValues(inputData = genInputData(nPossProds), sim =NULL, msg = NULL)
     valuesTariffs <-  reactiveValues(inputData = genInputData(nPossProds), sim =NULL, msg = NULL)
@@ -1225,7 +1203,7 @@ shinyServer(function(input, output, session) {
 
 
 
-    ## initialize inputData
+    ##### initialize inputData (fix???)
     observeEvent((input$menu == "Tariffs") | input$addRowsTariffs,{
 
         valuesTariffs[["inputData"]] <- genInputData(nrow = input$addRowsTariffs ,type = "Tariffs")}
@@ -1291,105 +1269,11 @@ shinyServer(function(input, output, session) {
     })
 
     observe({
-        if (req(input$menu) == "Horizontal"){
-        }
-
-        #provElast <- grepl('elasticity', input$calcElast)
-        #demand <- gsub("\\s*(unknown elasticity)","",input$demand,perl=TRUE)
-        #demand <- gsub("( \\(unknown elasticity\\))", "", input$demand,perl=TRUE)
-
-
-        # } else if (input$menu == "Quotas"){
-        #     supply <- input$supplyQuota
-        #     demand <- gsub("\\s*(unknown elasticity)","",input$demandQuota,perl=TRUE)
-        #     provElast <- grepl('elasticity',input$calcElastQuota)
-        # } else {
-        #     supply <- input$supplyTariffs
-        #     demand <- gsub("\\s*(unknown elasticity)","",input$demandTariffs,perl=TRUE)
-        #     provElast <- grepl('elasticity',input$calcElastTariffs)
-        # }
-
-        # provElast <- grepl('elasticity', input$calcElast)
-        # defElast <- ifelse(provElast, 1 , 2)
-
-        # if(supply == 'Cournot'){
-        #     theseChoices <- c("market elasticity and 0 or more margins",
-        #                       "1 or more margins"
-        #     )
-        #
-        #
-        #     demandChoices<- c("linear","log")
-        #
-        # }
-
-        #else{
-
-        # theseChoices <- c("market elasticity and 1 or more margins",
-        #                   "2 or more margins")
-        #
-        # updateRadioButtons(session = session, "calcElast", "Calibrate model parameters using:",
-        #                    choices = theseChoices , selected = theseChoices[defElast])
-        #
-        #
-        # if(supply == 'Bertrand' & input$menu != "Quotas" & provElast){
-        #   demandChoices <- c('logit','ces','aids')
-        # } else if (supply == 'Bertrand' & input$menu != "Quotas" & !provElast) {
-        #   demandChoices <- paste(c('logit','ces','aids'), "(unknown elasticity)")
-        #   #input$enterElast <- NA
-        # } else if (supply == '2nd Score Auction' & input$menu != "Quotas" & provElast) {
-        #   demandChoices <- "logit"
-        # } else if (supply == '2nd Score Auction' & input$menu != "Quotas" & !provElast) {
-        #   demandChoices <- paste("logit", "(unknown elasticity)")
-        #   #input$enterElast <- NA
-        # } else if (supply == 'Cournot' & input$menu != "Quotas" & provElast) {
-        #   demandChoices <- paste("linear", "log")
-        # } else if (supply == 'Cournot' & input$menu != "Quotas" & !provElast) {
-        #   demandChoices <- paste(c("linear", "log"), "(unknown elastcity")
-        # }
-        # # if(supply == 'Bertrand' & input$menu != "Quotas"){demandChoices<- c('logit','ces','aids')}
-        # # else{demandChoices<- c('logit')}
-        #
-        # #}
-        #
-        # #if( !provElast ){ demandChoices <- paste(demandChoices,"(unknown elasticity)")}
-        #
-        # if (input$menu == "Merger"){
-        #     updateRadioButtons(session = session, "calcElast", "Calibrate model parameters using:",
-        #                        choices = theseChoices , selected = theseChoices[defElast])
-        #
-        #     provDemand <- grep(demand, demandChoices)
-        #     provDemand <- ifelse(length(provDemand) > 0 , provDemand, 1)
-        #
-        #     updateSelectInput(session=session, "demand", "Demand Specification:",
-        #                       choices = demandChoices, selected = demandChoices[provDemand])
-        #
-        # } else if (input$menu == "Quotas"){
-        #     updateRadioButtons(session = session, "calcElastQuota", "Calibrate model parameters using:",
-        #                        choices = theseChoices , selected = theseChoices[defElast])
-        #
-        #     provDemand <- grep(demand, demandChoices)
-        #     provDemand <- ifelse(length(provDemand) > 0 , provDemand, 1)
-        #
-        #     updateSelectInput(session=session, "demandQuota", "Demand Specification:",
-        #                       choices = demandChoices, selected = demandChoices[provDemand])
-        # } else {
-        #     updateRadioButtons(session = session, "calcElastTariffs", "Calibrate model parameters using:",
-        #                        choices = theseChoices , selected = theseChoices[defElast])
-        #
-        #     provDemand <- grep(demand, demandChoices)
-        #     provDemand <- ifelse(length(provDemand) > 0 , provDemand, 1)
-        #
-        #     updateSelectInput(session=session, "demandTariffs", "Demand Specification:",
-        #                       choices = demandChoices, selected = demandChoices[provDemand])
-        # }
-
-
 
         if(!is.null(input$hotTariffs)){
 
             valuesTariffs[["inputData"]] = hot_to_r(input$hotTariffs)
         }
-
 
 
         if(!is.null(input$hotQuota)){
@@ -1429,9 +1313,6 @@ shinyServer(function(input, output, session) {
         if (missPrices && any(grepl("ces|aids",input$demandTariffs, perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
         else{{colnames(inputData)[grepl("Revenues",colnames(inputData))] <- "Quantities"}}
 
-
-
-
         if (!is.null(inputData))
             rhandsontable(inputData, stretchH = "all", contextMenu = FALSE ) %>% hot_col(col = 1:ncol(inputData), valign = "htMiddle") %>%
             hot_col(col = which (sapply(inputData,is.numeric)),halign = "htCenter" ) %>% hot_cols(columnSorting = TRUE)
@@ -1458,10 +1339,6 @@ shinyServer(function(input, output, session) {
 
         if (missPrices && any(grepl("ces|aids",input$demandQuota, perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
         else{{colnames(inputData)[grepl("Revenues",colnames(inputData))] <- "Quantities"}}
-
-
-
-
 
         if (!is.null(inputData))
             rhandsontable(inputData, stretchH = "all", contextMenu = FALSE ) %>% hot_col(col = 1:ncol(inputData), valign = "htMiddle") %>%
@@ -1561,11 +1438,9 @@ shinyServer(function(input, output, session) {
             print(c(input$supplyQuota, input$demandQuota))
 
             thisSim <- msgCatcher(
-
                 runSims(supply = input$supplyQuota,demand = input$demandQuota,
                         indata = indata, mktElast = input$enterElastQuota,
                         type = input$menu)
-
                 )
 
         } else {
@@ -1591,12 +1466,6 @@ shinyServer(function(input, output, session) {
             thisSim <<- thisSim  # Delete later...
         }
 
-
-
-
-
-
-
         thisSim$warning <- grep("are the same|INCREASE in marginal costs", thisSim$warning, value= TRUE, invert=TRUE, perl=TRUE)
         if(length(thisSim$warning) == 0){thisSim$warning = NULL}
 
@@ -1611,7 +1480,6 @@ shinyServer(function(input, output, session) {
             values[["sim"]] <-  thisSim$value
 
             values[["msg"]] <-  list(error=thisSim$error,warning=thisSim$warning)
-            #print(values[["msg"]])
         }
 
         if(!is.null(thisSim$error) || !is.null(thisSim$warning)){
@@ -1768,19 +1636,13 @@ shinyServer(function(input, output, session) {
 
             thesenames <-  c("Foreign Firm","Name","Current Tariff Price","New Tariff Price", "Price Change (%)","Current Tariff Share (%)","New Tariff Share (%)", "Share Change (%)")
 
-
             colnames(res) <- thesenames
-
-
-
 
             if(inLevels){ colnames(res)[ colnames(res) == "Price Change (%)"] = "Price Change ($/unit)"}
 
         }
 
-
         res
-
 
     }, digits = 2)
 
@@ -1825,19 +1687,13 @@ shinyServer(function(input, output, session) {
 
             thesenames <-  c("Foreign Firm","Name","Current Quota Price","New Quota Price", "Price Change (%)","Current Quota Share (%)","New Quota Share (%)", "Share Change (%)")
 
-
             colnames(res) <- thesenames
-
-
-
 
             if(inLevels){ colnames(res)[ colnames(res) == "Price Change (%)"] = "Price Change ($/unit)"}
 
         }
 
-
         res
-
 
     }, digits = 2)
 
@@ -1894,8 +1750,6 @@ shinyServer(function(input, output, session) {
 
 
     }, digits = 2)
-
-
 
 
     output$results_shareOutTariffs <- renderTable({
@@ -1973,8 +1827,6 @@ shinyServer(function(input, output, session) {
 
         res
 
-
-
     }, digits = 0 ,rownames = TRUE,align="c")
 
 
@@ -2008,8 +1860,6 @@ shinyServer(function(input, output, session) {
 
         res
 
-
-
     }, digits =2,rownames = FALSE,align="c")
 
 
@@ -2022,7 +1872,6 @@ shinyServer(function(input, output, session) {
 
         print(getParms(valuesTariffs[["sim"]],digits=2))
 
-
     })
 
     output$parametersQuota <- renderPrint({
@@ -2030,7 +1879,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetQuota!= "diagpanelQuota" || input$simulateQuota == 0  || is.null(valuesQuota[["sim"]])){return()}
 
         print(getParms(valuesQuota[["sim"]],digits=2))
-
 
     })
 
@@ -2040,7 +1888,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabset!= "diagpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
 
         print(getParms(values[["sim"]],digits=2))
-
 
     })
 
@@ -2062,7 +1909,6 @@ shinyServer(function(input, output, session) {
 
         res
 
-
     }, rownames = TRUE)
 
     output$results_elastQuota <- renderTable({
@@ -2081,7 +1927,6 @@ shinyServer(function(input, output, session) {
         if(isCournot){colnames(res) <- "Elasticity"}
 
         res
-
 
     }, rownames = TRUE)
 
@@ -2102,7 +1947,6 @@ shinyServer(function(input, output, session) {
         if(isCournot){colnames(res) <- "Elasticity"}
 
         res
-
 
     }, rownames = TRUE)
 
@@ -2243,6 +2087,7 @@ shinyServer(function(input, output, session) {
             #argvalues[grep("insideSize", argvalues)] <- NULL
         }
         else if(supply() =="Bertrand"){atrfun <- "bertrand.alm"}
+
         else{atrfun <- "auction2nd.logit.alm"
         argvalues <- argvalues[-1]
         argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum( simdata$`Quantities` ) "
@@ -2278,7 +2123,6 @@ shinyServer(function(input, output, session) {
 
         cat(thiscode)
 
-
     })
 
 
@@ -2308,7 +2152,6 @@ shinyServer(function(input, output, session) {
 
         print(valuesQuota[["msg"]]$warning)
 
-
     })
 
     output$errorsTariffs <- renderPrint({
@@ -2316,7 +2159,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetTariffs!= "msgpanelTariffs" || input$simulateTariffs == 0 || is.null(valuesTariffs[["msg"]]$error)){cat(return())}
 
         print(valuesTariffs[["msg"]]$error)
-
 
     })
 
@@ -2326,7 +2168,6 @@ shinyServer(function(input, output, session) {
 
         print(valuesQuota[["msg"]]$error)
 
-
     })
 
     output$errors <- renderText({
@@ -2334,7 +2175,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabset!= "msgpanel" || input$simulate == 0 || is.null(values[["msg"]]$error)){cat(return())}
 
         paste(values[["msg"]]$error,collapse="\n")
-
 
     })
 
