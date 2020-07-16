@@ -1,5 +1,4 @@
 
-
 get_vignette_link <- function(...) {
     x <- vignette(...)
     if (nzchar(out <- x$PDF)) {
@@ -23,26 +22,23 @@ data("sumboxmktCnt", package = "competitiontoolbox")
 
 shinyServer(function(input, output, session) {
 
+    nPossProds <- 10  # Only allow 10 products by default
 
-    nPossProds <- 10 #only allow 10 products by default
+    msgCatcher <- function(expr){
 
-    msgCatcher <-
-
-        function(expr)
-        {
             W <- NULL
             E <- NULL
 
             w.handler <- function(w){ # warning handler
                 W <<- append(W,conditionMessage(w))
                 invokeRestart("muffleWarning")
-
             }
+
             e.handler <- function(e){ # error handler
                 E <<- append(E, conditionMessage(e))
                 NULL
-
             }
+
             list(value = withCallingHandlers(tryCatch(expr, error = e.handler),
                                              warning = w.handler),
                  warning = W, error = E)
@@ -56,76 +52,31 @@ shinyServer(function(input, output, session) {
         nMargins <- inputData[,grepl("Margins",colnames(inputData))]
         nMargins <- length(nMargins[!is.na(nMargins)])
 
-
         if(supply == "Cournot" &&
            ((provElast && nMargins > 0)  || (!provElast && nMargins >1) )){
             res <- paste(helpText(tags$b("Note:"), "some model parameters are over-identified. The tables above may be helpful in assessing model fit."))
-        }
-
-        else if(supply != "Cournot" &&
+        } else if(supply != "Cournot" &&
                 ((provElast && nMargins > 1)  || (!provElast && nMargins >2) )){
             res <- paste(helpText(tags$b("Note:"),"some model parameters are over-identified. The tables above may be helpful in assessing model fit."))
-        }
-        else{
+        } else {
             res <- paste(helpText(tags$b("Note:"),"model parameters are just-identified. Inputted and fitted values should match."))
-
         }
+
         res
     }
 
-    ##### This function is just the "Tariffs"/"Quotas" version of genInputDataMergers() for "Horizontal". This entire thing needs to be desperately refactored...
-    genInputData <- function(nrows, type = c("Tariffs","Quotas")){
-        # a function to generate default input data set for simulations
 
-        type=match.arg(type)
-
-        exampleData <- data.frame(
-            Name = c("Prod1","Prod2","Prod3","Prod4"),
-            Owner  = c("Firm1","Firm2","Firm3","Firm3"),
-            'Prices \n($/unit)'    = rep(10,4),
-            'Quantities'   =c(0.4,.3,.2,.1)*100,
-            'Margins\n(p-c)/p' =c(0.25,NA,NA,NA),
-            stringsAsFactors = FALSE,
-            check.names=FALSE
-        )
-
-        exampleData <- exampleData[order(exampleData$`Quantities`, decreasing = TRUE),]
-        rownames(exampleData) <- NULL
-
-        if(type == "Tariffs"){
-            fx <- data.frame('Current \nTariff \n(proportion)' = c(.05,.05,0,0),
-                             'New \nTariff \n(proportion)' = c(.25,.25,0,0),
-                             stringsAsFactors = FALSE,
-                             check.names=FALSE)
-        }
-        else if (type == "Quotas"){
-            fx <- data.frame('Current \nQuota \n(proportion)' = c(Inf,Inf,Inf,Inf),
-                             'New \nQuota \n(proportion)' = c(.75,.75,Inf,Inf),
-                             stringsAsFactors = FALSE,
-                             check.names=FALSE)
-
-        }
-
-
-        exampleData <- cbind(exampleData, fx)
-
-        inputData <- as.data.frame(matrix(NA_real_,nrow=max(nrows, nrow(exampleData)),ncol= ncol(exampleData)))
-        colnames(inputData) <- colnames(exampleData)
-        inputData[1:nrow(exampleData),] <- exampleData
-
-
-        return(inputData)
-
-    }
+    ##### genInputData.R
+    source("genInputData.R", local = TRUE)
 
 
     gencode <- function(type){
 
         if(type == "Tariffs"){
-            indata <-   valuesTariffs[["inputData"]]
+            indata <- valuesTariffs[["inputData"]]
+        } else if(type == "Quotas") {
+            indata <- valuesQuota[["inputData"]]
         }
-        else if(type == "Quotas"){
-            indata <-   valuesQuota[["inputData"]]}
 
         indata <- indata[!is.na(indata$Name) & indata$Name != '',]
 
@@ -141,7 +92,6 @@ shinyServer(function(input, output, session) {
                       "margins",
                       "tariffPre",
                       "tariffPost"
-
         )
 
 
@@ -164,8 +114,6 @@ shinyServer(function(input, output, session) {
             else{
 
                 thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
-
-
             }
 
             thisdemand <- gsub("\\s*\\(.*","", demandTariff() ,perl=TRUE)
@@ -178,8 +126,6 @@ shinyServer(function(input, output, session) {
                            "labels = simdata$Name"
 
             )
-
-
 
 
             if(input$supplyTariffs == "Cournot"){
@@ -200,7 +146,7 @@ shinyServer(function(input, output, session) {
                                                             grep("Margin",cnames,value = TRUE),
                                                             "` * ", "simdata$`", grep("Price", cnames, value=TRUE),"`")
             }
-        } else{
+        } else {
 
             thisElast <- ifelse(grepl("elast",input$calcElastQuota),
                                 input$enterElastQuota,
@@ -211,15 +157,11 @@ shinyServer(function(input, output, session) {
                 thisSize <- "sum(simdata$`Quantities`)"
             }
             else if(all(is.na(indata[,grepl("price",cnames, ignore.case = TRUE)]))){
-
-                thisSize <-   "sum(simdata$`Revenues`)"
+                thisSize <- "sum(simdata$`Revenues`)"
             }
 
             else{
-
                 thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
-
-
             }
 
             thisdemand <- gsub("\\s*\\(.*","", demandQuota() ,perl=TRUE)
@@ -230,10 +172,7 @@ shinyServer(function(input, output, session) {
                            paste0("mktElast = ", thisElast,collapse = ""),
                            #paste0("insideSize = ",thisSize, collapse=""),
                            "labels = simdata$Name"
-
             )
-
-
 
 
             if(input$supplyQuota == "Cournot"){
@@ -287,11 +226,6 @@ shinyServer(function(input, output, session) {
         )
 
         return(thiscode)
-
-
-
-
-
     }
 
 
@@ -311,7 +245,6 @@ shinyServer(function(input, output, session) {
                                                  calcRevenues(sim, preMerger=FALSE, market = TRUE )
         )))
 
-
         rownames(res) <- c("Current Tariff","New Tariff")
 
         if( grepl("aids",class(sim),ignore.case = TRUE)) res$'No-purchase\n Share (%)' <- NULL
@@ -321,7 +254,6 @@ shinyServer(function(input, output, session) {
 
     gensum <- function(res, indata,type = c("Tariffs","Quotas")){
         #a function to generate summary stats for results tab
-
 
         type=match.arg(type)
 
@@ -338,11 +270,8 @@ shinyServer(function(input, output, session) {
 
         indata <- indata[!is.na(indata$Name),]
 
-
-
         tariffPre <- indata[,grepl("Cur.*\\n(Tariff|Quota)",colnames(indata), perl= TRUE),drop=TRUE]
         tariffPost <- indata[,grepl("New.*\\n(Tariff|Quota)",colnames(indata), perl=TRUE),drop=TRUE]
-
 
         if(type == "Tariffs"){
             tariffPre[is.na(tariffPre)] <- 0
@@ -363,21 +292,14 @@ shinyServer(function(input, output, session) {
             totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
             s$sharesPost <- s$quantityPost/totQuantPost*100
 
-
         }
 
         else{
             capture.output(s <- summary(res, revenue = isRevDemand & missPrices,levels = inLevels))
             theseshares <- calcShares(res, preMerger=TRUE, revenue=isRevDemand & missPrices)
 
-
             theseshares <- theseshares/sum(theseshares)
-
         }
-
-
-
-
 
         thisgovrev <- thispsdelta <- thiscv <- NA
 
@@ -389,16 +311,10 @@ shinyServer(function(input, output, session) {
         }
 
         try(thisgovrev <- sum(tariffPost * calcRevenues(res, preMerger = FALSE) - tariffPre * calcRevenues(res, preMerger = TRUE), na.rm=TRUE))
-
-
         try(thispsdelta  <- tapply(drop(calcProducerSurplus(res,preMerger=FALSE)*(1 - tariffPost)) - drop(calcProducerSurplus(res,preMerger=TRUE)*(1 - tariffPre)), istaxed,sum),silent=TRUE)
-
-
-
 
         foreignshare <- s$sharesPost[istaxed]
         domesticshare <- s$sharesPost[!istaxed]
-
 
         res <- with(s, data.frame(
             #'Current Tariff HHI' = as.integer(round(hhi(res,preMerger=TRUE))),
@@ -425,7 +341,6 @@ shinyServer(function(input, output, session) {
     }
 
 
-
     gendiag <- function(res,mktElast=FALSE){
         #a function to generate diagnostics data
 
@@ -440,7 +355,6 @@ shinyServer(function(input, output, session) {
         obsElast <- res@mktElast
 
         #if(length(obsMargins[!is.na(obsMargins)]) < 2){return()}
-
 
         prePrices <- unname(drop(res@pricePre))
         preMargins <- drop(calcMargins(res, preMerger=TRUE))
@@ -465,16 +379,10 @@ shinyServer(function(input, output, session) {
             )
 
             #rmThese <- colSums(abs(res),na.rm=TRUE)
-
-
-
             if(isCournot)  res[-1,grepl('Prices',colnames(res))] <- NA
 
             #res <- res[,rmThese >1e-3,drop=FALSE]
-
-
             if(!isCournot) rownames(res) <- labels
-
         }
 
         else{ res <- data.frame(
@@ -488,282 +396,16 @@ shinyServer(function(input, output, session) {
         return(res)
     }
 
-    runSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quotas")){
-        # a function to execute code from antitrust package based on ui inputs
-
-        type <- match.arg(type)
-
-        prices <- indata[,"Prices \n($/unit)"]
-        margins <- indata$Margins
-
-        tariffPre  <- indata[,grepl("Cur.*\\n(Tariff|Quota)",colnames(indata),perl=TRUE),drop=TRUE]
-        tariffPost <- indata[,grepl("New.*\\n(Tariff|Quota)",colnames(indata),perl=TRUE),drop=TRUE]
+    ##### runSims.R
+    source("runSims.R", local = TRUE)
 
 
-        if(type == "Tariffs"){
-            tariffPre[is.na(tariffPre)] <- 0
-            tariffPost[is.na(tariffPost)] <- 0
-        }
-        else if(type == "Quotas"){
-            ## set quota for unconstrained firms to be Inf
-            tariffPre[is.na(tariffPre)] <- Inf
-            tariffPost[is.na(tariffPost)] <- Inf
-        }
+    ##### genInputDataMergers.R
+    source("genInputDataMergers.R", local = TRUE)
 
-        missPrices <- any(is.na(prices))
-
-        shares_quantity <- shares_revenue <- indata$Output/sum(indata$Output, na.rm=TRUE)
-        insideSize <- sum(indata[,"Output"], na.rm=TRUE)
-
-
-        if(!missPrices){
-
-            if(any(grepl("ces|aids", demand, perl=TRUE, ignore.case=TRUE))) insideSize <- sum(prices * indata[,"Output"], na.rm =TRUE)
-
-            shares_revenue <- prices * shares_revenue / sum(prices * shares_revenue)
-            if(supply == "2nd Score Auction") margins <- margins * prices  # convert to level margins
-        }
-
-        firstMargin <- which(!is.na(margins))[1]
-        firstPrice <- which(!is.na(prices))[1]
-
-
-        ownerPre = model.matrix(~-1+indata$Owner)
-        ownerPre = tcrossprod(ownerPre)
-        ownerPost = ownerPre
-
-
-        if(supply != "Cournot" && type == "Tariffs" ){
-            ownerPost =ownerPost*(1-tariffPost)
-            ownerPre =ownerPre*(1-tariffPre)
-        }
-
-        ## Cournot
-        # Quantities
-        # quantities <- matrix(NA, nrow = length(unique(indata[[2]])), ncol = length(prices))
-        # for (row in 1:nrow(indata)){
-        #   quantities[as.integer(gsub("\\D", "", as.character(indata[row, 2]))), as.integer(gsub("\\D", "", as.character(indata[row, 1])))] <- indata[row, 'Output']
-        # }
-        #
-        # # Margins
-        # marginsCournot <- matrix(NA, nrow = length(unique(indata[[2]])), ncol = length(prices))
-        # for (row in 1:nrow(indata)){
-        #   marginsCournot[as.integer(gsub("\\D", "", as.character(indata[row, 2]))), as.integer(gsub("\\D", "", as.character(indata[row, 1])))] <- indata[row, 'Margins']
-        # }
-
-
-        if( type == "Tariffs"){
-            switch(supply,
-                   Bertrand =
-                       switch(demand,
-                              `logit (unknown elasticity)`= logit.alm(prices= prices,
-                                                                      shares= shares_quantity,
-                                                                      margins= margins,
-                                                                      ownerPre= ownerPre,
-                                                                      ownerPost= ownerPost,
-                                                                      insideSize = insideSize ,
-                                                                      mcDelta = indata$mcDelta, labels=indata$Name),
-                              `aids (unknown elasticity)` = aids(prices= prices,
-                                                                 shares= shares_revenue,
-                                                                 margins= margins,
-                                                                 ownerPre= ownerPre,
-                                                                 ownerPost= ownerPost,
-                                                                 insideSize = insideSize ,
-                                                                 mcDelta = indata$mcDelta, labels=indata$Name),
-                              `ces (unknown elasticity)`= ces.alm(prices= prices,
-                                                                  shares= shares_revenue,
-                                                                  margins= margins,
-                                                                  ownerPre= ownerPre,
-                                                                  ownerPost= ownerPost,
-                                                                  insideSize = insideSize ,
-                                                                  mcDelta = indata$mcDelta, labels=indata$Name),
-                              linear=linear(prices= prices,
-                                            quantities= indata[,"Output"],
-                                            margins= margins,
-                                            ownerPre= ownerPre,
-                                            ownerPost= ownerPost,
-                                            mcDelta = indata$mcDelta, labels=indata$Name),
-                              aids=aids(prices= prices,
-                                        shares= shares_revenue,
-                                        margins= margins,
-                                        ownerPre= ownerPre,
-                                        ownerPost= ownerPost,
-                                        insideSize = insideSize ,
-                                        mcDelta = indata$mcDelta, labels=indata$Name, mktElast = mktElast),
-                              logit= logit.alm(prices= prices,
-                                               shares= shares_quantity,
-                                               margins= margins,
-                                               ownerPre= ownerPre,
-                                               ownerPost= ownerPost,
-                                               insideSize = insideSize ,
-                                               mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast),
-                              ces = ces.alm(prices= prices,
-                                            shares= shares_revenue,
-                                            margins= margins,
-                                            ownerPre= ownerPre,
-                                            ownerPost= ownerPost,
-                                            insideSize = insideSize ,
-                                            mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast),
-                              pcaids=pcaids(prices= prices,
-                                            shares= shares_revenue,
-                                            knownElast = -1/margins[firstMargin],
-                                            knownElastIndex = firstMargin,
-                                            mktElast = mktElast,
-                                            insideSize = insideSize,
-                                            ownerPre= ownerPre,
-                                            ownerPost= ownerPost,
-                                            mcDelta = indata$mcDelta, labels=indata$Name)
-                       ),
-                   Cournot = switch(demand,
-                                    linear = cournot(prices = na.omit(prices)[1],
-                                                     #demand = rep("linear", length(prices)),
-                                                     demand = "linear",
-                                                     #cost= rep("linear", nrow(indata)),
-                                                     quantities = as.matrix(indata$Output),
-                                                     margins= as.matrix(margins),
-                                                     ownerPre= ownerPre,
-                                                     ownerPost= ownerPost,
-                                                     mktElast = mktElast,
-                                                     mcDelta = indata$mcDelta,
-                                                     labels=list(indata$Name, "Prod")),
-                                    loglinear = cournot(prices = na.omit(prices)[1],
-                                                        demand = "log",
-                                                        #cost= rep("linear", nrow(indata)),
-                                                        quantities = as.matrix(indata$Output),
-                                                        margins= as.matrix(margins),
-                                                        ownerPre= ownerPre,
-                                                        ownerPost= ownerPost,
-                                                        mktElast = mktElast,
-                                                        mcDelta = indata$mcDelta,
-                                                        labels=list(indata$Name, "Prod")),
-                                    `linear (unknown elasticity)` = cournot(prices = na.omit(prices)[1],
-                                                                            demand = "linear",
-                                                                            #cost= rep("linear", nrow(indata)),
-                                                                            quantities = as.matrix(indata$Output),
-                                                                            margins= as.matrix(margins),
-                                                                            ownerPre= ownerPre,
-                                                                            ownerPost= ownerPost,
-                                                                            mktElast = NA_real_,
-                                                                            mcDelta = indata$mcDelta,
-                                                                            labels=list(indata$Name, "Prod")),
-                                    `loglinear (unknown elasticity)` = cournot(prices = na.omit(prices)[1],
-                                                                               demand = "log",
-                                                                               #cost= rep("linear", nrow(indata)),
-                                                                               quantities = as.matrix(indata$Output),
-                                                                               margins= as.matrix(margins),
-                                                                               ownerPre= ownerPre,
-                                                                               ownerPost= ownerPost,
-                                                                               mktElast = NA_real_,
-                                                                               mcDelta = indata$mcDelta,
-                                                                               labels=list(indata$Name, "Prod"))
-                   )
-                   ,
-                   `2nd Score Auction`= switch(demand,
-                                               `logit (unknown elasticity)` = auction2nd.logit.alm(prices= prices,
-                                                                                                   shares= shares_quantity,
-                                                                                                   margins= margins,
-                                                                                                   ownerPre= ownerPre,
-                                                                                                   ownerPost= ownerPost,
-                                                                                                   mcDelta = indata$mcDelta, labels=indata$Name),
-                                               logit = auction2nd.logit.alm(prices= prices,
-                                                                            shares= shares_quantity,
-                                                                            margins= margins,
-                                                                            ownerPre= ownerPre,
-                                                                            ownerPost= ownerPost,
-                                                                            insideSize = insideSize,
-                                                                            mcDelta = indata$mcDelta, labels=indata$Name,
-                                                                            mktElast = mktElast)
-
-                   )
-            )
-        }
-
-        else if ( type == "Quotas"){
-
-
-            switch(supply,
-                   Bertrand =
-                       switch(demand,
-                              `logit (unknown elasticity)`= logit.cap.alm(prices= prices,
-                                                                          shares= shares_quantity,
-                                                                          margins= margins,
-                                                                          capacitiesPre = indata$Output*tariffPre,
-                                                                          capacitiesPost = indata$Output*tariffPost,
-                                                                          ownerPre= ownerPre,
-                                                                          ownerPost= ownerPost,
-                                                                          insideSize = insideSize ,
-                                                                          mcDelta = indata$mcDelta, labels=indata$Name),
-                              logit= logit.cap.alm(prices= prices,
-                                                   shares= shares_quantity,
-                                                   margins= margins,
-                                                   capacitiesPre = indata$Output*tariffPre,
-                                                   capacitiesPost = indata$Output*tariffPost,
-                                                   ownerPre= ownerPre,
-                                                   ownerPost= ownerPost,
-                                                   insideSize = insideSize ,
-                                                   mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast )
-                       ),
-                   Cournot =
-
-                       cournot(prices= prices[firstPrice],
-                               demand = gsub("\\s+\\(.*","",demand,perl=TRUE),
-                               cost= rep("linear", nrow(indata)),
-                               quantities = as.matrix(indata[,"Output"]),
-                               margins= as.matrix(margins),
-                               ownerPre= ownerPre,
-                               ownerPost= ownerPost,
-                               mktElast = ifelse( grepl("unknown elasticity", demand),
-                                                  NA_real_, mktElast),
-                               mcDelta = indata$mcDelta,
-                               labels=list(as.character(indata$Name),indata$Name[firstPrice]))
-            )
-
-
-        }
-    }
-
-    genInputDataMergers <- function(){
-        # a function to generate default input data set for simulations
-
-        inputData <- data.frame(
-            Name = c("Prod1","Prod2","Prod3","Prod4"),
-            'Pre-merger\n Owner'  = c("Firm1","Firm2","Firm3","Firm3"),
-            'Post-merger\n Owner' = c("Firm1","Firm1","Firm3","Firm3"),
-            'Prices \n($/unit)'    = rep(10,4),
-            'Quantities'   = c(0.4,.3,.2,.1)*100,
-            'Margins\n(p-c)/p' = c(0.5,NA,NA,NA),
-            'Post-merger\n Cost Changes\n(Proportion)' = rep(0,4),
-            stringsAsFactors = FALSE,
-            check.names=FALSE
-        )
-
-
-        # if(req(input$menu) == "Horizontal"){
-        #   if (req(supply()) == "Bertrand" & (req(demand()) == "logit (unknown elasticity)" | req(demand()) == "aids (unknown elasticity)")){
-        #     inputData[['Margins\n(p-c)/p']] <- c(0.5, 0.5, NA, NA)
-        #   }
-        #   if (req(supply()) == "Bertrand" & req(demand()) == "ces (unknown elasticity)"){
-        #     inputData[['Margins\n(p-c)/p']] <- c(0.5, 0.5, 0.25, 0.25)
-        #   }
-        # }
-
-
-        nDefProd <- nrow(inputData)
-        inputData <- inputData[c(1:nDefProd,rep(1, nPossProds - nDefProd)),]
-        #if(input$incEff) inputData$mcDelta <- 0
-
-        inputData[(nDefProd+1):nPossProds,] <- NA
-        inputData <- inputData[order(inputData$`Quantities`, decreasing = TRUE),]
-        rownames(inputData) <- NULL
-
-
-        return(inputData)
-
-    }
 
     gensumMergers <- function(res){
         #a function to generate summary stats for results tab
-
 
         isCournot <- grepl("Cournot",class(res))
         isAuction <- grepl("Auction",class(res))
@@ -775,9 +417,6 @@ shinyServer(function(input, output, session) {
         inLevels <- FALSE
 
         if(isAuction && missPrices){inLevels = TRUE}
-
-
-
 
         if(isCournot){
 
@@ -793,7 +432,6 @@ shinyServer(function(input, output, session) {
             capture.output(s <- summary(res, revenue = isRevDemand & missPrices,levels = inLevels))
             theseshares <- calcShares(res, preMerger=TRUE, revenue=isRevDemand & missPrices)
 
-
             theseshares <- theseshares/sum(theseshares)
 
         }
@@ -805,12 +443,9 @@ shinyServer(function(input, output, session) {
         try(thiscmcr <- cmcr(res), silent=TRUE)
         try(thiscv <- CV(res),silent = TRUE)
 
-
         try(thispsdelta  <- sum(calcProducerSurplus(res,preMerger=FALSE) - calcProducerSurplus(res,preMerger=TRUE)),silent=TRUE)
 
-
         partyshare <- s$sharesPost[isparty]
-
 
         result <- with(s, data.frame(
             #'HHI Change' = as.integer(round(hhi(res,preMerger=FALSE) -  hhi(res,preMerger=TRUE))),
@@ -845,7 +480,6 @@ shinyServer(function(input, output, session) {
     }
 
 
-
     gendiagMergers <- function(res,mktElast=FALSE){
         #a function to generate diagnostics data
 
@@ -860,7 +494,6 @@ shinyServer(function(input, output, session) {
         obsElast <- res@mktElast
 
         #if(length(obsMargins[!is.na(obsMargins)]) < 2){return()}
-
 
         prePrices <- unname(drop(res@pricePre))
         preMargins <- drop(calcMargins(res, preMerger=TRUE))
@@ -885,11 +518,9 @@ shinyServer(function(input, output, session) {
             )
 
             #rmThese <- colSums(abs(res),na.rm=TRUE)
-
             if(isCournot)  res[-1,grepl('Prices',colnames(res))] <- NA
 
             #res <- res[,rmThese >1e-3,drop=FALSE]
-
             if(!isCournot) rownames(res) <- labels
 
         }
@@ -906,178 +537,10 @@ shinyServer(function(input, output, session) {
         return(res)
     }
 
-    runSimsMergers <- function(supply, demand, indata, mktElast){
-        # a function to execute code from antitrust package based on ui inputs
 
-        prices <- indata[,"Prices \n($/unit)"]
-        margins <- indata$Margins
+    ##### runSimsMergers.R
+    source("runSimsMergers.R", local = TRUE)
 
-        missPrices <- any(is.na(prices))
-
-        shares_quantity <- shares_revenue <- indata$Output/sum(indata$Output, na.rm=TRUE)
-        insideSize <- sum(indata[,"Output"], na.rm=TRUE)
-
-
-        if(!missPrices){
-
-            if(any(grepl("ces|aids",demand,perl=TRUE,ignore.case=TRUE))) insideSize <- sum(prices * indata[,"Output"], na.rm =TRUE)
-
-            shares_revenue <- prices * shares_revenue / sum(prices * shares_revenue)
-            if(supply == "2nd Score Auction") margins <- margins * prices # convert to level margins
-        }
-
-        firstMargin <- which(!is.na(margins))[1]
-        firstPrice <- which(!is.na(prices))[1]
-
-
-        ownerPre = model.matrix(~-1+indata$'Pre-merger\n Owner')
-        ownerPre = tcrossprod(ownerPre)
-        if(nlevels(indata$'Post-merger\n Owner') > 1){
-            ownerPost = model.matrix(~-1+indata$'Post-merger\n Owner')
-            ownerPost = tcrossprod(ownerPost)
-        }
-        else{ownerPost <- matrix(1, ncol=length(indata$Output), nrow = length(indata$Output))}
-
-        ## Cournot
-        # Quantities
-        indata <<- indata
-        # quantities <- matrix(NA, nrow = length(unique(indata[[2]])), ncol = length(prices))
-        # for (row in 1:nrow(indata)){
-        #   quantities[as.integer(gsub("\\D", "", as.character(indata[row, 2]))), as.integer(gsub("\\D", "", as.character(indata[row, 1])))] <- indata[row, 'Output']
-        # }
-        #
-        # # Margins
-        # marginsCournot <- matrix(NA, nrow = length(unique(indata[[2]])), ncol = length(prices))
-        # for (row in 1:nrow(indata)){
-        #   marginsCournot[as.integer(gsub("\\D", "", as.character(indata[row, 2]))), as.integer(gsub("\\D", "", as.character(indata[row, 1])))] <- indata[row, 'Margins']
-        # }
-
-
-        switch(supply,
-               Bertrand =
-                   switch(demand,
-                          `logit (unknown elasticity)` = logit.alm(prices= prices,
-                                                                  shares= shares_quantity,
-                                                                  margins= margins,
-                                                                  ownerPre= ownerPre,
-                                                                  ownerPost= ownerPost,
-                                                                  insideSize = insideSize ,
-                                                                  mcDelta = indata$mcDelta, labels=indata$Name),
-                          `aids (unknown elasticity)` = aids(prices= prices,
-                                                             shares= shares_revenue,
-                                                             margins= margins,
-                                                             ownerPre= ownerPre,
-                                                             ownerPost= ownerPost,
-                                                             insideSize = insideSize ,
-                                                             mcDelta = indata$mcDelta, labels=indata$Name),
-                          `ces (unknown elasticity)`= ces.alm(prices= prices,
-                                                              shares= shares_revenue,
-                                                              margins= margins,
-                                                              ownerPre= ownerPre,
-                                                              ownerPost= ownerPost,
-                                                              insideSize = insideSize ,
-                                                              mcDelta = indata$mcDelta, labels=indata$Name),
-                          linear=linear(prices= prices,
-                                        quantities= indata[,"Output"],
-                                        margins= margins,
-                                        ownerPre= ownerPre,
-                                        ownerPost= ownerPost,
-                                        mcDelta = indata$mcDelta, labels=indata$Name),
-                          aids=aids(prices= prices,
-                                    shares= shares_revenue,
-                                    margins= margins,
-                                    ownerPre= ownerPre,
-                                    ownerPost= ownerPost,
-                                    insideSize = insideSize ,
-                                    mcDelta = indata$mcDelta, labels=indata$Name, mktElast = mktElast),
-                          logit= logit.alm(prices= prices,
-                                           shares= shares_quantity,
-                                           margins= margins,
-                                           ownerPre= ownerPre,
-                                           ownerPost= ownerPost,
-                                           insideSize = insideSize ,
-                                           mcDelta = indata$mcDelta, labels=indata$Name, mktElast = mktElast),
-                          ces = ces.alm(prices= prices,
-                                        shares= shares_revenue,
-                                        margins= margins,
-                                        ownerPre= ownerPre,
-                                        ownerPost= ownerPost,
-                                        insideSize = insideSize ,
-                                        mcDelta = indata$mcDelta, labels=indata$Name, mktElast = mktElast),
-                        pcaids = pcaids(prices= prices,
-                                        shares= shares_revenue,
-                                        knownElast = -1/margins[firstMargin],
-                                        knownElastIndex = firstMargin,
-                                        mktElast = mktElast,
-                                        insideSize = insideSize,
-                                        ownerPre= ownerPre,
-                                        ownerPost= ownerPost,
-                                        mcDelta = indata$mcDelta, labels=indata$Name)
-                   ),
-               Cournot = switch(demand,
-                   linear = cournot(prices = na.omit(prices)[1],
-                                    #demand = rep("linear", length(prices)),
-                                    demand = "linear",
-                                    #cost= rep("linear", nrow(indata)),
-                                    quantities = as.matrix(indata$Output),
-                                    margins= as.matrix(margins),
-                                    ownerPre= ownerPre,
-                                    ownerPost= ownerPost,
-                                    mktElast = mktElast,
-                                    #mcDelta = indata$mcDelta,
-                                    labels=list(indata$Name, "Prod")),
-                    loglinear = cournot(prices = na.omit(prices)[1],
-                                        demand = "log",
-                                        #cost= rep("linear", nrow(indata)),
-                                        quantities = as.matrix(indata$Output),
-                                        margins= as.matrix(margins),
-                                        ownerPre= ownerPre,
-                                        ownerPost= ownerPost,
-                                        mktElast = mktElast,
-                                        #mcDelta = indata$mcDelta,
-                                        labels=list(indata$Name, "Prod")),
-                   `linear (unknown elasticity)` = cournot(prices = na.omit(prices)[1],
-                                                           demand = "linear",
-                                                           #cost= rep("linear", nrow(indata)),
-                                                           quantities = as.matrix(indata$Output),
-                                                           margins= as.matrix(margins),
-                                                           ownerPre= ownerPre,
-                                                           ownerPost= ownerPost,
-                                                           mktElast = NA_real_,
-                                                           #mcDelta = indata$mcDelta,
-                                                           labels=list(indata$Name, "Prod")),
-                   `loglinear (unknown elasticity)` = cournot(prices = na.omit(prices)[1],
-                                                              demand = "log",
-                                                              #cost= rep("linear", nrow(indata)),
-                                                              quantities = as.matrix(indata$Output),
-                                                              margins= as.matrix(margins),
-                                                              ownerPre= ownerPre,
-                                                              ownerPost= ownerPost,
-                                                              mktElast = NA_real_,
-                                                              #mcDelta = indata$mcDelta,
-                                                              labels=list(indata$Name, "Prod"))
-                   ),
-
-               `2nd Score Auction`= switch(demand,
-                                           `logit (unknown elasticity)` = auction2nd.logit.alm(prices= prices,
-                                                                                               shares= shares_quantity,
-                                                                                               margins= margins,
-                                                                                               ownerPre= ownerPre,
-                                                                                               ownerPost= ownerPost,
-                                                                                               insideSize = insideSize,
-                                                                                               mcDelta = indata$mcDelta, labels=indata$Name),
-                                           logit = auction2nd.logit.alm(prices= prices,
-                                                                        shares= shares_quantity,
-                                                                        margins= margins,
-                                                                        ownerPre= ownerPre,
-                                                                        ownerPost= ownerPost,
-                                                                        insideSize = insideSize,
-                                                                        mcDelta = indata$mcDelta, labels=indata$Name,
-                                                                        mktElast = mktElast)
-
-               )
-        )
-    }
 
     # Creates the graph for the Summary tab of Numerical Simulations (ATR)
     output$plotSumATR <- renderPlot({
@@ -1117,7 +580,6 @@ shinyServer(function(input, output, session) {
 
     })
 
-
     # Number of Simulated Mergers for Indices and Summary Tab of ATR Numerical Simulations
     output$sumNumMergerATR <- renderUI({
         sumNumMerg <- subset(sumboxmktCnt, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR)
@@ -1129,7 +591,6 @@ shinyServer(function(input, output, session) {
         indicNumMerg <- prettyNum(indicboxmktCnt$Cnt[which(indicboxmktCnt$Cut_type == input$indexIndATR & indicboxmktCnt$shareOutThresh == input$shareOutIndATR )], big.mark=",")
         HTML(paste("Examine the relationship between industry price changes and commmonly used merger indices from", prettyNum((indicNumMerg), big.mark=","), "simulated horizontal mergers."))
     })
-
 
     #Generates Captions for Summary and Indices Graphs of ATR Numerical Simulations
     output$capSumATR <- renderText({
@@ -1143,7 +604,6 @@ shinyServer(function(input, output, session) {
                'Industry Price Change (%)' = "Industry Price Change Measured as a Percent Change from Pre-Merger Price",
                'Merging Party Price Change (%)' = "Merging Party Price Change as a Percent Change from Pre-Merger Price")
     })
-
 
     output$capIndATR <- renderText({
         captionIndATR()
@@ -1198,12 +658,9 @@ shinyServer(function(input, output, session) {
     values <- reactiveValues(inputData = genInputDataMergers(), sim = NULL, msg = NULL)
 
 
-
-    ##### initialize inputData (fix???)
+    ##### Initialize inputData (fix???)
     observeEvent((input$menu == "Tariffs") | input$addRowsTariffs,{
-
         valuesTariffs[["inputData"]] <- genInputData(nrow = input$addRowsTariffs ,type = "Tariffs")}
-
     )
 
     observeEvent((input$menu == "Quotas") | input$addRowsQuota,{
@@ -1218,137 +675,18 @@ shinyServer(function(input, output, session) {
     #####
     # Create reactive demand object depending on merger type
     # Instead of running nested reactive calls for Horizontal and Vertical and Tariffs, etc. for demand/supply/elasticity,
-    # I want to refactor this out into modulated scripts (I understand this code, but too unwieldly). Talk to Charles.
-    ### INSERT SOURCED FILE HERE ###
-    # Supply
-    supply <- reactive({
-
-      if (req(input$menu) == "Horizontal"){
-        return(input$supply)
-      }
-    })
-
-    supplyTariff <- reactive({
-
-      if (req(input$menu) == "Tariffs"){
-        return(input$supplyTariffs)
-      }
-    })
-
-    supplyQuota <- reactive({
-
-      if (req(input$menu) == "Quotas"){
-        return(input$supplyQuota)
-      }
-    })
-
-    # Demand
-    demand <- reactive({
-
-      if (req(input$menu) == "Horizontal"){
-
-        if (input$supply == "Bertrand" & grepl('elasticity', input$calcElast)){
-          return(input$demand1)
-        }
-        if (input$supply == "Bertrand" & !grepl('elasticity', input$calcElast)){
-          return(input$demand2)
-        }
-        if (input$supply == "2nd Score Auction" & grepl('elasticity', input$calcElast)){
-          return(input$demand3)
-        }
-        if (input$supply == "2nd Score Auction" & !grepl('elasticity', input$calcElast)){
-          return(input$demand4)
-        }
-        if (input$supply == "Cournot" & grepl('elasticity', input$calcElast)){
-          return(input$demand5)
-        }
-        if (input$supply == "Cournot" & !grepl('elasticity', input$calcElast)){
-          return(input$demand6)
-        }
-      }
-    })
-
-    demandTariff <- reactive({
-
-      if (req(input$menu) == "Tariffs"){
-
-        if (input$supplyTariffs == "Bertrand" & grepl('elasticity', input$calcElastTariffs)){
-          return(input$demandTariffs1)
-        }
-        if (input$supplyTariffs == "Bertrand" & !grepl('elasticity', input$calcElastTariffs)){
-          return(input$demandTariffs2)
-        }
-        if (input$supplyTariffs == "Cournot" & grepl('elasticity', input$calcElastTariffs)){
-          return(input$demandTariffs3)
-        }
-        if (input$supplyTariffs == "Cournot" & !grepl('elasticity', input$calcElastTariffs)){
-          return(input$demandTariffs4)
-        }
-      }
-    })
-
-    demandQuota <- reactive({
-
-      if (req(input$menu) == "Quotas"){
-
-        if (input$supplyQuota == "Bertrand" & grepl('elasticity', input$calcElastQuota)){
-          return(input$demandQuota1)
-        }
-        if (input$supplyQuota == "Bertrand" & !grepl('elasticity', input$calcElastQuota)){
-          return(input$demandQuota2)
-        }
-      }
-    })
-
-    # Elasticity
-    elasticity <- reactive({
-
-      if (req(input$menu) == "Horizontal"){
-
-        if (grepl('elasticity', input$calcElast)){
-          return(input$enterElast)
-        } else {
-          return(NA_real_)
-        }
-      }
-    })
-
-    elasticityTariff <- reactive({
-
-      if (req(input$menu) == "Tariffs"){
-
-        if (grepl('elasticity', input$calcElastTariffs)){
-          return(input$enterElastTariffs)
-        } else {
-          return(NA_real_)
-        }
-      }
-    })
-
-    elasticityQuota <- reactive({
-
-      if (req(input$menu) == "Quotas"){
-
-        if (grepl('elasticity', input$calcElastQuota)){
-          return(input$enterElastQuota)
-        } else {
-          return(NA_real_)
-        }
-      }
-    })
-
+    # I want to refactor this out into modulated scripts (I understand this code, but too unwieldly).
+    ##### reactiveInputs.R
+    source("reactiveInputs.R", local = TRUE)
 
 
     observe({
 
         if(!is.null(input$hotTariffs)){
-
             valuesTariffs[["inputData"]] = hot_to_r(input$hotTariffs)
         }
 
-
         if(!is.null(input$hotQuota)){
-
             valuesQuota[["inputData"]] = hot_to_r(input$hotQuota)
         }
 
@@ -1358,7 +696,6 @@ shinyServer(function(input, output, session) {
             values$inputData = hot_to_r(input$hot)
             values$inputData[!is.na(values$inputData$Name) & values$inputData$Name != '',]
         }
-
     })
 
 
@@ -1373,7 +710,6 @@ shinyServer(function(input, output, session) {
         output <- inputData[,grepl("Quantities|Revenue",colnames(inputData), perl=TRUE)]
 
         missPrices <- isTRUE(any(is.na(prices[ !is.na(output) ] ) ))
-
 
         if(input$supplyTariffs == "2nd Score Auction"){ colnames(inputData) <- gsub("Tariff \n(proportion)","Tariff \n($/unit)", colnames(inputData))}
         else{colnames(inputData) <- gsub("Tariff \n($/unit)","Tariff \n(proportion)", colnames(inputData))}
@@ -1467,14 +803,10 @@ shinyServer(function(input, output, session) {
 
         isOutput <-  grepl("Quantities|Revenues",colnames(indata),perl = TRUE)
 
-
         colnames(indata)[ grepl("Margins",colnames(indata),perl = TRUE)] <- "Margins"
-
         colnames(indata)[isOutput] <- "Output"
 
         indata <- indata[!is.na(indata[,"Output"]),]
-
-
         indata$mcDelta <- 0
 
         if(input$menu == "Tariffs"){
@@ -1497,7 +829,6 @@ shinyServer(function(input, output, session) {
             }
 
             thisSim <- msgCatcher(
-
               # Run merger simulation
               runSims(supply = supplyTariff(), demand = demandTariff(), indata = indata, mktElast = elasticityTariff(),
                         type = input$menu)
@@ -1512,7 +843,6 @@ shinyServer(function(input, output, session) {
             }
 
             thisSim <- msgCatcher(
-
               # Run merger simulation
               runSims(supply = supplyQuota(),demand = demandQuota(), indata = indata, mktElast = elasticityQuota(),
                       type = input$menu)
@@ -1532,7 +862,6 @@ shinyServer(function(input, output, session) {
             }
 
             thisSim <- msgCatcher(
-
                 # Run merger simulation
                 runSimsMergers(supply = supply(), demand = demand(), indata = indata, mktElast = elasticity())
 
@@ -1540,6 +869,7 @@ shinyServer(function(input, output, session) {
 
             thisSim <<- thisSim  # Delete later...
         }
+
 
         thisSim$warning <- grep("are the same|INCREASE in marginal costs", thisSim$warning, value= TRUE, invert=TRUE, perl=TRUE)
         if(length(thisSim$warning) == 0){thisSim$warning = NULL}
@@ -1570,7 +900,6 @@ shinyServer(function(input, output, session) {
             }
 
         }
-
     })
 
 
@@ -1601,7 +930,6 @@ shinyServer(function(input, output, session) {
         nMargins <- inputData[,grepl("Margins",colnames(inputData))]
         nMargins <- length(nMargins[!is.na(nMargins)])
 
-
         if(input$supply == "Cournot" &&
            ((provElast && nMargins > 0)  || (!provElast && nMargins >1) )){
             res <- paste(helpText(tags$b("Note:"), "some model parameters are over-identified. The tables above may be helpful in assessing model fit."))
@@ -1625,7 +953,6 @@ shinyServer(function(input, output, session) {
 
         thisurl <- session$clientData$url_hostname
 
-
         if(grepl("atrnet\\.gov", thisurl, perl=TRUE)){
             res <- paste(h4(span("Internal Server",style="color:blue")))
         }
@@ -1635,8 +962,8 @@ shinyServer(function(input, output, session) {
         else{
             res <- paste(h4(span("Public Server",style="color:red")))
         }
-        res
 
+        res
     })
 
 
@@ -1734,8 +1061,6 @@ shinyServer(function(input, output, session) {
 
 
             res$isParty <- factor(is.finite(valuesQuota[["sim"]]@capacitiesPre) | is.finite(valuesQuota[["sim"]]@capacitiesPost), labels=c("","*"))
-
-
             res$product <- res$mcDelta <- NULL
 
             try(colnames(res) <- c("Foreign Firm","Name","Current Quota Price","New Quota Price", "Price Change (%)","Current Quota Quantity","New Quota Quantity", "Output Change (%)"),silent=TRUE)
@@ -1761,7 +1086,6 @@ shinyServer(function(input, output, session) {
             res <- res[,c(1, ncol(res), 2 : (ncol(res)  - 1))]
 
             thesenames <-  c("Foreign Firm","Name","Current Quota Price","New Quota Price", "Price Change (%)","Current Quota Share (%)","New Quota Share (%)", "Share Change (%)")
-
             colnames(res) <- thesenames
 
             if(inLevels){ colnames(res)[ colnames(res) == "Price Change (%)"] = "Price Change ($/unit)"}
@@ -1781,8 +1105,6 @@ shinyServer(function(input, output, session) {
 
             res <- NULL
             capture.output(try(res <- summary(values[["sim"]], revenue= FALSE,market=FALSE),silent=TRUE))
-
-
             res$product <- res$mcDelta <- NULL
 
             try(colnames(res) <- c("Merging Party","Name","Pre-Merger Price","Post-Merger Price", "Price Change (%)","Pre-Merger Quantity","Post-Merger Quantity", "Output Change (%)"),silent=TRUE)
@@ -1809,20 +1131,16 @@ shinyServer(function(input, output, session) {
 
 
             #if(isAIDS && missPrice){thesenames <- thesenames[!thesenames %in% c("Pre-Merger Price","Post-Merger Price")]}
-
             colnames(res) <- thesenames
 
             if(all(is.na(res$`Compensating Marginal Cost Reduction (%)`))) res$`Compensating Marginal Cost Reduction (%)` <- NULL
-
             #res[,c("Pre-Merger Share (%)","Post-Merger Share (%)")] <-  res[,c("Pre-Merger Share (%)","Post-Merger Share (%)")] * 100 / colSums( res[,c("Pre-Merger Share (%)","Post-Merger Share (%)")])
 
             if(inLevels){ colnames(res)[ colnames(res) == "Price Change (%)"] = "Price Change ($/unit)"}
 
         }
 
-
         res
-
 
     }, digits = 2)
 
@@ -1878,7 +1196,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetTariffs!= "diagpanelTariffs" || input$simulateTariffs == 0 || is.null(valuesTariffs[["sim"]])){return()}
 
         res <- gendiag(valuesTariffs[["sim"]])
-
         res
 
     }, digits = 0 ,rownames = TRUE,align="c")
@@ -1888,7 +1205,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetQuota != "diagpanelQuota" || input$simulateQuota == 0 || is.null(valuesQuota[["sim"]])){return()}
 
         res <- gendiag(valuesQuota[["sim"]])
-
         res
 
     }, digits = 0 ,rownames = TRUE,align="c")
@@ -1899,7 +1215,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabset!= "diagpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
         res <- gendiagMergers(values[["sim"]])
-
         res
 
     }, digits = 0 ,rownames = TRUE,align="c")
@@ -1911,7 +1226,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetTariffs!= "diagpanelTariffs" || input$simulateTariffs == 0 || is.null(valuesTariffs[["sim"]])){return()}
 
         res <- gendiag(valuesTariffs[["sim"]], mktElast=TRUE)
-
         res
 
     }, digits =2,rownames = FALSE,align="c")
@@ -1921,7 +1235,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetQuota!= "diagpanelQuota" || input$simulateQuota == 0 || is.null(valuesQuota[["sim"]])){return()}
 
         res <- gendiag(valuesQuota[["sim"]], mktElast=TRUE)
-
         res
 
     }, digits =2,rownames = FALSE,align="c")
@@ -1932,12 +1245,9 @@ shinyServer(function(input, output, session) {
         if(input$inTabset!= "diagpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
         res <- gendiagMergers(values[["sim"]], mktElast=TRUE)
-
         res
 
     }, digits =2,rownames = FALSE,align="c")
-
-
 
 
     ## display parameters to diagnostics tab
@@ -2071,9 +1381,7 @@ shinyServer(function(input, output, session) {
 
         if(input$inTabsetTariffs!= "codepanelTariffs"){return()}
 
-
         thiscode <- gencode("Tariffs")
-
         cat(thiscode)
 
     })
@@ -2083,9 +1391,7 @@ shinyServer(function(input, output, session) {
 
         if( input$inTabsetQuota!= "codepanelQuota"){return()}
 
-
         thiscode <- gencode("Quotas")
-
         cat(thiscode)
 
     })
@@ -2094,8 +1400,6 @@ shinyServer(function(input, output, session) {
     output$results_code <- renderPrint({
 
         if(input$inTabset!= "codepanel"){return()}
-
-
 
         indata <- values[["inputData"]]
         indata <- indata[!is.na(indata$Name) & indata$Name != '',]
@@ -2132,10 +1436,7 @@ shinyServer(function(input, output, session) {
         }
 
         else{
-
             thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
-
-
         }
 
         thisdemand <- gsub("\\s*\\(.*","", demand() ,perl=TRUE)
@@ -2146,10 +1447,7 @@ shinyServer(function(input, output, session) {
                        paste0("mktElast = ", thisElast,collapse = ""),
                        paste0("insideSize = ",thisSize, collapse=""),
                        "labels = simdata$Name"
-
         )
-
-
 
 
         if(supply() == "Cournot"){
@@ -2197,7 +1495,6 @@ shinyServer(function(input, output, session) {
         )
 
         cat(thiscode)
-
     })
 
 
@@ -2207,8 +1504,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetTariffs!= "msgpanelTariffs" || input$simulateTariffs == 0 || is.null(valuesTariffs[["msg"]])){return()}
 
         print(valuesTariffs[["msg"]]$warning)
-
-
     })
 
     ## display messages to message tab
@@ -2217,8 +1512,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabset!= "msgpanel" || input$simulate == 0 || is.null(values[["msg"]]$warning)){return()}
 
         paste(values[["msg"]]$warning,collapse="\n")
-
-
     })
 
     output$warningsQuota <- renderPrint({
@@ -2226,7 +1519,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetQuota!= "msgpanelQuota" || input$simulateQuota == 0 || is.null(valuesQuota[["msg"]])){return()}
 
         print(valuesQuota[["msg"]]$warning)
-
     })
 
     output$errorsTariffs <- renderPrint({
@@ -2234,7 +1526,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetTariffs!= "msgpanelTariffs" || input$simulateTariffs == 0 || is.null(valuesTariffs[["msg"]]$error)){cat(return())}
 
         print(valuesTariffs[["msg"]]$error)
-
     })
 
     output$errorsQuota <- renderPrint({
@@ -2242,7 +1533,6 @@ shinyServer(function(input, output, session) {
         if(input$inTabsetQuota!= "msgpanelQuota" || input$simulateQuota == 0 || is.null(valuesQuota[["msg"]]$error)){cat(return())}
 
         print(valuesQuota[["msg"]]$error)
-
     })
 
     output$errors <- renderText({
@@ -2250,7 +1540,5 @@ shinyServer(function(input, output, session) {
         if(input$inTabset!= "msgpanel" || input$simulate == 0 || is.null(values[["msg"]]$error)){cat(return())}
 
         paste(values[["msg"]]$error,collapse="\n")
-
     })
-
 })
