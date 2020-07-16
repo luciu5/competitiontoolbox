@@ -66,8 +66,28 @@ shinyServer(function(input, output, session) {
     }
 
 
-    ##### genInputData.R
-    source("genInputData.R", local = TRUE)
+    genShareOut <- function(sim){
+      if( grepl("cournot",class(sim),ignore.case = TRUE)){return()}
+
+      isCES <- grepl("ces",class(sim),ignore.case = TRUE)
+
+      res <- data.frame('No-purchase\n Share (%)'= c(
+        1 - sum(calcShares(sim, preMerger=TRUE,revenue=isCES)),
+        1 - sum(calcShares(sim, preMerger=FALSE,revenue=isCES))
+      )
+      ,check.names = FALSE
+      )*100
+
+      res$'Revenues ($)' <- as.integer(round(c(calcRevenues(sim, preMerger=TRUE, market = TRUE ),
+                                               calcRevenues(sim, preMerger=FALSE, market = TRUE )
+      )))
+
+      rownames(res) <- c("Current Tariff","New Tariff")
+
+      if( grepl("aids",class(sim),ignore.case = TRUE)) res$'No-purchase\n Share (%)' <- NULL
+
+      return(res)
+    }
 
 
     gencode <- function(type){
@@ -124,9 +144,7 @@ shinyServer(function(input, output, session) {
                            paste0("mktElast = ", thisElast,collapse = ""),
                            #paste0("insideSize = ",thisSize, collapse=""),
                            "labels = simdata$Name"
-
             )
-
 
             if(input$supplyTariffs == "Cournot"){
                 atrfun <- "cournot_tariff"
@@ -173,7 +191,6 @@ shinyServer(function(input, output, session) {
                            #paste0("insideSize = ",thisSize, collapse=""),
                            "labels = simdata$Name"
             )
-
 
             if(input$supplyQuota == "Cournot"){
                 atrfun <- "cournot_tariff"
@@ -229,119 +246,7 @@ shinyServer(function(input, output, session) {
     }
 
 
-    genShareOut <- function(sim){
-        if( grepl("cournot",class(sim),ignore.case = TRUE)){return()}
-
-        isCES <- grepl("ces",class(sim),ignore.case = TRUE)
-
-        res <- data.frame('No-purchase\n Share (%)'= c(
-            1 - sum(calcShares(sim, preMerger=TRUE,revenue=isCES)),
-            1 - sum(calcShares(sim, preMerger=FALSE,revenue=isCES))
-        )
-        ,check.names = FALSE
-        )*100
-
-        res$'Revenues ($)' <- as.integer(round(c(calcRevenues(sim, preMerger=TRUE, market = TRUE ),
-                                                 calcRevenues(sim, preMerger=FALSE, market = TRUE )
-        )))
-
-        rownames(res) <- c("Current Tariff","New Tariff")
-
-        if( grepl("aids",class(sim),ignore.case = TRUE)) res$'No-purchase\n Share (%)' <- NULL
-
-        return(res)
-    }
-
-    gensum <- function(res, indata,type = c("Tariffs","Quotas")){
-        #a function to generate summary stats for results tab
-
-        type=match.arg(type)
-
-        isCournot <- grepl("Cournot",class(res))
-        isAuction <- grepl("Auction",class(res))
-        isRevDemand <- grepl("ces|aids",class(res),ignore.case = TRUE)
-        isLogit <- grepl("logit",class(res),ignore.case = TRUE)
-
-        missPrices <- any(is.na(res@prices))
-
-        inLevels <- FALSE
-
-        if(isAuction && missPrices){inLevels = TRUE}
-
-        indata <- indata[!is.na(indata$Name),]
-
-        tariffPre <- indata[,grepl("Cur.*\\n(Tariff|Quota)",colnames(indata), perl= TRUE),drop=TRUE]
-        tariffPost <- indata[,grepl("New.*\\n(Tariff|Quota)",colnames(indata), perl=TRUE),drop=TRUE]
-
-        if(type == "Tariffs"){
-            tariffPre[is.na(tariffPre)] <- 0
-            tariffPost[is.na(tariffPost)] <- 0
-            istaxed <- tariffPre > 0 | tariffPost > 0
-        }
-        else if (type=="Quotas"){
-            ## set quota for unconstrained firms to be Infinite
-            istaxed <- is.finite(tariffPre) | is.finite(tariffPost)
-        }
-
-
-        if(isCournot){
-
-            capture.output( s <- summary(res, market = FALSE))
-            theseshares <- drop(res@quantities/sum(res@quantities))
-
-            totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
-            s$sharesPost <- s$quantityPost/totQuantPost*100
-
-        }
-
-        else{
-            capture.output(s <- summary(res, revenue = isRevDemand & missPrices,levels = inLevels))
-            theseshares <- calcShares(res, preMerger=TRUE, revenue=isRevDemand & missPrices)
-
-            theseshares <- theseshares/sum(theseshares)
-        }
-
-        thisgovrev <- thispsdelta <- thiscv <- NA
-
-        try(thiscv <- CV(res),silent = TRUE)
-
-        if(type == "Quotas"){
-            tariffPre[] <- 0
-            tariffPost[] <- 0
-        }
-
-        try(thisgovrev <- sum(tariffPost * calcRevenues(res, preMerger = FALSE) - tariffPre * calcRevenues(res, preMerger = TRUE), na.rm=TRUE))
-        try(thispsdelta  <- tapply(drop(calcProducerSurplus(res,preMerger=FALSE)*(1 - tariffPost)) - drop(calcProducerSurplus(res,preMerger=TRUE)*(1 - tariffPre)), istaxed,sum),silent=TRUE)
-
-        foreignshare <- s$sharesPost[istaxed]
-        domesticshare <- s$sharesPost[!istaxed]
-
-        res <- with(s, data.frame(
-            #'Current Tariff HHI' = as.integer(round(hhi(res,preMerger=TRUE))),
-            #'HHI Change' = as.integer(round(hhi(res,preMerger=FALSE) -  hhi(res,preMerger=TRUE))),
-            'Domestic Firm Price Change (%)'= sum(priceDelta[!istaxed] * domesticshare, na.rm=TRUE) / sum(domesticshare),
-            'Foreign Firm Price Change (%)'= sum(priceDelta[istaxed] * foreignshare, na.rm=TRUE) / sum(foreignshare),
-            'Industry Price Change (%)' = sum(priceDelta * sharesPost/100,na.rm=TRUE),
-            'Consumer Harm ($)' = thiscv,
-            'Domestic Firm Benefit ($)' = thispsdelta[1],
-            'Foreign Firm Harm ($)' = -thispsdelta[2],
-            `Gov't Revenue ($)` = thisgovrev,
-            'Net Domestic Harm ($)'= thiscv - thispsdelta[1]  - thisgovrev,
-            'Net Total Harm ($)'= thiscv - thispsdelta[1] - thispsdelta[2] - thisgovrev,
-
-            #'Estimated Market Elasticity' = thiselast,
-            check.names=FALSE
-        ))
-
-        if(inLevels){
-            colnames(res) <- gsub('(?<=Price Change\\s)\\(%\\)',"($/unit)",colnames(res), perl=TRUE)
-        }
-
-        return(res)
-    }
-
-
-    gendiag <- function(res,mktElast=FALSE){
+    gendiag <- function(res, mktElast = FALSE){
         #a function to generate diagnostics data
 
         isCournot <- grepl("Cournot",class(res))
@@ -396,12 +301,149 @@ shinyServer(function(input, output, session) {
         return(res)
     }
 
-    ##### runSims.R
-    source("runSims.R", local = TRUE)
+    gendiagMergers <- function(res, mktElast = FALSE){
+      #a function to generate diagnostics data
+
+      isCournot <- grepl("Cournot",class(res))
+
+      if(isCournot){labels= res@labels[[1]]}
+      else{labels=res@labels}
+
+      obsPrices <- res@prices
+      obsShares <- res@shares
+      obsMargins <- res@margins
+      obsElast <- res@mktElast
+
+      #if(length(obsMargins[!is.na(obsMargins)]) < 2){return()}
+
+      prePrices <- unname(drop(res@pricePre))
+      preMargins <- drop(calcMargins(res, preMerger=TRUE))
+      preShares <- drop(calcShares(res, preMerger=TRUE))
+      preShares <- drop(preShares/sum(preShares))
+      preElast <- elast(res, preMerger=TRUE, market=TRUE)
+
+      if(!mktElast){
+
+        res <- data.frame(
+          "Inputted Prices"= obsPrices,
+          "Fitted Prices" = prePrices,
+          "Price Change (%)"= (1 - obsPrices/prePrices)*100,
+          "Inputted Shares (%)" = obsShares*100,
+          "Fitted Shares(%)"=preShares*100,
+          "Share Change (%)"=(1 - obsShares/preShares)*100,
+          "Inputted Margins (%)" = obsMargins*100,
+          "Fitted  Margins (%)"=preMargins *100,
+          "Margin Change (%)"= (1 - obsMargins/preMargins)*100,
+          #'Market Elasticity'= 1 - obsElast/preElast,
+          check.names = FALSE
+        )
+
+        #rmThese <- colSums(abs(res),na.rm=TRUE)
+        if(isCournot)  res[-1,grepl('Prices',colnames(res))] <- NA
+
+        #res <- res[,rmThese >1e-3,drop=FALSE]
+        if(!isCournot) rownames(res) <- labels
+
+      }
+
+      else{ res <- data.frame(
+        'Inputted Elasticity' = obsElast,
+        'Fitted Elasticity' = preElast,
+        'Elasticity Change (%)'= (1 - obsElast/preElast)*100,
+        check.names = FALSE)
+
+      #if(res < 1e-3) res <- NULL
+      }
+
+      return(res)
+    }
 
 
-    ##### genInputDataMergers.R
-    source("genInputDataMergers.R", local = TRUE)
+    gensum <- function(res, indata,type = c("Tariffs", "Quotas")){
+      #a function to generate summary stats for results tab
+
+      type=match.arg(type)
+
+      isCournot <- grepl("Cournot",class(res))
+      isAuction <- grepl("Auction",class(res))
+      isRevDemand <- grepl("ces|aids",class(res),ignore.case = TRUE)
+      isLogit <- grepl("logit",class(res),ignore.case = TRUE)
+
+      missPrices <- any(is.na(res@prices))
+
+      inLevels <- FALSE
+
+      if(isAuction && missPrices){inLevels = TRUE}
+
+      indata <- indata[!is.na(indata$Name),]
+
+      tariffPre <- indata[,grepl("Cur.*\\n(Tariff|Quota)",colnames(indata), perl= TRUE),drop=TRUE]
+      tariffPost <- indata[,grepl("New.*\\n(Tariff|Quota)",colnames(indata), perl=TRUE),drop=TRUE]
+
+      if(type == "Tariffs"){
+        tariffPre[is.na(tariffPre)] <- 0
+        tariffPost[is.na(tariffPost)] <- 0
+        istaxed <- tariffPre > 0 | tariffPost > 0
+      }
+      else if (type=="Quotas"){
+        ## set quota for unconstrained firms to be Infinite
+        istaxed <- is.finite(tariffPre) | is.finite(tariffPost)
+      }
+
+
+      if(isCournot){
+        capture.output( s <- summary(res, market = FALSE))
+        theseshares <- drop(res@quantities/sum(res@quantities))
+
+        totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
+        s$sharesPost <- s$quantityPost/totQuantPost*100
+      }
+
+      else{
+        capture.output(s <- summary(res, revenue = isRevDemand & missPrices,levels = inLevels))
+        theseshares <- calcShares(res, preMerger=TRUE, revenue=isRevDemand & missPrices)
+
+        theseshares <- theseshares/sum(theseshares)
+      }
+
+      thisgovrev <- thispsdelta <- thiscv <- NA
+
+      try(thiscv <- CV(res),silent = TRUE)
+
+      if(type == "Quotas"){
+        tariffPre[] <- 0
+        tariffPost[] <- 0
+      }
+
+      try(thisgovrev <- sum(tariffPost * calcRevenues(res, preMerger = FALSE) - tariffPre * calcRevenues(res, preMerger = TRUE), na.rm=TRUE))
+      try(thispsdelta  <- tapply(drop(calcProducerSurplus(res,preMerger=FALSE)*(1 - tariffPost)) - drop(calcProducerSurplus(res,preMerger=TRUE)*(1 - tariffPre)), istaxed,sum),silent=TRUE)
+
+      foreignshare <- s$sharesPost[istaxed]
+      domesticshare <- s$sharesPost[!istaxed]
+
+      res <- with(s, data.frame(
+        #'Current Tariff HHI' = as.integer(round(hhi(res,preMerger=TRUE))),
+        #'HHI Change' = as.integer(round(hhi(res,preMerger=FALSE) -  hhi(res,preMerger=TRUE))),
+        'Domestic Firm Price Change (%)'= sum(priceDelta[!istaxed] * domesticshare, na.rm=TRUE) / sum(domesticshare),
+        'Foreign Firm Price Change (%)'= sum(priceDelta[istaxed] * foreignshare, na.rm=TRUE) / sum(foreignshare),
+        'Industry Price Change (%)' = sum(priceDelta * sharesPost/100,na.rm=TRUE),
+        'Consumer Harm ($)' = thiscv,
+        'Domestic Firm Benefit ($)' = thispsdelta[1],
+        'Foreign Firm Harm ($)' = -thispsdelta[2],
+        `Gov't Revenue ($)` = thisgovrev,
+        'Net Domestic Harm ($)'= thiscv - thispsdelta[1]  - thisgovrev,
+        'Net Total Harm ($)'= thiscv - thispsdelta[1] - thispsdelta[2] - thisgovrev,
+
+        #'Estimated Market Elasticity' = thiselast,
+        check.names=FALSE
+      ))
+
+      if(inLevels){
+        colnames(res) <- gsub('(?<=Price Change\\s)\\(%\\)',"($/unit)",colnames(res), perl=TRUE)
+      }
+
+      return(res)
+    }
 
 
     gensumMergers <- function(res){
@@ -480,66 +522,21 @@ shinyServer(function(input, output, session) {
     }
 
 
-    gendiagMergers <- function(res,mktElast=FALSE){
-        #a function to generate diagnostics data
+    ##### genInputData.R
+    source("genInputData.R", local = TRUE)
 
-        isCournot <- grepl("Cournot",class(res))
+    ##### genInputDataMergers.R
+    source("genInputDataMergers.R", local = TRUE)
 
-        if(isCournot){labels= res@labels[[1]]}
-        else{labels=res@labels}
-
-        obsPrices <- res@prices
-        obsShares <- res@shares
-        obsMargins <- res@margins
-        obsElast <- res@mktElast
-
-        #if(length(obsMargins[!is.na(obsMargins)]) < 2){return()}
-
-        prePrices <- unname(drop(res@pricePre))
-        preMargins <- drop(calcMargins(res, preMerger=TRUE))
-        preShares <- drop(calcShares(res, preMerger=TRUE))
-        preShares <- drop(preShares/sum(preShares))
-        preElast <- elast(res, preMerger=TRUE, market=TRUE)
-
-        if(!mktElast){
-
-            res <- data.frame(
-                "Inputted Prices"= obsPrices,
-                "Fitted Prices" = prePrices,
-                "Price Change (%)"= (1 - obsPrices/prePrices)*100,
-                "Inputted Shares (%)" = obsShares*100,
-                "Fitted Shares(%)"=preShares*100,
-                "Share Change (%)"=(1 - obsShares/preShares)*100,
-                "Inputted Margins (%)" = obsMargins*100,
-                "Fitted  Margins (%)"=preMargins *100,
-                "Margin Change (%)"= (1 - obsMargins/preMargins)*100,
-                #'Market Elasticity'= 1 - obsElast/preElast,
-                check.names = FALSE
-            )
-
-            #rmThese <- colSums(abs(res),na.rm=TRUE)
-            if(isCournot)  res[-1,grepl('Prices',colnames(res))] <- NA
-
-            #res <- res[,rmThese >1e-3,drop=FALSE]
-            if(!isCournot) rownames(res) <- labels
-
-        }
-
-        else{ res <- data.frame(
-            'Inputted Elasticity' = obsElast,
-            'Fitted Elasticity' = preElast,
-            'Elasticity Change (%)'= (1 - obsElast/preElast)*100,
-            check.names = FALSE)
-
-        #if(res < 1e-3) res <- NULL
-        }
-
-        return(res)
-    }
-
+    ##### runSims.R
+    source("runSims.R", local = TRUE)
 
     ##### runSimsMergers.R
     source("runSimsMergers.R", local = TRUE)
+
+    ##### reactiveInputs.R
+    source("reactiveInputs.R", local = TRUE)
+
 
 
     # Creates the graph for the Summary tab of Numerical Simulations (ATR)
@@ -576,8 +573,6 @@ shinyServer(function(input, output, session) {
             plotInd %+% subset(indicboxdata, Cut_type == input$indexIndATR & shareOutThresh == input$shareOutIndATR & !Supply == "Pooled") +
                 facet_wrap(Supply~Demand,scales = "fixed",nrow=1) + theme(axis.text.y  = element_text(size=7))
         }
-
-
     })
 
     # Number of Simulated Mergers for Indices and Summary Tab of ATR Numerical Simulations
@@ -671,13 +666,6 @@ shinyServer(function(input, output, session) {
     observeEvent(input$menu == "Merger",{
         values[["inputData"]] <- genInputDataMergers()
     })
-
-    #####
-    # Create reactive demand object depending on merger type
-    # Instead of running nested reactive calls for Horizontal and Vertical and Tariffs, etc. for demand/supply/elasticity,
-    # I want to refactor this out into modulated scripts (I understand this code, but too unwieldly).
-    ##### reactiveInputs.R
-    source("reactiveInputs.R", local = TRUE)
 
 
     observe({
@@ -898,7 +886,6 @@ shinyServer(function(input, output, session) {
             } else if(input$menu == "Horizontal" ){
                 updateTabsetPanel(session,inputId  = "inTabset", selected = "msgpanel")
             }
-
         }
     })
 
@@ -1064,7 +1051,6 @@ shinyServer(function(input, output, session) {
             res$product <- res$mcDelta <- NULL
 
             try(colnames(res) <- c("Foreign Firm","Name","Current Quota Price","New Quota Price", "Price Change (%)","Current Quota Quantity","New Quota Quantity", "Output Change (%)"),silent=TRUE)
-
         }
 
         else{
@@ -1089,7 +1075,6 @@ shinyServer(function(input, output, session) {
             colnames(res) <- thesenames
 
             if(inLevels){ colnames(res)[ colnames(res) == "Price Change (%)"] = "Price Change ($/unit)"}
-
         }
 
         res
@@ -1108,7 +1093,6 @@ shinyServer(function(input, output, session) {
             res$product <- res$mcDelta <- NULL
 
             try(colnames(res) <- c("Merging Party","Name","Pre-Merger Price","Post-Merger Price", "Price Change (%)","Pre-Merger Quantity","Post-Merger Quantity", "Output Change (%)"),silent=TRUE)
-
         }
 
         else{
