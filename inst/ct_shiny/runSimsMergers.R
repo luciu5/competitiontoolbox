@@ -108,6 +108,7 @@ runSimsMergers <- function(supply, demand, indata, mktElast){
                                   mcDelta = indata$mcDelta,
                                   labels=indata$Name)
            ),
+
          Cournot = switch(demand,
                           linear = cournot(prices = na.omit(prices)[1],
                                            #demand = rep("linear", length(prices)),

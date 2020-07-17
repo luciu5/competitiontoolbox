@@ -125,6 +125,7 @@ runSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quota
                                   ownerPost= ownerPost,
                                   mcDelta = indata$mcDelta, labels=indata$Name)
              ),
+
            Cournot = switch(demand,
                             linear = cournot(prices = na.omit(prices)[1],
                                              #demand = rep("linear", length(prices)),
@@ -190,8 +191,6 @@ runSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quota
   }
 
   else if ( type == "Quotas"){
-
-
     switch(supply,
            Bertrand =
              switch(demand,
@@ -214,22 +213,21 @@ runSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quota
                                          ownerPost= ownerPost,
                                          insideSize = insideSize ,
                                          mcDelta = indata$mcDelta, labels=indata$Name,  mktElast = mktElast )
-             ),
-           Cournot =
+             )#,
 
-             cournot(prices= prices[firstPrice],
-                     demand = gsub("\\s+\\(.*","",demand,perl=TRUE),
-                     cost= rep("linear", nrow(indata)),
-                     quantities = as.matrix(indata[,"Output"]),
-                     margins= as.matrix(margins),
-                     ownerPre= ownerPre,
-                     ownerPost= ownerPost,
-                     mktElast = ifelse( grepl("unknown elasticity", demand),
-                                        NA_real_, mktElast),
-                     mcDelta = indata$mcDelta,
-                     labels=list(as.character(indata$Name),indata$Name[firstPrice]))
+           # Cournot =
+           #   cournot(prices= prices[firstPrice],
+           #           demand = gsub("\\s+\\(.*","",demand,perl=TRUE),
+           #           cost= rep("linear", nrow(indata)),
+           #           quantities = as.matrix(indata[,"Output"]),
+           #           margins= as.matrix(margins),
+           #           ownerPre= ownerPre,
+           #           ownerPost= ownerPost,
+           #           mktElast = ifelse( grepl("unknown elasticity", demand),
+           #                              NA_real_, mktElast),
+           #           mcDelta = indata$mcDelta,
+           #           labels=list(as.character(indata$Name),indata$Name[firstPrice]))
     )
-
 
   }
 }

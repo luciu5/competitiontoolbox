@@ -123,7 +123,7 @@ shinyServer(function(input, output, session) {
                                 "NA_real_"
             )
 
-            if(grepl("logit", demandTariff(), ignore.case =TRUE)){
+            if(grepl("logit", demand(), ignore.case =TRUE)){
                 thisSize <- "sum(simdata$`Quantities`)"
             }
             else if(all(is.na(indata[,grepl("price",cnames, ignore.case = TRUE)]))){
@@ -136,7 +136,7 @@ shinyServer(function(input, output, session) {
                 thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
             }
 
-            thisdemand <- gsub("\\s*\\(.*","", demandTariff() ,perl=TRUE)
+            thisdemand <- gsub("\\s*\\(.*","", demand() ,perl=TRUE)
 
             argvalues[1] <- paste(c("demand = ", shQuote(thisdemand)), collapse = "")
 
@@ -171,7 +171,7 @@ shinyServer(function(input, output, session) {
                                 "NA_real_"
             )
 
-            if(grepl("logit", demandQuota(), ignore.case =TRUE)){
+            if(grepl("logit", demand(), ignore.case =TRUE)){
                 thisSize <- "sum(simdata$`Quantities`)"
             }
             else if(all(is.na(indata[,grepl("price",cnames, ignore.case = TRUE)]))){
@@ -182,7 +182,7 @@ shinyServer(function(input, output, session) {
                 thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
             }
 
-            thisdemand <- gsub("\\s*\\(.*","", demandQuota() ,perl=TRUE)
+            thisdemand <- gsub("\\s*\\(.*","", demand() ,perl=TRUE)
 
             argvalues[1] <- paste(c("demand = ", shQuote(thisdemand)), collapse = "")
 
@@ -705,7 +705,7 @@ shinyServer(function(input, output, session) {
         if(missPrices && input$supplyTariffs =="2nd Score Auction"){colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n ($/unit)"}
         else{colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n (p-c)/p"}
 
-        if (missPrices && any(grepl("ces|aids", demandTariff(), perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
+        if (missPrices && any(grepl("ces|aids", demand(), perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
         else{{colnames(inputData)[grepl("Revenues",colnames(inputData))] <- "Quantities"}}
 
         if (!is.null(inputData))
@@ -732,7 +732,7 @@ shinyServer(function(input, output, session) {
         if(missPrices && input$supplyQuota =="2nd Score Auction"){colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n ($/unit)"}
         else{colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n (p-c)/p"}
 
-        if (missPrices && any(grepl("ces|aids", demandQuota(), perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
+        if (missPrices && any(grepl("ces|aids", demand(), perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
         else{{colnames(inputData)[grepl("Revenues",colnames(inputData))] <- "Quantities"}}
 
         if (!is.null(inputData))
@@ -812,13 +812,11 @@ shinyServer(function(input, output, session) {
             indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
 
             ## Very useful, output the three information types for the merger simulation
-            if(exists("supplyTariff") & exists("demandTariff") & exists("elasticityTariff")){
-              print(c(supplyTariff(), demandTariff(), as.character(elasticityTariff())))
-            }
+            print(c(supply(), demand(), as.character(elasticity())))
 
             thisSim <- msgCatcher(
               # Run merger simulation
-              runSims(supply = supplyTariff(), demand = demandTariff(), indata = indata, mktElast = elasticityTariff(),
+              runSims(supply = supply(), demand = demand(), indata = indata, mktElast = elasticity(),
                         type = input$menu)
               )
 
@@ -826,13 +824,11 @@ shinyServer(function(input, output, session) {
             indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
 
             ## Very useful, output the three information types for the merger simulation
-            if(exists("supplyQuota") & exists("demandQuota") & exists("elasticityQuota")){
-              print(c(supplyQuota(), demandQuota(), as.character(elasticityQuota())))
-            }
+            print(c(supply(), demand(), as.character(elasticity())))
 
             thisSim <- msgCatcher(
               # Run merger simulation
-              runSims(supply = supplyQuota(),demand = demandQuota(), indata = indata, mktElast = elasticityQuota(),
+              runSims(supply = supply(),demand = demand(), indata = indata, mktElast = elasticity(),
                       type = input$menu)
               )
 
@@ -845,9 +841,7 @@ shinyServer(function(input, output, session) {
             indata$'Post-merger\n Owner' <- factor(indata$'Post-merger\n Owner',levels=unique(indata$'Post-merger\n Owner'))
 
             ## Very useful, output the three information types for the merger simulation
-            if(exists("supply") & exists("demand") & exists("elasticity")){
-              print(c(supply(), demand(), as.character(elasticity())))
-            }
+            print(c(supply(), demand(), as.character(elasticity())))
 
             thisSim <- msgCatcher(
                 # Run merger simulation
