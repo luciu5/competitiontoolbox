@@ -57,7 +57,6 @@ mergersSummary <- function(res){
     check.names=FALSE
   ))
 
-
   ## Append parenthetical with % of post-merger revenues
   result <- rbind(result,result)
   result[2, !grepl("\\$",colnames(result))] <- NA

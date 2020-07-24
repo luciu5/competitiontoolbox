@@ -138,7 +138,7 @@ navbarPage("", id = "menu",
                                                                                              A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.
                                                                                              Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues.")
                                                          ),
-                                                         tabPanel("Details", value = "detpanel", br(),br(), tableOutput("results_shareOut"),br(), tableOutput("results_detailed")
+                                                         tabPanel("Details", value = "detpanel", br(), br(), tableOutput("results_shareOut"), br(), tableOutput("results_detailed")
 
                                                                   #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
                                                                   #                  helpText(tags$b("Note:"), "shares are revenue-based.")
