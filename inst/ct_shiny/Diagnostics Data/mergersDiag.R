@@ -1,6 +1,6 @@
 
 mergersDiag <- function(res, mktElast = FALSE){
-  #a function to generate diagnostics data
+  #a function to generate diagnostic data
 
   isCournot <- grepl("Cournot",class(res))
 

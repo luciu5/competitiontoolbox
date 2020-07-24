@@ -91,38 +91,29 @@ shinyServer(function(input, output, session) {
     }
 
 
-    ##### mergersInputs.R
+    ##### Source Mergers and Trade functions
+    # Inputs
     source(paste0(getwd(), "/Inputs/mergersInputs.R"), local = TRUE)
-
-    ##### tradeInputs.R
     source(paste0(getwd(), "/Inputs/tradeInputs.R"), local = TRUE)
-
-    ##### reactiveInputs.R
     source(paste0(getwd(), "/Inputs/reactiveInputs.R"), local = TRUE)
 
-    ##### mergeraDiag.R
-    source(paste0(getwd(), "/Diagnostics/mergersDiag.R"), local = TRUE)
-
-    ##### tradeDiag.R
-    source(paste0(getwd(), "/Diagnostics/tradeDiag.R"), local = TRUE)
-
-    ##### mergersSims.R
+    # Simulations
     source(paste0(getwd(), "/Simulations/mergersSims.R"), local = TRUE)
-
-    ##### tradeSims.R
     source(paste0(getwd(), "/Simulations/tradeSims.R"), local = TRUE)
 
-    ##### mergersSummary.R
-    source(paste0(getwd(), "/Summary/mergersSummary.R"), local = TRUE)
+    # Summary Tables
+    source(paste0(getwd(), "/Summary Tables/mergersSummary.R"), local = TRUE)
+    source(paste0(getwd(), "/Summary Tables/tradeSummary.R"), local = TRUE)
 
-    ##### tradeSummary.R
-    source(paste0(getwd(), "/Summary/tradeSummary.R"), local = TRUE)
+    # Diagnostics Data
+    source(paste0(getwd(), "/Diagnostics Data/mergersDiag.R"), local = TRUE)
+    source(paste0(getwd(), "/Diagnostics Data/tradeDiag.R"), local = TRUE)
 
-    ##### mergersTemplateCode.R
+    # Template Code
     source(paste0(getwd(), "/Template Code/mergersTemplateCode.R"), local = TRUE)
-
-    ##### tradeTemplateCode.R
     source(paste0(getwd(), "/Template Code/tradeTemplateCode.R"), local = TRUE)
+
+    # Output
 
 
 
