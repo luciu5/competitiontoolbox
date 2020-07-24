@@ -1,5 +1,5 @@
 
-runSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quotas")){
+tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quotas")){
   # a function to execute code from antitrust package based on ui inputs
 
   type <- match.arg(type)

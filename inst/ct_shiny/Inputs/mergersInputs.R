@@ -1,5 +1,5 @@
 
-genInputDataMergers <- function(){
+mergersInputs <- function(){
   # a function to generate default input data set for simulations
 
   inputData <- data.frame(

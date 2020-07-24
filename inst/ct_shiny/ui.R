@@ -28,7 +28,6 @@ navbarPage("", id = "menu",
                             )
                     ),
 
-
                    navbarMenu("Mergers",
                               tabPanel("Horizontal", style = "overflow-y:scroll; max-height: 90vh",
                                        fluidPage(

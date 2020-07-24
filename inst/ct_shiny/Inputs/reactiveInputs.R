@@ -5,9 +5,11 @@ supply <- reactive({
   if (req(input$menu) == "Horizontal"){
     return(input$supply)
   }
+
   if (req(input$menu) == "Tariffs"){
     return(input$supplyTariffs)
   }
+
   if (req(input$menu) == "Quotas"){
     return(input$supplyQuota)
   }
@@ -18,7 +20,6 @@ supply <- reactive({
 demand <- reactive({
 
   if (req(input$menu) == "Horizontal"){
-
     if (input$supply == "Bertrand" & grepl('elasticity', input$calcElast)){
       return(input$demand1)
     }
@@ -38,8 +39,8 @@ demand <- reactive({
       return(input$demand6)
     }
   }
-  if (req(input$menu) == "Tariffs"){
 
+  if (req(input$menu) == "Tariffs"){
     if (input$supplyTariffs == "Bertrand" & grepl('elasticity', input$calcElastTariffs)){
       return(input$demandTariffs1)
     }
@@ -53,8 +54,8 @@ demand <- reactive({
       return(input$demandTariffs4)
     }
   }
-  if (req(input$menu) == "Quotas"){
 
+  if (req(input$menu) == "Quotas"){
     if (input$supplyQuota == "Bertrand" & grepl('elasticity', input$calcElastQuota)){
       return(input$demandQuota1)
     }
@@ -69,23 +70,22 @@ demand <- reactive({
 elasticity <- reactive({
 
   if (req(input$menu) == "Horizontal"){
-
     if (grepl('elasticity', input$calcElast)){
       return(input$enterElast)
     } else {
       return(NA_real_)
     }
   }
-  if (req(input$menu) == "Tariffs"){
 
+  if (req(input$menu) == "Tariffs"){
     if (grepl('elasticity', input$calcElastTariffs)){
       return(input$enterElastTariffs)
     } else {
       return(NA_real_)
     }
   }
-  if (req(input$menu) == "Quotas"){
 
+  if (req(input$menu) == "Quotas"){
     if (grepl('elasticity', input$calcElastQuota)){
       return(input$enterElastQuota)
     } else {

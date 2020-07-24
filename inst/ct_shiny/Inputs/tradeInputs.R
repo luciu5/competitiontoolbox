@@ -1,6 +1,6 @@
 
 ##### This function is just the "Tariffs"/"Quotas" version of genInputDataMergers() for "Horizontal". This entire thing needs to be desperately refactored...
-genInputData <- function(nrows, type = c("Tariffs","Quotas")){
+tradeInputs <- function(nrows, type = c("Tariffs","Quotas")){
   # a function to generate default input data set for simulations
 
   type=match.arg(type)

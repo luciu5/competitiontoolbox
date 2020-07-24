@@ -1,5 +1,5 @@
 
-runSimsMergers <- function(supply, demand, indata, mktElast){
+mergersSims <- function(supply, demand, indata, mktElast){
   # a function to execute code from antitrust package based on ui inputs
 
   prices <- indata[,"Prices \n($/unit)"]
