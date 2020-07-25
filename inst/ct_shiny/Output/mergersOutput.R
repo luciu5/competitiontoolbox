@@ -142,6 +142,15 @@ output$results_diagnostics <- renderTable({
 }, digits = 0 ,rownames = TRUE, align = "c")
 
 
+## Identify whether the model is over-identified in Diagnostics tab
+output$overIDText <- renderText({
+
+  if(is.null(values[["inputData"]])){return()}
+
+  isOverID(input$supply, input$calcElast, values[["inputData"]])
+})
+
+
 ## Display parameters to Diagnostics tab
 output$parameters <- renderPrint({
 

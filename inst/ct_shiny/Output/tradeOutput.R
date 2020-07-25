@@ -279,6 +279,24 @@ output$results_diagnosticsQuota <- renderTable({
 }, digits = 0 ,rownames = TRUE, align = "c")
 
 
+## Identify whether the model is over-identified in Diagnostics tab
+# Tariffs
+output$overIDTextTariffs <- renderText({
+
+  if(is.null(valuesTariffs[["inputData"]])){return()}
+
+  isOverID(input$supplyTariffs, input$calcElastTariffs, valuesTariffs[["inputData"]])
+})
+
+# Quotas
+output$overIDTextQuota <- renderText({
+
+  if(is.null(valuesQuota[["inputData"]])){return()}
+
+  isOverID(input$supplyQuota, input$calcElastQuota, valuesQuota[["inputData"]])
+})
+
+
 ## Display parameters to Diagnostics tab
 # Tariffs
 output$parametersTariffs <- renderPrint({

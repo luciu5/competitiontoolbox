@@ -15,11 +15,13 @@ get_vignette_link <- function(...) {
     stop("no html help found")
 }
 
+## Load in competitiontoolbac datasets
 data("indicboxdata", package = "competitiontoolbox")
 data("sumboxdata", package = "competitiontoolbox")
 data("indicboxmktCnt", package = "competitiontoolbox")
 data("sumboxmktCnt", package = "competitiontoolbox")
 
+## Run server-side
 shinyServer(function(input, output, session) {
 
     nPossProds <- 10  # Only allow 10 products by default
@@ -43,46 +45,23 @@ shinyServer(function(input, output, session) {
                                        warning = w.handler), warning = W, error = E)
     }
 
-    isOverID <-  function(supply, calcElast, inputData){
 
-        provElast <- grepl('elasticity',calcElast)
-
-        nMargins <- inputData[,grepl("Margins",colnames(inputData))]
-        nMargins <- length(nMargins[!is.na(nMargins)])
-
-        if(supply == "Cournot" &&
-           ((provElast && nMargins > 0)  || (!provElast && nMargins >1) )){
-            res <- paste(helpText(tags$b("Note:"), "some model parameters are over-identified. The tables above may be helpful in assessing model fit."))
-        } else if(supply != "Cournot" &&
-                ((provElast && nMargins > 1)  || (!provElast && nMargins >2) )){
-            res <- paste(helpText(tags$b("Note:"),"some model parameters are over-identified. The tables above may be helpful in assessing model fit."))
-        } else {
-            res <- paste(helpText(tags$b("Note:"),"model parameters are just-identified. Inputted and fitted values should match."))
-        }
-
-        res
-    }
 
     genShareOut <- function(sim){
 
-      if( grepl("cournot",class(sim),ignore.case = TRUE)){return()}
+      if(grepl("cournot",class(sim),ignore.case = TRUE)){return()}
 
       isCES <- grepl("ces",class(sim),ignore.case = TRUE)
 
       res <- data.frame('No-purchase\n Share (%)'= c(
         1 - sum(calcShares(sim, preMerger=TRUE,revenue=isCES)),
-        1 - sum(calcShares(sim, preMerger=FALSE,revenue=isCES))
-      )
-      ,check.names = FALSE
-      )*100
+        1 - sum(calcShares(sim, preMerger=FALSE,revenue=isCES))), check.names = FALSE)*100
 
-      res$'Revenues ($)' <- as.integer(round(c(calcRevenues(sim, preMerger=TRUE, market = TRUE ),
-                                               calcRevenues(sim, preMerger=FALSE, market = TRUE )
-      )))
-
+      res$'Revenues ($)' <- as.integer(round(c(calcRevenues(sim, preMerger=TRUE, market = TRUE),
+                                               calcRevenues(sim, preMerger=FALSE, market = TRUE))))
       rownames(res) <- c("Current Tariff", "New Tariff")
 
-      if( grepl("aids",class(sim),ignore.case = TRUE)) res$'No-purchase\n Share (%)' <- NULL
+      if(grepl("aids",class(sim),ignore.case = TRUE)) res$'No-purchase\n Share (%)' <- NULL
 
       return(res)
     }
@@ -105,6 +84,9 @@ shinyServer(function(input, output, session) {
     ## Diagnostics Data
     source(paste0(getwd(), "/Diagnostics Data/mergersDiag.R"), local = TRUE)
     source(paste0(getwd(), "/Diagnostics Data/tradeDiag.R"), local = TRUE)
+
+    ## Identification
+    source(paste0(getwd(), "/Identification/isOverID.R"), local = TRUE)
 
     ## Template Code
     source(paste0(getwd(), "/Template Code/mergersTemplateCode.R"), local = TRUE)
@@ -150,7 +132,7 @@ shinyServer(function(input, output, session) {
 
 
     ## Simulate Mergers and Trade when corresponding "simulate" button is clicked by the observer
-    observeEvent(input$simulate | input$simulateTariffs | input$simulateQuota , {
+    observeEvent(input$simulate | input$simulateTariffs | input$simulateQuota, {
 
       if(input$menu == "Tariffs"){
         valuesTariffs[["sim"]] <- valuesTariffs[["msg"]] <-  NULL
@@ -313,55 +295,6 @@ shinyServer(function(input, output, session) {
 
 
 
-
-
-
-
-    ## Identify whether the model is over-identified in Diagnostics tab
-    output$overIDTextTariffs <- renderText({
-
-        if(is.null(valuesTariffs[["inputData"]])){return()}
-
-        isOverID(input$supplyTariffs, input$calcElastTariffs, valuesTariffs[["InputData"]])
-    })
-
-    output$overIDTextQuota <- renderText({
-
-        if(is.null(valuesQuota[["inputData"]])){return()}
-
-        isOverID(input$supplyQuota, input$calcElastQuota, valuesQuota[["InputData"]])
-    })
-
-    ## Identify whether the model is over-identified in Diagnostics tab
-    output$overIDText <- renderText({
-
-        if(is.null(values[["inputData"]])){return()}
-
-        provElast <- grepl('elasticity',input$calcElast)
-
-        inputData <- values[["inputData"]]
-
-        nMargins <- inputData[,grepl("Margins",colnames(inputData))]
-        nMargins <- length(nMargins[!is.na(nMargins)])
-
-        if(input$supply == "Cournot" &&
-           ((provElast && nMargins > 0)  || (!provElast && nMargins >1) )){
-            res <- paste(helpText(tags$b("Note:"), "some model parameters are over-identified. The tables above may be helpful in assessing model fit."))
-        }
-
-        else if(input$supply != "Cournot" &&
-                ((provElast && nMargins > 1)  || (!provElast && nMargins >2) )){
-            res <- paste(helpText(tags$b("Note:"),"some model parameters are over-identified. The tables above may be helpful in assessing model fit."))
-        }
-        else{
-            res <- paste(helpText(tags$b("Note:"),"model parameters are just-identified. Inputted and fitted values should match."))
-        }
-        res
-
-    })
-
-
-
     ## Generate no-purchase shares in Details tab
     output$results_shareOutTariffs <- renderTable({
 
@@ -407,10 +340,5 @@ shinyServer(function(input, output, session) {
         return(res)
 
     }, rownames = TRUE, digits = 1, align = "c")
-
-
-
-
-
 
 })
