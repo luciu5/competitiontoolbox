@@ -1,5 +1,5 @@
 
-## Display inputData
+## Display hot inputData
 # Tariffs
 output$hotTariffs <- renderRHandsontable({
 
@@ -53,7 +53,7 @@ output$hotQuota <- renderRHandsontable({
 })
 
 
-## Display summary results from tradeSummary to results tab
+## Display summary results from tradeSummary
 # Tariffs
 output$resultsTariffs <-
 
@@ -77,6 +77,26 @@ output$resultsQuota <-
     tradeSummary(valuesQuota[["sim"]], inputData, type = "Quotas")
 
   })
+
+
+## Generate no-purchase shares in Details tab
+# Tariffs
+output$results_shareOutTariffs <- renderTable({
+
+  if(input$inTabsetTariffs!= "detpanelTariffs" || input$simulateTariffs == 0  || is.null(valuesTariffs[["sim"]])){return()}
+
+  tradeNoPurch(valuesTariffs[["sim"]])
+
+}, rownames = TRUE, digits = 1, align = "c")
+
+# Quotas
+output$results_shareOutQuota <- renderTable({
+
+  if(input$inTabsetQuota != "detpanelQuota" || input$simulateQuota == 0  || is.null(valuesQuota[["sim"]])){return()}
+
+  tradeNoPurch(valuesQuota[["sim"]])
+
+}, rownames = TRUE, digits = 1, align = "c")
 
 
 ## Display detailed summary values to details tab

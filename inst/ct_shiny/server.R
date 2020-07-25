@@ -15,13 +15,15 @@ get_vignette_link <- function(...) {
     stop("no html help found")
 }
 
-## Load in competitiontoolbac datasets
+
+## Load competitiontoolbox datasets
 data("indicboxdata", package = "competitiontoolbox")
 data("sumboxdata", package = "competitiontoolbox")
 data("indicboxmktCnt", package = "competitiontoolbox")
 data("sumboxmktCnt", package = "competitiontoolbox")
 
-## Run server-side
+
+## Run server-side Shiny program
 shinyServer(function(input, output, session) {
 
     nPossProds <- 10  # Only allow 10 products by default
@@ -46,27 +48,6 @@ shinyServer(function(input, output, session) {
     }
 
 
-
-    genShareOut <- function(sim){
-
-      if(grepl("cournot",class(sim),ignore.case = TRUE)){return()}
-
-      isCES <- grepl("ces",class(sim),ignore.case = TRUE)
-
-      res <- data.frame('No-purchase\n Share (%)'= c(
-        1 - sum(calcShares(sim, preMerger=TRUE,revenue=isCES)),
-        1 - sum(calcShares(sim, preMerger=FALSE,revenue=isCES))), check.names = FALSE)*100
-
-      res$'Revenues ($)' <- as.integer(round(c(calcRevenues(sim, preMerger=TRUE, market = TRUE),
-                                               calcRevenues(sim, preMerger=FALSE, market = TRUE))))
-      rownames(res) <- c("Current Tariff", "New Tariff")
-
-      if(grepl("aids",class(sim),ignore.case = TRUE)) res$'No-purchase\n Share (%)' <- NULL
-
-      return(res)
-    }
-
-
     ##### Source Mergers and Trade functions #####
     ## Inputs
     source(paste0(getwd(), "/Inputs/mergersInputs.R"), local = TRUE)
@@ -76,6 +57,10 @@ shinyServer(function(input, output, session) {
     ## Simulations
     source(paste0(getwd(), "/Simulations/mergersSims.R"), local = TRUE)
     source(paste0(getwd(), "/Simulations/tradeSims.R"), local = TRUE)
+
+    ## No-purchase Shares
+    source(paste0(getwd(), "/No-purchase Shares/mergersNoPurch.R"), local = TRUE)
+    source(paste0(getwd(), "/No-purchase Shares/tradeNoPurch.R"), local = TRUE)
 
     ## Summary Tables
     source(paste0(getwd(), "/Summary Tables/mergersSummary.R"), local = TRUE)
@@ -100,15 +85,15 @@ shinyServer(function(input, output, session) {
 
 
     ## Initialize reactive values using inputData (Charles fix?)
-    observeEvent((input$menu == "Tariffs") | input$addRowsTariffs,{
-      valuesTariffs[["inputData"]] <- tradeInputs(nrow = input$addRowsTariffs, type = "Tariffs")}
-    )
-
-    observeEvent((input$menu == "Quotas") | input$addRowsQuota,{
-      valuesQuota[["inputData"]]<- tradeInputs(nrow = input$addRowsQuota, type = "Quotas")
+    observeEvent((input$menu == "Tariffs") | input$addRowsTariffs, {
+      valuesTariffs[["inputData"]] <- tradeInputs(nrow = input$addRowsTariffs, type = "Tariffs")
     })
 
-    observeEvent(input$menu == "Merger",{
+    observeEvent((input$menu == "Quotas") | input$addRowsQuota, {
+      valuesQuota[["inputData"]] <- tradeInputs(nrow = input$addRowsQuota, type = "Quotas")
+    })
+
+    observeEvent(input$menu == "Horizontal", {
       values[["inputData"]] <- mergersInputs()
     })
 
@@ -150,9 +135,9 @@ shinyServer(function(input, output, session) {
         indata <- values[["inputData"]]
       }
 
-      isOutput <-  grepl("Quantities|Revenues",colnames(indata),perl = TRUE)
+      isOutput <-  grepl("Quantities|Revenues", colnames(indata), perl = TRUE)
 
-      colnames(indata)[ grepl("Margins",colnames(indata),perl = TRUE)] <- "Margins"
+      colnames(indata)[ grepl("Margins", colnames(indata), perl = TRUE)] <- "Margins"
       colnames(indata)[isOutput] <- "Output"
 
       indata <- indata[!is.na(indata[,"Output"]),]
@@ -286,59 +271,5 @@ shinyServer(function(input, output, session) {
                         marginheight = 0
             )
         })
-
-
-
-
-
-
-
-
-
-    ## Generate no-purchase shares in Details tab
-    output$results_shareOutTariffs <- renderTable({
-
-        if(input$inTabsetTariffs!= "detpanelTariffs" || input$simulateTariffs == 0  || is.null(valuesTariffs[["sim"]])){return()}
-
-        genShareOut(valuesTariffs[["sim"]])
-
-    }, rownames = TRUE, digits = 1, align = "c")
-
-
-    output$results_shareOutQuota <- renderTable({
-
-        if(input$inTabsetQuota != "detpanelQuota" || input$simulateQuota == 0  || is.null(valuesQuota[["sim"]])){return()}
-
-        genShareOut(valuesQuota[["sim"]])
-
-    }, rownames = TRUE, digits = 1, align = "c")
-
-    ## Generate no-purchase shares in Details tab
-    output$results_shareOut <- renderTable({
-
-        if(input$inTabset!= "detpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
-        if( grepl("cournot",class(values[["sim"]]),ignore.case = TRUE)){return()}
-
-        isCES <- grepl("ces",class(values[["sim"]]),ignore.case = TRUE)
-
-        res <- data.frame('No-purchase\n Share (%)'= c(
-            1 - sum(calcShares(values[["sim"]], preMerger=TRUE,revenue=isCES)),
-            1 - sum(calcShares(values[["sim"]], preMerger=FALSE,revenue=isCES))
-        )
-        ,check.names = FALSE
-        )*100
-
-        res$'Revenues ($)' <- as.integer(round(c(calcRevenues(values[["sim"]], preMerger=TRUE, market = TRUE ),
-                                                 calcRevenues(values[["sim"]], preMerger=FALSE, market = TRUE )
-        )))
-
-
-        rownames(res) <- c("Pre-Merger","Post-Merger")
-
-        if( grepl("aids",class(values[["sim"]]),ignore.case = TRUE)) res$'No-purchase\n Share (%)' <- NULL
-
-        return(res)
-
-    }, rownames = TRUE, digits = 1, align = "c")
 
 })

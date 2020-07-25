@@ -1,5 +1,5 @@
 
-## Display inputData
+## Display hot inputData
 output$hot <- renderRHandsontable({
 
   inputData <- values[["inputData"]]
@@ -24,7 +24,7 @@ output$hot <- renderRHandsontable({
 })
 
 
-## Display summary results from mergersSummary to results tab
+## Display summary results from mergersSummary
 output$results <-
 
   renderTable({
@@ -35,6 +35,16 @@ output$results <-
     mergersSummary(values[["sim"]])
 
   }, na = "", digits = 1)
+
+
+## Generate no-purchase shares in Details tab
+output$results_shareOut <- renderTable({
+
+  if(input$inTabset!= "detpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
+
+  mergersNoPurch(values[["sim"]])
+
+}, rownames = TRUE, digits = 1, align = "c")
 
 
 ## Display detailed summary values to details tab
@@ -67,7 +77,6 @@ output$results_detailed <- renderTable({
     try(res$cmcr[res$isParty=="*"] <- cmcr(values[["sim"]]))
 
     thesenames <-  c("Merging Party","Name","Pre-Merger Price","Post-Merger Price", "Price Change (%)","Pre-Merger Share (%)","Post-Merger Share (%)", "Share Change (%)",'Compensating Marginal Cost Reduction (%)')
-
 
     #if(isAIDS && missPrice){thesenames <- thesenames[!thesenames %in% c("Pre-Merger Price","Post-Merger Price")]}
     colnames(res) <- thesenames
@@ -112,7 +121,7 @@ output$results_elast <- renderTable({
   if(!isCournot && input$diversions){
     res <- diversion(values[["sim"]], preMerger=preMerger)
   }
-  else{  res <- elast(values[["sim"]], preMerger=preMerger)}
+  else{res <- elast(values[["sim"]], preMerger=preMerger)}
   if(isCournot){colnames(res) <- "Elasticity"}
 
   res

@@ -1,7 +1,9 @@
+
+## Load libraries
 require(competitiontoolbox)
 require(ggplot2)
 
-# Sponsor Footer for Shiny Interface
+## Sponsor Footer for Shiny Interface
 logoURL <- "https://cran.r-project.org/web/packages/antitrust/index.html"
 logoSrc <- "logo.png"
 logoAlt <- "Insert Logo Here"
