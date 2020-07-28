@@ -33,12 +33,12 @@ shinyServer(function(input, output, session) {
       W <- NULL
       E <- NULL
 
-      w.handler <- function(w){ # warning handler
+      w.handler <- function(w){  # warning handler
           W <<- append(W,conditionMessage(w))
           invokeRestart("muffleWarning")
       }
 
-      e.handler <- function(e){ # error handler
+      e.handler <- function(e){  # error handler
           E <<- append(E, conditionMessage(e))
           NULL
       }
@@ -192,8 +192,8 @@ shinyServer(function(input, output, session) {
         thisSim <- msgCatcher(
           # Run merger simulation
           mergersSims(supply = supply(), demand = demand(), indata = indata, mktElast = elasticity())
-
         )
+
         thisSim <<- thisSim  # Delete later...
       }
 

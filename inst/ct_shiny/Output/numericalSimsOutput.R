@@ -1,5 +1,6 @@
 
 ## Creates the graph for the Summary tab of Numerical Simulations
+# Horizontal
 output$plotSumATR <- renderPlot({
 
   if(grepl("%", input$outcomeSumATR)) ylimSumATR <- c(0,50)
@@ -16,6 +17,7 @@ output$plotSumATR <- renderPlot({
 
 
 ## Creates the graph for the Indices tab of Numerical Simulations
+# Horizontal
 output$plotIndATR <- renderPlot({
 
   plotInd <- ggplot(subset(indicboxdata, Cut_type == input$indexIndATR & Supply == "Pooled" & shareOutThresh == input$shareOutIndATR),
@@ -37,23 +39,25 @@ output$plotIndATR <- renderPlot({
 })
 
 
-## Number of Simulated Mergers for Summary and Indices Tab of ATR Numerical Simulations
-# Summary
+## Number of Simulated Mergers for Summary Tab of ATR Numerical Simulations
+# Horizontal
 output$sumNumMergerATR <- renderUI({
   sumNumMerg <- subset(sumboxmktCnt, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR)
   sumNumMerg <- prettyNum(sum(sumNumMerg$Cnt), big.mark=",")
   HTML(paste("Examine the distribution of outcomes from", sumNumMerg, "simulated horizontal mergers."))
 })
 
-# Indices
+
+## Number of Simulated Mergers for Indices Tab of ATR Numerical Simulation
+# Horizontal
 output$indicNumMergerATR <- renderUI({
   indicNumMerg <- prettyNum(indicboxmktCnt$Cnt[which(indicboxmktCnt$Cut_type == input$indexIndATR & indicboxmktCnt$shareOutThresh == input$shareOutIndATR )], big.mark=",")
   HTML(paste("Examine the relationship between industry price changes and commmonly used merger indices from", prettyNum((indicNumMerg), big.mark=","), "simulated horizontal mergers."))
 })
 
 
-## Generates captions for Summary and Indices Graphs of ATR Numerical Simulations
-# Summary
+## Generates captions for Summary Graph of ATR Numerical Simulations
+# Horizontal
 output$capSumATR <- renderText({
   captionSumATR()
 })
@@ -66,11 +70,13 @@ captionSumATR <- reactive({
          'Merging Party Price Change (%)' = "Merging Party Price Change as a Percent Change from Pre-Merger Price")
 })
 
+
+## Generates captions for Indices Graph of ATR Numerical Simulations
+# Horizontal
 output$capIndATR <- renderText({
   captionIndATR()
 })
 
-# Indices
 captionIndATR <- reactive({
   switch(input$indexIndATR, 'UPP' = "Upward Pricing Pressure (UPP): Describes the relationship between UPP and industry-wide price changes across the different models, confirming previous findings
          that UPP's predictive power substantially degrades as demand curvature increases. Second, with the exception of Cournot-log and Bertrand-AIDS specifications,

@@ -195,99 +195,105 @@ navbarPage("", id = "menu",
 
                               tabPanel("Documentation",
                                        fluidPage(htmlOutput("referenceATR"))
-                              ),
-
-
-                              tabPanel("Numerical Simulations", style = "overflow-y:scroll; max-height: 90vh",
-                                       fluidPage(
-                                         titlePanel("Numerical Simulations"),
-
-                                           mainPanel(
-                                             tabsetPanel(
-                                               tabPanel("Summary",
-                                                        fluidPage(
-                                                          sidebarLayout(
-                                                            sidebarPanel(
-                                                              h5(tags$b("Overview:")),
-                                                              helpText(tags$ul(
-                                                                tags$li(htmlOutput('sumNumMergerATR')),
-                                                                tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
-                                                                                                  (Taragin and Loudermilk 2019)"),"for further details." ))
-                                                              )
-                                                              ),
-                                                              # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                              #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                              #                    selected = "Bertrand ces"),
-                                                              selectInput("outcomeSumATR", "Outcomes to Report:",
-                                                                          choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                              sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),  # Ask Charles if we should go from step == 10 to step == 5
-                                                              fluidRow(
-                                                                column(width=12, align = "center",
-                                                                       tags$div(
-                                                                         HTML("<font size=\"2\"> Supported by </font>"),
-                                                                         HTML(logo)
-                                                                       )
-                                                                )
-                                                              )
-                                                            ),
-                                                            mainPanel(
-                                                              br(),
-                                                              fillPage(plotOutput('plotSumATR')),
-                                                              wellPanel(h5(tags$b("Description:")),
-                                                                        textOutput('capSumATR'))
-
-                                                            )
-
-                                                          )
-                                                        )),
-                                               tabPanel("Indices",
-                                                        fluidPage(
-                                                          sidebarLayout(
-                                                            sidebarPanel(
-                                                              h5(tags$b("Overview:")),
-                                                              helpText(tags$ul(
-                                                                tags$li(htmlOutput('indicNumMergerATR')),
-                                                                tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                                                                "(Taragin and Loudermilk 1019)"),"for further details." ))
-                                                              )
-                                                              ),
-                                                              # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                              #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                              #                    selected = "Bertrand ces"),
-                                                              radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
-                                                              selectInput("indexIndATR", "Index:",
-                                                                          choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd", "Party Gap")),
-                                                              sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
-                                                              fluidRow(
-                                                                column(width=12, align = "center",
-                                                                       tags$div(
-                                                                         HTML("<font size=\"2\"> Supported by </font>"),
-                                                                         HTML(logo)
-                                                                       )
-                                                                )
-                                                              )
-                                                            ),
-                                                            mainPanel(
-                                                              br(),
-                                                              fillPage(plotOutput('plotIndATR')),
-                                                              wellPanel(h5(tags$b("Description:")),
-                                                                        textOutput('capIndATR'))
-                                                              )
-
-
-                                                            )
-
-                                                          )
-                                                        )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
-
-                                           )
-
-
-                                       )
-
-
                               )
 
+                   ),
+
+                   navbarMenu("Numerical Simulations",
+
+                              tabPanel("Horizontal", style = "overflow-y:scroll; max-height: 90vh",
+                                       fluidPage(
+                                         titlePanel("Horizontal Simulations"),
+
+                                         mainPanel(
+                                           tabsetPanel(
+                                             tabPanel("Summary",
+                                                      fluidPage(
+                                                        sidebarLayout(
+                                                          sidebarPanel(
+                                                            h5(tags$b("Overview:")),
+                                                            helpText(tags$ul(
+                                                              tags$li(htmlOutput('sumNumMergerATR')),
+                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
+                                                                                             (Taragin and Loudermilk 2019)"),"for further details." ))
+                                                              )
+                                                            ),
+                                                            # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                            #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                            #                    selected = "Bertrand ces"),
+                                                            selectInput("outcomeSumATR", "Outcomes to Report:",
+                                                                        choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
+                                                            sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),  # Ask Charles if we should go from step == 10 to step == 5
+                                                            fluidRow(
+                                                              column(width=12, align = "center",
+                                                                     tags$div(
+                                                                       HTML("<font size=\"2\"> Supported by </font>"),
+                                                                       HTML(logo)
+                                                                     )
+                                                              )
+                                                            )
+                                                            ),
+                                                          mainPanel(
+                                                            br(),
+                                                            fillPage(plotOutput('plotSumATR')),
+                                                            wellPanel(h5(tags$b("Description:")),
+                                                                      textOutput('capSumATR'))
+
+                                                          )
+
+                                                        )
+                                                      )),
+                                             tabPanel("Indices",
+                                                      fluidPage(
+                                                        sidebarLayout(
+                                                          sidebarPanel(
+                                                            h5(tags$b("Overview:")),
+                                                            helpText(tags$ul(
+                                                              tags$li(htmlOutput('indicNumMergerATR')),
+                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                             "(Taragin and Loudermilk 1019)"),"for further details." ))
+                                                            )
+                                                            ),
+                                                            # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                            #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                            #                    selected = "Bertrand ces"),
+                                                            radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
+                                                            selectInput("indexIndATR", "Index:",
+                                                                        choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd", "Party Gap")),
+                                                            sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
+                                                            fluidRow(
+                                                              column(width=12, align = "center",
+                                                                     tags$div(
+                                                                       HTML("<font size=\"2\"> Supported by </font>"),
+                                                                       HTML(logo)
+                                                                     )
+                                                              )
+                                                            )
+                                                          ),
+                                                          mainPanel(
+                                                            br(),
+                                                            fillPage(plotOutput('plotIndATR')),
+                                                            wellPanel(h5(tags$b("Description:")),
+                                                                      textOutput('capIndATR'))
+                                                          )
+
+
+                                                        )
+
+                                                      )
+                                             )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
+
+                                         )
+
+                                    )
+
+                              ),
+
+                              tabPanel("Vertical",
+                                       fluidPage(
+                                         titlePanel("Vertical Simulations"),
+                                         p(em("Coming Soon"))
+                                       ))
                    ),
 
                    navbarMenu("Trade",
