@@ -1,5 +1,6 @@
 
 ## Display hot inputData
+# Horizontal
 output$hot <- renderRHandsontable({
 
   inputData <- values[["inputData"]]
@@ -25,6 +26,7 @@ output$hot <- renderRHandsontable({
 
 
 ## Display summary results from mergersSummary
+# Horizontal
 output$results <-
 
   renderTable({
@@ -38,6 +40,7 @@ output$results <-
 
 
 ## Generate no-purchase shares in Details tab
+# Horizontal
 output$results_shareOut <- renderTable({
 
   if(input$inTabset!= "detpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
@@ -48,6 +51,7 @@ output$results_shareOut <- renderTable({
 
 
 ## Display detailed summary values to details tab
+# Horizontal
 output$results_detailed <- renderTable({
 
   if(input$inTabset != "detpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
@@ -94,6 +98,7 @@ output$results_detailed <- renderTable({
 
 
 ## Display market elasticity in Elasticities tab
+# Horizontal
 output$results_mktelast <- renderTable({
 
   if(input$inTabset!= "elastpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
@@ -109,6 +114,7 @@ output$results_mktelast <- renderTable({
 
 
 ## Display elasticities to Elasticities tab
+# Horizontal
 output$results_elast <- renderTable({
 
   if(input$inTabset!= "elastpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
@@ -130,6 +136,7 @@ output$results_elast <- renderTable({
 
 
 ## Display market elasticity gap in Diagnostics tab
+# Horizontal
 output$results_diag_elast <- renderTable({
 
   if(input$inTabset!= "diagpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
@@ -141,6 +148,7 @@ output$results_diag_elast <- renderTable({
 
 
 ## Display results to Diagnostics tab
+# Horizontal
 output$results_diagnostics <- renderTable({
 
   if(input$inTabset!= "diagpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
@@ -152,6 +160,7 @@ output$results_diagnostics <- renderTable({
 
 
 ## Identify whether the model is over-identified in Diagnostics tab
+# Horizontal
 output$overIDText <- renderText({
 
   if(is.null(values[["inputData"]])){return()}
@@ -161,6 +170,7 @@ output$overIDText <- renderText({
 
 
 ## Display parameters to Diagnostics tab
+# Horizontal
 output$parameters <- renderPrint({
 
   if(input$inTabset!= "diagpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
@@ -171,6 +181,7 @@ output$parameters <- renderPrint({
 
 
 ## Display template code to the R Code tab
+# Horizontal
 output$results_code <- renderPrint({
 
   if(input$inTabset != "codepanel"){return()}
@@ -181,6 +192,7 @@ output$results_code <- renderPrint({
 
 
 ## Display warnings to Messages tab
+# Horizontal
 output$warnings <- renderText({
 
   if(input$inTabset!= "msgpanel" || input$simulate == 0 || is.null(values[["msg"]]$warning)){return()}
@@ -190,6 +202,7 @@ output$warnings <- renderText({
 
 
 ## Display errors to Messages tab
+# Horizontal
 output$errors <- renderText({
 
   if(input$inTabset!= "msgpanel" || input$simulate == 0 || is.null(values[["msg"]]$error)){cat(return())}
