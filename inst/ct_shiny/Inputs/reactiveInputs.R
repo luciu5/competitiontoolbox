@@ -6,6 +6,10 @@ supply <- reactive({
     return(input$supply)
   }
 
+  if (req(input$menu) == "Vertical"){
+    return(input$supplyVertical)
+  }
+
   if (req(input$menu) == "Tariffs"){
     return(input$supplyTariffs)
   }
@@ -37,6 +41,15 @@ demand <- reactive({
     }
     if (input$supply == "Cournot" & !grepl('elasticity', input$calcElast)){
       return(input$demand6)
+    }
+  }
+
+  if (req(input$menu) == "Vertical") {
+    if (input$supplyVertical == "Bertrand") {
+      return(input$demandVertical1)
+    }
+    if (input$supplyVertical == "2nd Score Auction"){
+      return(input$demandVertical2)
     }
   }
 

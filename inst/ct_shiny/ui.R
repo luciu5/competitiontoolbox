@@ -255,16 +255,16 @@ navbarPage("", id = "menu",
                                              # #tags$head(
                                              #  tags$style(HTML('#run{color:white;background-color:black}'))
                                              #),
-                                             actionButton(inputId = "simulate", label = "", icon = icon("play"), width = '60px', style = 'padding:4px')
+                                             actionButton(inputId = "simulateVertical", label = "", icon = icon("play"), width = '60px', style = 'padding:4px')
                                              #)
                                              ,
-                                             br(), br(),br()
-                                             # tabsetPanel(id = "inTabset",
-                                             #             tabPanel("Summary", value = "respanel", br(),br(),tableOutput("results"), br(),
-                                             #                      helpText(tags$b("Note:"), "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages.
-                                             #                               A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.
-                                             #                               Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues.")
-                                             #                      ),
+                                             br(), br(),br(),
+                                             tabsetPanel(id = "inTabsetVertical",
+                                                         tabPanel("Summary", value = "respanelVertical", br(), br(), tableOutput("resultsVertical"), br(),
+                                                                  helpText(tags$b("Note:"), "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages.
+                                                                           A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.
+                                                                           Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues.")
+                                                                  )
                                              #             tabPanel("Details", value = "detpanel", br(), br(), tableOutput("results_shareOut"), br(), tableOutput("results_detailed")
                                              #
                                              #                      #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
@@ -300,7 +300,7 @@ navbarPage("", id = "menu",
                                              #                      h4("Errors"),
                                              #                      span(textOutput("errors"), style="color:red"))
                                              #
-                                             #                      )
+                                                                   )
 
                                            )
 

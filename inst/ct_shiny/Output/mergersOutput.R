@@ -46,10 +46,22 @@ output$results <-
 
   renderTable({
 
-    if(input$inTabset != "respanel" || input$simulate == 0|| is.null(values[["sim"]])){return()}
+    if(input$inTabset != "respanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
     inputData <- values[["inputData"]]
     mergersSummary(values[["sim"]])
+
+  }, na = "", digits = 1)
+
+# Vertical
+output$resultsVertical <-
+
+  renderText({
+
+    if(input$inTabsetVertical != "respanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
+
+    inputData <- valuesVertical[["inputData"]]
+    mergersSummary(valuesVertical[["sim"]])
 
   }, na = "", digits = 1)
 

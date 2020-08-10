@@ -32,8 +32,8 @@ mergersInputs <- function(type = c("Horizontal", "Vertical")) {
 
     inputData <- data.frame(
       Name = c("Prod1","Prod2","Prod3","Prod4"),
-      'ownerPreUp' = c("U1","U2","U1","U1"),
-      'ownerPostUp' = c("U1","U2","U1","U1"),
+      'ownerPreUp' = c("U1","U2","U1","U2"),
+      'ownerPostUp' = c("U1","U2","U1","U2"),
       'pricesUp' = rep(10,4),
       'marginsUp' = rep(0.5,4),
       'ownerPreDown' = c("D1","D1","D2","D2"),

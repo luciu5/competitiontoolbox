@@ -15,7 +15,7 @@ mergersSummary <- function(res){
 
   if(isCournot){
 
-    capture.output( s <- summary(res, market = FALSE))
+    capture.output(s <- summary(res, market = FALSE))
     theseshares <- drop(res@quantities/sum(res@quantities))
     # Fixed HHI share calculations for Cournot results
     totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
