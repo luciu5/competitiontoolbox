@@ -228,14 +228,14 @@ navbarPage("", id = "menu",
                                                condition = "input.supplyVertical == 'Bertrand'",
                                                selectInput("demandVertical1", "Downstream Demand Specification:",
                                                            choices = c("logit")),
-                                               helpText(tags$b("Note:"), "Share of outside good implied by product shares.")
+                                               helpText(tags$b("Note:"), "Share of outside good implied by sum of inside product shares.")
                                              ),
                                              # 2nd Score Auction
                                              conditionalPanel(
                                                condition = "input.supplyVertical == '2nd Score Auction'",
                                                selectInput("demandVertical2", "Downstream Demand Specification:",
                                                            choices = c("logit")),
-                                               helpText(tags$b("Note:"), "Share of outside good implied by product shares.")
+                                               helpText(tags$b("Note:"), "Share of outside good implied by sum of inside product shares.")
                                              ),
 
                                              hr(),

@@ -95,11 +95,11 @@ shinyServer(function(input, output, session) {
     })
 
     observeEvent(input$menu == "Vertical", {
-      valuesVertical[["inputData"]] <- mergersInputs()
+      valuesVertical[["inputData"]] <- mergersInputs(type = "Vertical")
     })
 
     observeEvent(input$menu == "Horizontal", {
-      values[["inputData"]] <- mergersInputs()
+      values[["inputData"]] <- mergersInputs(type = "Horizontal")
     })
 
 
