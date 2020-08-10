@@ -231,7 +231,7 @@ shinyServer(function(input, output, session) {
 
 
     ## Identify server as Internal, Local, or Public
-    output$urlTextQuota <- output$urlTextTariffs <- output$urlText <- renderText({
+    output$urlTextQuota <- output$urlTextTariffs <- output$urlTextVertical <- output$urlText <- renderText({
 
       thisurl <- session$clientData$url_hostname
 
