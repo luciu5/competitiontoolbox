@@ -81,6 +81,7 @@ shinyServer(function(input, output, session) {
     ## Create a series of reactive values
     valuesQuota <- reactiveValues(inputData = tradeInputs(nPossProds), sim = NULL, msg = NULL)
     valuesTariffs <- reactiveValues(inputData = tradeInputs(nPossProds), sim = NULL, msg = NULL)
+    valuesVertical <- reactiveValues(inputData = mergersInputs(), sim = NULL, msg = NULL)
     values <- reactiveValues(inputData = mergersInputs(), sim = NULL, msg = NULL)
 
 
@@ -91,6 +92,10 @@ shinyServer(function(input, output, session) {
 
     observeEvent((input$menu == "Quotas") | input$addRowsQuota, {
       valuesQuota[["inputData"]] <- tradeInputs(nrow = input$addRowsQuota, type = "Quotas")
+    })
+
+    observeEvent(input$menu == "Vertical", {
+      valuesVertical[["inputData"]] <- mergersInputs()
     })
 
     observeEvent(input$menu == "Horizontal", {
@@ -106,6 +111,12 @@ shinyServer(function(input, output, session) {
 
       if(!is.null(input$hotQuota)){
         valuesQuota[["inputData"]] <- hot_to_r(input$hotQuota)
+      }
+
+      if(!is.null(input$hotVertical)){
+        #valuesVertical[["inputData"]] <- mergersInputs()
+        valuesVertical$inputData <- hot_to_r(input$hotVertical)
+        valuesVertical$inputData[!is.na(valuesVertical$inputData$Name) & valuesVertical$inputData$Name != '', ]
       }
 
       if(!is.null(input$hot)){

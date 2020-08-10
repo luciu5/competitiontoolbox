@@ -130,7 +130,7 @@ navbarPage("", id = "menu",
                                              #tags$head(
                                              #  tags$style(HTML('#run{color:white;background-color:black}'))
                                              #),
-                                             actionButton(inputId ="simulate" , label = "", icon = icon("play"), width = '60px', style='padding:4px')
+                                             actionButton(inputId = "simulate", label = "", icon = icon("play"), width = '60px', style='padding:4px')
                                              #)
                                              ,
                                              br(), br(),br(),
@@ -193,7 +193,7 @@ navbarPage("", id = "menu",
                                          sidebarLayout(
                                            sidebarPanel(
 
-                                             htmlOutput("urlTextVertical"),hr(),
+                                             htmlOutput("urlTextVertical"), hr(),
 
                                              h5(tags$b("Directions:")),
                                              helpText(tags$ul(
@@ -250,15 +250,15 @@ navbarPage("", id = "menu",
                                            ),
 
                                            mainPanel(
-                                             h2("Enter Inputs")
-                                             # rHandsontableOutput("hot"), br(),
+                                             h2("Enter Inputs"),
+                                              rHandsontableOutput("hotVertical"), br(),
                                              # #tags$head(
-                                             # #  tags$style(HTML('#run{color:white;background-color:black}'))
-                                             # #),
-                                             # actionButton(inputId = "simulate" , label = "", icon = icon("play"), width = '60px', style = 'padding:4px')
-                                             # #)
-                                             # ,
-                                             # br(), br(),br(),
+                                             #  tags$style(HTML('#run{color:white;background-color:black}'))
+                                             #),
+                                             actionButton(inputId = "simulate", label = "", icon = icon("play"), width = '60px', style = 'padding:4px')
+                                             #)
+                                             ,
+                                             br(), br(),br()
                                              # tabsetPanel(id = "inTabset",
                                              #             tabPanel("Summary", value = "respanel", br(),br(),tableOutput("results"), br(),
                                              #                      helpText(tags$b("Note:"), "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages.

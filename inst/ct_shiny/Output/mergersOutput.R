@@ -8,12 +8,12 @@ output$hot <- renderRHandsontable({
   prices <- inputData[,"Prices \n($/unit)"]
   output <- inputData[,grepl("Quantities|Revenue",colnames(inputData), perl=TRUE)]
 
-  missPrices <- isTRUE(any(is.na(prices[ !is.na(output) ] ) ))
+  missPrices <- isTRUE(any(is.na(prices[!is.na(output)])))
 
   if(input$supply == "2nd Score Auction"){colnames(inputData)[grepl("Cost Changes",colnames(inputData))] <-'Post-merger\n Cost Changes\n($/unit)'}
   else{colnames(inputData)[grepl("Cost Changes",colnames(inputData))] <-'Post-merger\n Cost Changes\n(Proportion)'}
 
-  if(missPrices && input$supply =="2nd Score Auction"){colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n ($/unit)"}
+  if(missPrices && input$supply == "2nd Score Auction"){colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n ($/unit)"}
   else{colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n (p-c)/p"}
 
   if (missPrices && any(grepl("ces|aids", demand(), perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
@@ -21,9 +21,29 @@ output$hot <- renderRHandsontable({
 
   if (!is.null(inputData))
     rhandsontable(inputData, stretchH = "all", contextMenu = FALSE ) %>% hot_col(col = 1:ncol(inputData), valign = "htMiddle") %>%
-    hot_col(col = which (sapply(inputData,is.numeric)),halign = "htCenter" ) %>% hot_cols(columnSorting = TRUE)
+    hot_col(col = which(sapply(inputData, is.numeric)), halign = "htCenter") %>% hot_cols(columnSorting = TRUE)
 })
 
+# Vertical
+output$hotVertical <- renderRHandsontable({
+
+  inputData <- valuesVertical[["inputData"]]
+
+  missPricesUp <- isTRUE(any(is.na(inputData$priceUp[!is.na(inputData$shareUp)])))
+  missPricesDown <- isTRUE(any(is.na(inputData$priceDown[!is.na(inputData$shareDown)])))
+
+  ### UNNECESSARY DUE TO VERTICAL.BARG() INPUT CONSTRAINTS, BUT KEEP FOR NOW:
+  if(missPricesUp && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp \n ($/unit)"}
+  else{colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp \n (p-c)/p"}
+
+  if(missPricesDown && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown \n ($/unit)"}
+  else{colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown \n (p-c)/p"}
+
+  if (!is.null(inputData))
+    rhandsontable(inputData, stretchH = "all", contextMenu = FALSE ) %>% hot_col(col = 1:ncol(inputData), valign = "htMiddle") %>%
+    hot_col(col = which(sapply(inputData, is.numeric)), halign = "htCenter") %>% hot_cols(columnSorting = TRUE)
+
+})
 
 ## Display summary results from mergersSummary
 # Horizontal
