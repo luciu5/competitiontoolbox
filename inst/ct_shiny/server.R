@@ -176,7 +176,8 @@ shinyServer(function(input, output, session) {
         indata$mcDelta <- indata$mcDelta/(1 - tariffPost)
       }
 
-      ##### Run simulations based on input menu:
+
+      ##### Run simulations based on input$menu:
       if (req(input$menu) == "Tariffs") {
         indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
 

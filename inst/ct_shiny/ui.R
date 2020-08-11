@@ -265,40 +265,40 @@ navbarPage("", id = "menu",
                                                                            A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.
                                                                            Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues.")
                                                                   )
-                                             #             tabPanel("Details", value = "detpanel", br(), br(), tableOutput("results_shareOut"), br(), tableOutput("results_detailed")
+                                             #             tabPanel("Details", value = "detpanelVertical", br(), br(), tableOutput("results_shareOutVertical"), br(), tableOutput("results_detailedVertical")
                                              #
                                              #                      #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
                                              #                      #                  helpText(tags$b("Note:"), "shares are revenue-based.")
                                              #                      #)
                                              #             ),
-                                             #             tabPanel("Elasticities", value = "elastpanel",  br(),br(),
+                                             #             tabPanel("Elasticities", value = "elastpanelVertical",  br(),br(),
                                              #                      radioButtons("pre_elast", "",
                                              #                                   choices = c("Pre-Merger",
                                              #                                               "Post-Merger"
                                              #                                   ), inline = TRUE),
                                              #                      br(),
-                                             #                      tableOutput("results_mktelast"),br(),
-                                             #                      tableOutput("results_elast"),
-                                             #                      conditionalPanel("input.supply != 'Cournot'",
-                                             #                                       checkboxInput("diversions", "Report diversion ratios", value =FALSE),
+                                             #                      tableOutput("results_mktelastVertical"),br(),
+                                             #                      tableOutput("results_elastVertical"),
+                                             #                      conditionalPanel("input.supplyVertical != 'Cournot'",
+                                             #                                       checkboxInput("diversions", "Report diversion ratios", value = FALSE),
                                              #                                       helpText(tags$b("Note:"), "diagonal elements are own-price elasticities.","Off-diagonal elements are the cross-price elasticities of row with respect to column.")
                                              #                      ),
-                                             #                      conditionalPanel("input.supply == 'Cournot'",
+                                             #                      conditionalPanel("input.supplyVertical == 'Cournot'",
                                              #                                       helpText(tags$b("Note:"), "above are own-price elasticities")
                                              #                      )
                                              #             ),
-                                             #             tabPanel("Diagnostics", value = "diagpanel", br(),br(), h4("Inputted vs. Fitted Values"),
-                                             #                      tableOutput("results_diag_elast"),
-                                             #                      tableOutput("results_diagnostics"),
-                                             #                      htmlOutput("overIDText"),br(),
+                                             #             tabPanel("Diagnostics", value = "diagpanelVertical", br(),br(), h4("Inputted vs. Fitted Values"),
+                                             #                      tableOutput("results_diag_elastVertical"),
+                                             #                      tableOutput("results_diagnosticsVertical"),
+                                             #                      htmlOutput("overIDTextVertical"),br(),
                                              #                      #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
-                                             #                      h4("Parameters"),verbatimTextOutput("parameters"),
+                                             #                      h4("Parameters"),verbatimTextOutput("parametersVertical"),
                                              #                      helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the parameters displayed here." )
                                              #             ),
-                                             #             tabPanel("R Code",  value = "codepanel", br(),verbatimTextOutput("results_code")),
-                                             #             tabPanel("Messages", value = "msgpanel", br(),h4("Warnings"),  span(textOutput("warnings"), style="color:orange"), br(),
+                                             #             tabPanel("R Code",  value = "codepanelVertical", br(),verbatimTextOutput("results_codeVertical")),
+                                             #             tabPanel("Messages", value = "msgpanelVertical", br(), h4("Warnings"), span(textOutput("warningsVertical"), style="color:orange"), br(),
                                              #                      h4("Errors"),
-                                             #                      span(textOutput("errors"), style="color:red"))
+                                             #                      span(textOutput("errorsVertical"), style="color:red"))
                                              #
                                                                    )
 

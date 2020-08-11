@@ -144,7 +144,7 @@ mergersSims <- function(supply, demand, indata, mktElast, type = c("Horizontal",
                                                                     ownerPost= ownerPost,
                                                                     mktElast = NA_real_,
                                                                     mcDelta = indata$mcDelta,
-                                                                    labels=list(indata$Name, "Prod")),
+                                                                    labels = list(indata$Name, "Prod")),
                             `loglinear (unknown elasticity)` = cournot(prices = na.omit(prices)[1],
                                                                        demand = "log",
                                                                        #cost= rep("linear", nrow(indata)),
@@ -154,7 +154,7 @@ mergersSims <- function(supply, demand, indata, mktElast, type = c("Horizontal",
                                                                        ownerPost= ownerPost,
                                                                        mktElast = NA_real_,
                                                                        mcDelta = indata$mcDelta,
-                                                                       labels=list(indata$Name, "Prod"))
+                                                                       labels = list(indata$Name, "Prod"))
            ),
 
            `2nd Score Auction`= switch(demand,
@@ -181,29 +181,35 @@ mergersSims <- function(supply, demand, indata, mktElast, type = c("Horizontal",
 
   } else if (type == "Vertical") {
 
+    marginUp <- indata[grepl("marginsUp", colnames(indata))][[1]]
+    marginDown <- indata[grepl("marginsDown", colnames(indata))][[1]]
+
     switch(supply,
            Bertrand = vertical.barg(supplyDown = "bertrand",
-                                    sharesDown = shareDown,
-                                    pricesDown = priceDown,
+                                    sharesDown = indata$sharesDown,
+                                    pricesDown = indata$pricesDown,
                                     marginsDown = marginDown,
-                                    ownerPreDown = ownerPreDown,
-                                    ownerPostDown = ownerPostDown,
-                                    pricesUp = priceUp,
+                                    ownerPreDown = indata$ownerPreDown,
+                                    ownerPostDown = indata$ownerPostDown,
+                                    pricesUp = indata$pricesUp,
                                     marginsUp = marginUp,
-                                    ownerPreUp = ownerPreUp,
-                                    ownerPostUp = ownerPreUp,
-                                    priceOutside = 0),
+                                    ownerPreUp = indata$ownerPreUp,
+                                    ownerPostUp = indata$ownerPostUp,
+                                    priceOutside = 0,
+                                    labels = indata$Name),
            `2nd Score Auction` = vertical.barg(supplyDown = "2nd",
-                                               sharesDown = shareDown,
-                                               pricesDown = priceDown,
+                                               sharesDown = indata$sharesDown,
+                                               pricesDown = indata$pricesDown,
                                                marginsDown = marginDown,
-                                               ownerPreDown = ownerPreDown,
-                                               ownerPostDown = ownerPostDown,
-                                               pricesUp = priceUp,
+                                               ownerPreDown = indata$ownerPreDown,
+                                               ownerPostDown = indata$ownerPostDown,
+                                               pricesUp = indata$pricesUp,
                                                marginsUp = marginUp,
-                                               ownerPreUp = ownerPreUp,
-                                               ownerPostUp = ownerPreUp,
-                                               priceOutside = 0))
+                                               ownerPreUp = indata$ownerPreUp,
+                                               ownerPostUp = indata$ownerPostUp,
+                                               priceOutside = 0,
+                                               labels = indata$Name)
+           )
 
   }
 

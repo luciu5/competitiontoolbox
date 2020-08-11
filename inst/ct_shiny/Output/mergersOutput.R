@@ -30,10 +30,14 @@ output$hotVertical <- renderRHandsontable({
   inputData <- valuesVertical[["inputData"]]
 
   missPricesDown <- isTRUE(any(is.na(inputData$pricesDown[!is.na(inputData$sharesDown)])))
+  missPricesUp <- isTRUE(any(is.na(inputData$pricesUp[!is.na(inputData$sharesDown)])))
 
   ### UNNECESSARY DUE TO VERTICAL.BARG() INPUT CONSTRAINTS, BUT KEEP FOR NOW (DISCUSS WITH CHARLES):
   if(missPricesDown && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown \n ($/unit)"}
   else{colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown \n (p-c)/p"}
+
+  if(missPricesDown && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp \n ($/unit)"}
+  else{colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp \n (p-c)/p"}
 
   if (!is.null(inputData))
     rhandsontable(inputData, stretchH = "all", contextMenu = FALSE ) %>% hot_col(col = 1:ncol(inputData), valign = "htMiddle") %>%
@@ -48,7 +52,7 @@ output$results <-
 
     if(input$inTabset != "respanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
-    inputData <- values[["inputData"]]
+    #inputData <- values[["inputData"]]
     mergersSummary(values[["sim"]])
 
   }, na = "", digits = 1)
@@ -56,12 +60,13 @@ output$results <-
 # Vertical
 output$resultsVertical <-
 
-  renderText({
+  renderTable({
 
     if(input$inTabsetVertical != "respanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
 
-    inputData <- valuesVertical[["inputData"]]
-    mergersSummary(valuesVertical[["sim"]])
+    #inputData <- valuesVertical[["inputData"]]
+    capture.output(result <- summary(valuesVertical[["sim"]], market = TRUE))
+    result <- as.data.frame(result)
 
   }, na = "", digits = 1)
 
@@ -75,6 +80,8 @@ output$results_shareOut <- renderTable({
   mergersNoPurch(values[["sim"]])
 
 }, rownames = TRUE, digits = 1, align = "c")
+
+# Vertical
 
 
 ## Display detailed summary values to details tab
@@ -123,6 +130,8 @@ output$results_detailed <- renderTable({
 
 }, digits = 2)
 
+# Vertical
+
 
 ## Display market elasticity in Elasticities tab
 # Horizontal
@@ -138,6 +147,8 @@ output$results_mktelast <- renderTable({
   res
 
 }, rownames = FALSE)
+
+# Vertical
 
 
 ## Display elasticities to Elasticities tab
@@ -161,6 +172,8 @@ output$results_elast <- renderTable({
 
 }, rownames = TRUE)
 
+# Vertical
+
 
 ## Display market elasticity gap in Diagnostics tab
 # Horizontal
@@ -172,6 +185,8 @@ output$results_diag_elast <- renderTable({
   res
 
 }, digits = 2, rownames = FALSE, align = "c")
+
+# Vertical
 
 
 ## Display results to Diagnostics tab
@@ -185,6 +200,8 @@ output$results_diagnostics <- renderTable({
 
 }, digits = 0 ,rownames = TRUE, align = "c")
 
+# Vertical
+
 
 ## Identify whether the model is over-identified in Diagnostics tab
 # Horizontal
@@ -195,6 +212,8 @@ output$overIDText <- renderText({
   isOverID(input$supply, input$calcElast, values[["inputData"]])
 })
 
+# Vertical
+
 
 ## Display parameters to Diagnostics tab
 # Horizontal
@@ -203,8 +222,9 @@ output$parameters <- renderPrint({
   if(input$inTabset!= "diagpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
 
   print(getParms(values[["sim"]], digits = 2))
-
 })
+
+# Vertical
 
 
 ## Display template code to the R Code tab
@@ -217,6 +237,8 @@ output$results_code <- renderPrint({
   cat(thiscode)
 })
 
+# Vertical
+
 
 ## Display warnings to Messages tab
 # Horizontal
@@ -227,6 +249,8 @@ output$warnings <- renderText({
   paste(values[["msg"]]$warning,collapse="\n")
 })
 
+# Vertical
+
 
 ## Display errors to Messages tab
 # Horizontal
@@ -236,3 +260,5 @@ output$errors <- renderText({
 
   paste(values[["msg"]]$error,collapse="\n")
 })
+
+# Vertical
