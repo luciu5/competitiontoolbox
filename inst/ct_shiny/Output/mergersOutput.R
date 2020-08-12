@@ -36,13 +36,15 @@ output$hotVertical <- renderRHandsontable({
   if(missPricesDown && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown \n ($/unit)"}
   else{colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown \n (p-c)/p"}
 
-  if(missPricesDown && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp \n ($/unit)"}
+  if(missPricesUp && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp \n ($/unit)"}
   else{colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp \n (p-c)/p"}
 
   if (!is.null(inputData))
     rhandsontable(inputData, stretchH = "all", contextMenu = FALSE ) %>% hot_col(col = 1:ncol(inputData), valign = "htMiddle") %>%
     hot_col(col = which(sapply(inputData, is.numeric)), halign = "htCenter") %>% hot_cols(columnSorting = TRUE)
 })
+
+
 
 ## Display summary results from mergersSummary
 # Horizontal
@@ -71,24 +73,33 @@ output$resultsVertical <-
   }, na = "", digits = 1)
 
 
+
 ## Generate no-purchase shares in Details tab
 # Horizontal
 output$results_shareOut <- renderTable({
 
-  if(input$inTabset!= "detpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
+  if(input$inTabset != "detpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
 
   mergersNoPurch(values[["sim"]])
 
 }, rownames = TRUE, digits = 1, align = "c")
 
 # Vertical
+output$results_shareOutVertical <- renderTable({
+
+  if(input$inTabsetVertical != "detpanelVertical" || input$simulateVertical == 0  || is.null(valuesVertical[["sim"]])){return()}
+
+  mergersNoPurch(valuesVertical[["sim"]])
+
+}, rownames = TRUE, digits = 1, align = "c")
+
 
 
 ## Display detailed summary values to details tab
 # Horizontal
 output$results_detailed <- renderTable({
 
-  if(input$inTabset != "detpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
+  if(input$inTabset != "detpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
   if(input$supply == "Cournot"){
 
@@ -131,24 +142,53 @@ output$results_detailed <- renderTable({
 }, digits = 2)
 
 # Vertical
+output$results_detailedVertical <- renderTable({
+
+  if(input$inTabsetVertical != "detpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
+
+  ##
+  ## ASK CHARLES if the complicated logic for results_detailed in -Horizontal- needs to be replicated here...
+  ##
+
+  capture.output(result <- summary(valuesVertical[["sim"]]))
+  result <- as.data.frame(result)
+
+  result$Name <- rownames(result)
+  result <- result[, c(1, ncol(result), 2:(ncol(result)-1))]
+
+}, digits = 2)
+
 
 
 ## Display market elasticity in Elasticities tab
 # Horizontal
 output$results_mktelast <- renderTable({
 
-  if(input$inTabset!= "elastpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
+  if(input$inTabset != "elastpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
   if(input$pre_elast == "Pre-Merger"){ preMerger = TRUE}
   else{preMerger = FALSE}
 
   res <- as.matrix(elast(values[["sim"]], preMerger=preMerger, market = TRUE))
-  colnames(res)= "Market"
+  colnames(res) <- "Market"
   res
 
 }, rownames = FALSE)
 
 # Vertical
+output$results_mktelastVertical <- renderTable({
+
+  if(input$inTabsetVertical != "elastpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
+
+  if(input$pre_elastVertical == "Pre-Merger"){preMerger = TRUE}
+  else{preMerger = FALSE}
+
+  result <- as.matrix(elast(valuesVertical[["sim"]], preMerger = preMerger, market = TRUE))
+  colnames(res) <- "Market"
+  res
+
+}, rownames = FALSE)
+
 
 
 ## Display elasticities to Elasticities tab
@@ -175,21 +215,34 @@ output$results_elast <- renderTable({
 # Vertical
 
 
-## Display market elasticity gap in Diagnostics tab
+
+## Display inputted vs fitted mkt elasticity in Diagnostics tab
 # Horizontal
 output$results_diag_elast <- renderTable({
 
-  if(input$inTabset!= "diagpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
+  if(input$inTabset != "diagpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
-  res <- mergersDiag(values[["sim"]], mktElast=TRUE)
+  res <- mergersDiag(values[["sim"]], mktElast = TRUE)
   res
 
 }, digits = 2, rownames = FALSE, align = "c")
 
 # Vertical
+output$results_diag_elastVertical <- renderTable({
+
+  if(input$inTabsetVertical != "diagpanel" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
+
+  ##
+  ## UNCLEAR what to do here. Should we look at upstream or downstream margins/prices/etc...
+  ##
+
+  # res <- mergersDiag(valuesVertical[["sim"]], mktElast = TRUE)
+  # res
+
+}, digits = 2, rownames = FALSE, align = "c")
 
 
-## Display results to Diagnostics tab
+## Display diagnostic results to Diagnostics tab
 # Horizontal
 output$results_diagnostics <- renderTable({
 
@@ -201,6 +254,7 @@ output$results_diagnostics <- renderTable({
 }, digits = 0 ,rownames = TRUE, align = "c")
 
 # Vertical
+
 
 
 ## Identify whether the model is over-identified in Diagnostics tab
@@ -215,6 +269,7 @@ output$overIDText <- renderText({
 # Vertical
 
 
+
 ## Display parameters to Diagnostics tab
 # Horizontal
 output$parameters <- renderPrint({
@@ -225,6 +280,7 @@ output$parameters <- renderPrint({
 })
 
 # Vertical
+
 
 
 ## Display template code to the R Code tab
@@ -240,6 +296,7 @@ output$results_code <- renderPrint({
 # Vertical
 
 
+
 ## Display warnings to Messages tab
 # Horizontal
 output$warnings <- renderText({
@@ -252,6 +309,7 @@ output$warnings <- renderText({
 # Vertical
 
 
+
 ## Display errors to Messages tab
 # Horizontal
 output$errors <- renderText({
@@ -262,3 +320,4 @@ output$errors <- renderText({
 })
 
 # Vertical
+

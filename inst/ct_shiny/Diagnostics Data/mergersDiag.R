@@ -2,7 +2,7 @@
 mergersDiag <- function(res, mktElast = FALSE){
   #a function to generate diagnostic data
 
-  isCournot <- grepl("Cournot",class(res))
+  isCournot <- grepl("Cournot", class(res))
 
   if(isCournot){labels= res@labels[[1]]}
   else{labels=res@labels}
@@ -30,7 +30,7 @@ mergersDiag <- function(res, mktElast = FALSE){
       "Fitted Shares(%)"=preShares*100,
       "Share Change (%)"=(1 - obsShares/preShares)*100,
       "Inputted Margins (%)" = obsMargins*100,
-      "Fitted  Margins (%)"=preMargins *100,
+      "Fitted  Margins (%)"= preMargins *100,
       "Margin Change (%)"= (1 - obsMargins/preMargins)*100,
       #'Market Elasticity'= 1 - obsElast/preElast,
       check.names = FALSE
