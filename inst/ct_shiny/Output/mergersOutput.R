@@ -89,7 +89,7 @@ output$results_shareOutVertical <- renderTable({
 
   if(input$inTabsetVertical != "detpanelVertical" || input$simulateVertical == 0  || is.null(valuesVertical[["sim"]])){return()}
 
-  mergersNoPurch(valuesVertical[["sim"]])
+  mergersNoPurch(valuesVertical[["sim"]])  # Returns an error; need to code calcRevenues() in -antitrust-
 
 }, rownames = TRUE, digits = 1, align = "c")
 
@@ -183,7 +183,7 @@ output$results_mktelastVertical <- renderTable({
   if(input$pre_elastVertical == "Pre-Merger"){preMerger = TRUE}
   else{preMerger = FALSE}
 
-  result <- as.matrix(elast(valuesVertical[["sim"]], preMerger = preMerger, market = TRUE))
+  result <- as.matrix(elast(valuesVertical[["sim"]], preMerger = preMerger, market = TRUE))  # Returns an error; need to code elast() in -antitrust-
   colnames(res) <- "Market"
   res
 
@@ -199,13 +199,13 @@ output$results_elast <- renderTable({
 
   isCournot <- grepl("Cournot",class(values[["sim"]]))
 
-  if(input$pre_elast == "Pre-Merger"){ preMerger = TRUE}
-  else{preMerger =FALSE}
+  if(input$pre_elast == "Pre-Merger"){preMerger = TRUE}
+  else{preMerger = FALSE}
 
   if(!isCournot && input$diversions){
-    res <- diversion(values[["sim"]], preMerger=preMerger)
+    res <- diversion(values[["sim"]], preMerger = preMerger)
   }
-  else{res <- elast(values[["sim"]], preMerger=preMerger)}
+  else{res <- elast(values[["sim"]], preMerger = preMerger)}
   if(isCournot){colnames(res) <- "Elasticity"}
 
   res
@@ -230,10 +230,10 @@ output$results_diag_elast <- renderTable({
 # Vertical
 output$results_diag_elastVertical <- renderTable({
 
-  if(input$inTabsetVertical != "diagpanel" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
+  if(input$inTabsetVertical != "diagpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
 
   ##
-  ## UNCLEAR what to do here. Should we look at upstream or downstream margins/prices/etc...
+  ## UNCLEAR what to do here. Should we look at upstream or downstream margins/prices/etc. to calculate the fitted mkt elasticity?
   ##
 
   # res <- mergersDiag(valuesVertical[["sim"]], mktElast = TRUE)
@@ -242,7 +242,8 @@ output$results_diag_elastVertical <- renderTable({
 }, digits = 2, rownames = FALSE, align = "c")
 
 
-## Display diagnostic results to Diagnostics tab
+
+## Display diagnostic data to Diagnostics tab
 # Horizontal
 output$results_diagnostics <- renderTable({
 
@@ -254,6 +255,18 @@ output$results_diagnostics <- renderTable({
 }, digits = 0 ,rownames = TRUE, align = "c")
 
 # Vertical
+output$results_diagnosticsVertical <- renderTable({
+
+  if(input$inTabsetVertical != "diagpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
+
+  ##
+  ## UNCLEAR what to do here. Should we look at upstream or downstream margins/prices/etc. to calculate the diagnostic data?
+  ##
+
+  # res <- mergersDiag(valuesVertical[["sim"]])
+  # res
+
+}, digits = 2, rownames = FALSE, align = "c")
 
 
 
@@ -267,6 +280,16 @@ output$overIDText <- renderText({
 })
 
 # Vertical
+output$overIDTextVertical <- renderText({
+
+  if(is.null(valuesVertical[["inputData"]])){return()}
+
+  ##
+  ## UNCLEAR what to do here. Market elasticity is not a user input and there is never a Cournot demand system assumed under vertical simulation.
+  ##
+
+  #isOverID(input$supplyVertical, input$calcElastVertical, valuesVertical[["inputData"]])  # There is no "calcElastVertical"!
+})
 
 
 
@@ -274,12 +297,18 @@ output$overIDText <- renderText({
 # Horizontal
 output$parameters <- renderPrint({
 
-  if(input$inTabset!= "diagpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
+  if(input$inTabset != "diagpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
 
   print(getParms(values[["sim"]], digits = 2))
 })
 
 # Vertical
+output$parametersVertical <- renderPrint({
+
+  if(input$inTabsetVertical != "diagpanelVertical" || input$simulateVertical == 0  || is.null(valuesVertical[["sim"]])){return()}
+
+  print(getParms(valuesVertical[["sim"]], digits = 2))
+})
 
 
 
@@ -289,11 +318,18 @@ output$results_code <- renderPrint({
 
   if(input$inTabset != "codepanel"){return()}
 
-  thiscode <- mergersTemplateCode()
-  cat(thiscode)
+  thisCode <- mergersTemplateCode()
+  cat(thisCode)
 })
 
 # Vertical
+output$results_codeVertical <- renderPrint({
+
+  if(input$inTabsetVertical != "codepanelVertical"){return()}
+
+  thisCode <- mergersTemplateCode()
+  cat(thisCode)
+})
 
 
 
@@ -303,10 +339,16 @@ output$warnings <- renderText({
 
   if(input$inTabset!= "msgpanel" || input$simulate == 0 || is.null(values[["msg"]]$warning)){return()}
 
-  paste(values[["msg"]]$warning,collapse="\n")
+  paste(values[["msg"]]$warning, collapse = "\n")
 })
 
 # Vertical
+output$warningsVertical <- renderText({
+
+  if(input$inTabsetVertical != "msgpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["msg"]]$warning)){return()}
+
+  paste(valuesVertical[["msg"]]$warning, collapse = "\n")
+})
 
 
 
@@ -316,8 +358,13 @@ output$errors <- renderText({
 
   if(input$inTabset!= "msgpanel" || input$simulate == 0 || is.null(values[["msg"]]$error)){cat(return())}
 
-  paste(values[["msg"]]$error,collapse="\n")
+  paste(values[["msg"]]$error, collapse = "\n")
 })
 
 # Vertical
+output$errorsVertical <- renderText({
 
+  if(input$inTabsetVertical != "msgpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["msg"]]$error)){cat(return())}
+
+  paste(valuesVertical[["msg"]]$error, collapse = "\n")
+})

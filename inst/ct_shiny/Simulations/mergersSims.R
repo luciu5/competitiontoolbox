@@ -184,6 +184,8 @@ mergersSims <- function(supply, demand, indata, mktElast, type = c("Horizontal",
     marginUp <- indata[grepl("marginsUp", colnames(indata))][[1]]
     marginDown <- indata[grepl("marginsDown", colnames(indata))][[1]]
 
+    indata <<- indata
+
     switch(supply,
            Bertrand = vertical.barg(supplyDown = "bertrand",
                                     sharesDown = indata$sharesDown,
