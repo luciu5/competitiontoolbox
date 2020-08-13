@@ -33,11 +33,11 @@ output$hotVertical <- renderRHandsontable({
   missPricesUp <- isTRUE(any(is.na(inputData$pricesUp[!is.na(inputData$sharesDown)])))
 
   ### UNNECESSARY DUE TO VERTICAL.BARG() INPUT CONSTRAINTS, BUT KEEP FOR NOW (DISCUSS WITH CHARLES):
-  if(missPricesDown && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown \n ($/unit)"}
-  else{colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown \n (p-c)/p"}
+  if(missPricesDown && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown\n ($/unit)"}
+  else{colnames(inputData)[grepl("marginsDown", colnames(inputData))] <- "marginsDown\n (p-c)/p"}
 
-  if(missPricesUp && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp \n ($/unit)"}
-  else{colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp \n (p-c)/p"}
+  if(missPricesUp && input$supplyVertical == "2nd Score Auction"){colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp\n ($/unit)"}
+  else{colnames(inputData)[grepl("marginsUp", colnames(inputData))] <- "marginsUp\n (p-c)/p"}
 
   if (!is.null(inputData))
     rhandsontable(inputData, stretchH = "all", contextMenu = FALSE ) %>% hot_col(col = 1:ncol(inputData), valign = "htMiddle") %>%
@@ -318,7 +318,7 @@ output$results_code <- renderPrint({
 
   if(input$inTabset != "codepanel"){return()}
 
-  thisCode <- mergersTemplateCode()
+  thisCode <- mergersTemplateCode("Horizontal")
   cat(thisCode)
 })
 
@@ -327,7 +327,7 @@ output$results_codeVertical <- renderPrint({
 
   if(input$inTabsetVertical != "codepanelVertical"){return()}
 
-  thisCode <- mergersTemplateCode()
+  thisCode <- mergersTemplateCode("Vertical")
   cat(thisCode)
 })
 
