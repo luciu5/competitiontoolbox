@@ -42,7 +42,7 @@ navbarPage("", id = "menu",
 
                                              h5(tags$b("Directions:")),
                                              helpText(tags$ul(
-                                               tags$li("Copy and paste (or enter) data into Inputs table to simulate a merger between 'Firm1' and 'Firm2'"),
+                                               tags$li("Copy and paste (or enter) data into Inputs table to simulate a merger between 'Firm1' and 'Firm2'."),
                                                tags$li(helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the models used." ))
                                                #tags$li("Shares must be between 0 and 1."),
                                                #tags$li("Margins should exclude fixed costs.")
@@ -197,9 +197,7 @@ navbarPage("", id = "menu",
 
                                              h5(tags$b("Directions:")),
                                              helpText(tags$ul(
-                                               tags$li("Copy and paste (or enter) data into Inputs table to simulate a merger between 'Firm1' and 'Firm2'"),
-                                               tags$li("To simulate a downstream merger, "),
-                                               tags$li("To simulate a vertical merger, "),
+                                               tags$li(htmlOutput("directionsVertical")),
                                                tags$li(helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the models used." ))
                                                #tags$li("Shares must be between 0 and 1."),
                                                #tags$li("Margins should exclude fixed costs.")
@@ -216,6 +214,8 @@ navbarPage("", id = "menu",
                                              # ),
                                              # hr(),
                                              #checkboxInput("incEff", "Include Proportional Cost Changes (negative values imply cost reductions)", value = FALSE, width = NULL),
+                                             selectInput("mergerTypeVertical", "Merger Type:",
+                                                         choices = c("Upstream", "Downstream", "Vertical")),
 
                                              radioButtons("supplyVertical", "Competitive Interaction:",
                                                           choices = c("Bertrand",

@@ -29,6 +29,22 @@ output$hotVertical <- renderRHandsontable({
 
   inputData <- valuesVertical[["inputData"]]
 
+  # if (input$mergerTypeVertical == "Upstream"){
+  #   inputData$ownerPostDown <- inputData$ownerPreDown
+  #   inputData$ownerPostUp <- c(rep("U1", 4), rep(NA, nPossProds - 4))
+  # }
+  #
+  # if (input$mergerTypeVertical == "Downstream"){
+  #   inputData$ownerPostUp <- inputData$ownerPreUp
+  #   inputData$ownerPostDown <- c(rep("D1", 4), rep(NA, nPossProds - 4))
+  # }
+  #
+  # if (input$mergerTypeVertical == "Vertical"){
+  #   inputData$ownerPostUp <- inputData$ownerPreUp
+  #   inputData$ownerPostDown <- inputData$ownerPreDown
+  #   inputData$ownerPostDown[inputData$ownerPostDown == "D1"] <- "U1"
+  # }
+
   missPricesDown <- isTRUE(any(is.na(inputData$pricesDown[!is.na(inputData$sharesDown)])))
   missPricesUp <- isTRUE(any(is.na(inputData$pricesUp[!is.na(inputData$sharesDown)])))
 
@@ -367,4 +383,18 @@ output$errorsVertical <- renderText({
   if(input$inTabsetVertical != "msgpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["msg"]]$error)){cat(return())}
 
   paste(valuesVertical[["msg"]]$error, collapse = "\n")
+})
+
+
+
+## ENDOGENIZE DIRECTIONS FOR VERTICAL SIMULATIONS
+output$directionsVertical <- renderUI({
+  #sumNumMerg <- subset(sumboxmktCnt, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR)
+  if (input$mergerTypeVertical == "Upstream") {
+    HTML(paste("Copy and paste (or enter) numerical data into Inputs table to simulate an upstream merger between 'U1' and 'U2'."))
+  } else if (input$mergerTypeVertical == "Downstream") {
+    HTML(paste("Copy and paste (or enter) numerical data into Inputs table to simulate a downstream merger between 'D1' and 'D2'."))
+  } else if (input$mergerTypeVertical == "Vertical") {
+    HTML(paste("Copy and paste (or enter) numerical data into Inputs table to simulate a vertical merger between 'U1' and 'D1'."))
+  }
 })

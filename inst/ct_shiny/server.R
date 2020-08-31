@@ -114,7 +114,7 @@ shinyServer(function(input, output, session) {
       }
 
       if(!is.null(input$hotVertical)){
-        #valuesVertical[["inputData"]] <- mergersInputs()
+        #valuesVertical[["inputData"]] <- mergersInputs(type = "Vertical")
         valuesVertical$inputData <- hot_to_r(input$hotVertical)
         valuesVertical$inputData[!is.na(valuesVertical$inputData$Name) & valuesVertical$inputData$Name != '', ]
       }
@@ -151,7 +151,7 @@ shinyServer(function(input, output, session) {
         indata <- values[["inputData"]]
       }
 
-      # Standardize "Margin" and "Output" column names fo horizontal merger sims
+      # Standardize "Margin" and "Output" column names of horizontal merger sims
       # Drop products from horizontal merger sim inputs that have missing market shares
       if (input$menu != "Vertical") {
         colnames(indata)[grepl("Margins", colnames(indata), perl = TRUE)] <- "Margins"
