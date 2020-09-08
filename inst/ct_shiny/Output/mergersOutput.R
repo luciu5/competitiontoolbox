@@ -27,23 +27,17 @@ output$hot <- renderRHandsontable({
 # Vertical
 output$hotVertical <- renderRHandsontable({
 
-  inputData <- valuesVertical[["inputData"]]
+  #inputData <- valuesVertical[["inputData"]]
 
-  # if (input$mergerTypeVertical == "Upstream"){
-  #   inputData$ownerPostDown <- inputData$ownerPreDown
-  #   inputData$ownerPostUp <- c(rep("U1", 4), rep(NA, nPossProds - 4))
-  # }
-  #
-  # if (input$mergerTypeVertical == "Downstream"){
-  #   inputData$ownerPostUp <- inputData$ownerPreUp
-  #   inputData$ownerPostDown <- c(rep("D1", 4), rep(NA, nPossProds - 4))
-  # }
-  #
-  # if (input$mergerTypeVertical == "Vertical"){
-  #   inputData$ownerPostUp <- inputData$ownerPreUp
-  #   inputData$ownerPostDown <- inputData$ownerPreDown
-  #   inputData$ownerPostDown[inputData$ownerPostDown == "D1"] <- "U1"
-  # }
+  if (input$mergerTypeVertical == "Upstream"){
+    inputData <- mergersInputs(type = "Vertical", typeVertical = "Upstream")
+  }
+  if (input$mergerTypeVertical == "Downstream"){
+    inputData <- mergersInputs(type = "Vertical", typeVertical = "Downstream")
+  }
+  if (input$mergerTypeVertical == "Vertical"){
+    inputData <- mergersInputs(type = "Vertical", typeVertical = "Vertical")
+  }
 
   missPricesDown <- isTRUE(any(is.na(inputData$pricesDown[!is.na(inputData$sharesDown)])))
   missPricesUp <- isTRUE(any(is.na(inputData$pricesUp[!is.na(inputData$sharesDown)])))

@@ -1,5 +1,5 @@
 
-mergersInputs <- function(type = c("Horizontal", "Vertical")) {
+mergersInputs <- function(type = c("Horizontal", "Vertical"), typeVertical = "Upstream") {
   # a function to generate default input data set for simulations
 
   type = match.arg(type)
@@ -30,20 +30,58 @@ mergersInputs <- function(type = c("Horizontal", "Vertical")) {
 
   if (type == "Vertical") {
 
-    inputData <- data.frame(
-      Name = c("Prod1","Prod2","Prod3","Prod4"),
-      'ownerPreUp' = c("U1","U2","U1","U2"),
-      'ownerPostUp' = c("U1","U1","U1","U1"),
-      'pricesUp' = rep(10,4),
-      'marginsUp' = rep(0.5,4),
-      'ownerPreDown' = c("D1","D1","D2","D2"),
-      'ownerPostDown' = c("D1","D1","D2","D2"),
-      'pricesDown' = rep(20,4),
-      'marginsDown' = rep(0.25,4),
-      'sharesDown' = c(0.3, 0.3, 0.2, 0.1),
-      stringsAsFactors = FALSE,
-      check.names = FALSE
-    )
+    if (typeVertical == "Upstream") {
+
+      inputData <- data.frame(
+        Name = c("Prod1","Prod2","Prod3","Prod4"),
+        'ownerPreUp' = c("U1","U2","U1","U2"),
+        'ownerPostUp' = c("U1","U1","U1","U1"),
+        'pricesUp' = rep(10,4),
+        'marginsUp' = rep(0.5,4),
+        'ownerPreDown' = c("D1","D1","D2","D2"),
+        'ownerPostDown' = c("D1","D1","D2","D2"),
+        'pricesDown' = rep(20,4),
+        'marginsDown' = rep(0.25,4),
+        'sharesDown' = c(0.3, 0.3, 0.2, 0.1),
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      )
+
+    } else if (typeVertical == "Downstream") {
+
+      inputData <- data.frame(
+        Name = c("Prod1","Prod2","Prod3","Prod4"),
+        'ownerPreUp' = c("U1","U2","U1","U2"),
+        'ownerPostUp' = c("U1","U2","U1","U2"),
+        'pricesUp' = rep(10,4),
+        'marginsUp' = rep(0.5,4),
+        'ownerPreDown' = c("D1","D1","D2","D2"),
+        'ownerPostDown' = c("D1","D1","D1","D1"),
+        'pricesDown' = rep(20,4),
+        'marginsDown' = rep(0.25,4),
+        'sharesDown' = c(0.3, 0.3, 0.2, 0.1),
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      )
+
+    } else if (typeVertical == "Vertical") {
+
+      inputData <- data.frame(
+        Name = c("Prod1","Prod2","Prod3","Prod4"),
+        'ownerPreUp' = c("U1","U2","U1","U2"),
+        'ownerPostUp' = c("U1","U2","U1","U2"),
+        'pricesUp' = rep(10,4),
+        'marginsUp' = rep(0.5,4),
+        'ownerPreDown' = c("D1","D1","D2","D2"),
+        'ownerPostDown' = c("U1","U1","D2","D2"),
+        'pricesDown' = rep(20,4),
+        'marginsDown' = rep(0.25,4),
+        'sharesDown' = c(0.3, 0.3, 0.2, 0.1),
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      )
+
+    }
   }
 
   nDefProd <- nrow(inputData)
