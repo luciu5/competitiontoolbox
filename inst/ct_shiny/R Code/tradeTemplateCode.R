@@ -146,7 +146,7 @@ tradeTemplateCode <- function(type){
       "summary(simres, revenues = FALSE, levels = FALSE, market=TRUE)",
       "\n\n ## Details Tab Results:\n",
       "summary(simres, revenues = FALSE, levels = FALSE, market=FALSE)\n\n",
-      "\n\n ## Elasticities Tab Results  (Pre-tariff Only):\n",
+      "\n ## Elasticities Tab Results  (Pre-tariff Only):\n",
       "elast(simres, preMerger = TRUE, market=TRUE)\n elast(simres, preMerger = TRUE, market=FALSE)",
       "\n\n ## Diagnostics Tab Results:\n",
       "calcDiagnostics(simres)\n\n"

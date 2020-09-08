@@ -58,24 +58,23 @@ shinyServer(function(input, output, session) {
     source(paste0(getwd(), "/Simulations/mergersSims.R"), local = TRUE)
     source(paste0(getwd(), "/Simulations/tradeSims.R"), local = TRUE)
 
-    ## No-purchase Shares
-    source(paste0(getwd(), "/No-purchase Shares/mergersNoPurch.R"), local = TRUE)
-    source(paste0(getwd(), "/No-purchase Shares/tradeNoPurch.R"), local = TRUE)
-
     ## Summary Tables
-    source(paste0(getwd(), "/Summary Tables/mergersSummary.R"), local = TRUE)
-    source(paste0(getwd(), "/Summary Tables/tradeSummary.R"), local = TRUE)
+    source(paste0(getwd(), "/Summary/mergersSummary.R"), local = TRUE)
+    source(paste0(getwd(), "/Summary/tradeSummary.R"), local = TRUE)
+
+    ## No-purchase Shares
+    source(paste0(getwd(), "/Details/mergersNoPurch.R"), local = TRUE)
+    source(paste0(getwd(), "/Details/tradeNoPurch.R"), local = TRUE)
 
     ## Diagnostics Data
-    source(paste0(getwd(), "/Diagnostics Data/mergersDiag.R"), local = TRUE)
-    source(paste0(getwd(), "/Diagnostics Data/tradeDiag.R"), local = TRUE)
-
+    source(paste0(getwd(), "/Diagnostics/mergersDiag.R"), local = TRUE)
+    source(paste0(getwd(), "/Diagnostics/tradeDiag.R"), local = TRUE)
     ## Identification
-    source(paste0(getwd(), "/Identification/isOverID.R"), local = TRUE)
+    source(paste0(getwd(), "/Diagnostics/isOverID.R"), local = TRUE)
 
     ## Template Code
-    source(paste0(getwd(), "/Template Code/mergersTemplateCode.R"), local = TRUE)
-    source(paste0(getwd(), "/Template Code/tradeTemplateCode.R"), local = TRUE)
+    source(paste0(getwd(), "/R Code/mergersTemplateCode.R"), local = TRUE)
+    source(paste0(getwd(), "/R Code/tradeTemplateCode.R"), local = TRUE)
 
 
     ## Create a series of reactive values
@@ -213,7 +212,7 @@ shinyServer(function(input, output, session) {
                       type = "Vertical")
         )
 
-        thisSim <<- thisSim
+        thisSim <<- thisSim  # Delete later
 
       } else {
 
@@ -232,7 +231,7 @@ shinyServer(function(input, output, session) {
                       type = "Horizontal")
         )
 
-        #thisSim <<- thisSim  # Delete later...
+        thisSim <<- thisSim  # Delete later...
       }
 
       thisSim$warning <- grep("are the same|INCREASE in marginal costs", thisSim$warning, value = TRUE, invert = TRUE, perl = TRUE)
