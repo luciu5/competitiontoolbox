@@ -9,7 +9,7 @@ output$plotSumATR <- renderPlot({
   ggplot(data = subset(sumboxdata, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
     geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
     coord_cartesian(ylim = ylimSumATR)+
-    theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title = element_text(size=13), axis.text.x  = element_text(angle =45 , hjust=1, size=11, face = "bold")) +
+    theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title = element_text(size = 13), axis.text.x = element_text(angle = 45, hjust = 1, size = 11, face = "bold")) +
     ylab(input$outcomeSumATR) +
     ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR,"%"))
 

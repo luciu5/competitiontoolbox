@@ -42,7 +42,7 @@ navbarPage("", id = "menu",
 
                                              h5(tags$b("Directions:")),
                                              helpText(tags$ul(
-                                               tags$li("Copy and paste (or enter) data into Inputs table to simulate a merger between 'Firm1' and 'Firm2'"),
+                                               tags$li("Copy and paste (or enter) data into Inputs table to simulate a merger between 'Firm1' and 'Firm2'."),
                                                tags$li(helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the models used." ))
                                                #tags$li("Shares must be between 0 and 1."),
                                                #tags$li("Margins should exclude fixed costs.")
@@ -130,7 +130,7 @@ navbarPage("", id = "menu",
                                              #tags$head(
                                              #  tags$style(HTML('#run{color:white;background-color:black}'))
                                              #),
-                                             actionButton(inputId ="simulate" , label = "", icon = icon("play"), width = '60px', style='padding:4px')
+                                             actionButton(inputId = "simulate", label = "", icon = icon("play"), width = '60px', style='padding:4px')
                                              #)
                                              ,
                                              br(), br(),br(),
@@ -186,11 +186,126 @@ navbarPage("", id = "menu",
                               ),
 
 
-                              tabPanel("Vertical",
+                              tabPanel("Vertical", style = "overflow-y:scroll; max-height: 90vh",
                                        fluidPage(
-                                         titlePanel("Simulate a Vertical Merger"),
-                                         p(em("Coming Soon"))
-                                         )),
+                                         titlePanel("Simulate a Merger in a Supply Chain") ,
+
+                                         sidebarLayout(
+                                           sidebarPanel(
+
+                                             htmlOutput("urlTextVertical"), hr(),
+
+                                             h5(tags$b("Directions:")),
+                                             helpText(tags$ul(
+                                               tags$li(htmlOutput("directionsVertical")),
+                                               tags$li(helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the models used." ))
+                                               #tags$li("Shares must be between 0 and 1."),
+                                               #tags$li("Margins should exclude fixed costs.")
+                                             )
+                                             ),hr(),
+                                             # radioButtons("calcElast", "Calibrate model parameters using:",
+                                             #              choices = c("market elasticity and 1 or more margins",
+                                             #                          "2 or more margins")
+                                             # ),
+                                             # conditionalPanel(
+                                             #   condition = "input.calcElast.includes('elasticity') == true",
+                                             #   numericInput("enterElast", "Enter Market Elasticity:", value = -1, min = -Inf, max = 0, step = .1  #, width='75%'
+                                             #   )
+                                             # ),
+                                             # hr(),
+                                             #checkboxInput("incEff", "Include Proportional Cost Changes (negative values imply cost reductions)", value = FALSE, width = NULL),
+                                             selectInput("mergerTypeVertical", "Merger Type:",
+                                                         choices = c("Upstream", "Downstream", "Vertical")),
+
+                                             radioButtons("supplyVertical", "Competitive Interaction:",
+                                                          choices = c("Bertrand",
+                                                                      "2nd Score Auction")
+                                                          ),
+
+                                             ## Use conditionalPanel() to select appropriate demand forms for each unique pair of competitive interaction and margin information
+                                             # Bertrand
+                                             conditionalPanel(
+                                               condition = "input.supplyVertical == 'Bertrand'",
+                                               selectInput("demandVertical1", "Downstream Demand Specification:",
+                                                           choices = c("logit")),
+                                               helpText(tags$b("Note:"), "Share of outside good implied by sum of inside product shares. Price of outside good fixed at 0.")
+                                             ),
+                                             # 2nd Score Auction
+                                             conditionalPanel(
+                                               condition = "input.supplyVertical == '2nd Score Auction'",
+                                               selectInput("demandVertical2", "Downstream Demand Specification:",
+                                                           choices = c("logit")),
+                                               helpText(tags$b("Note:"), "Share of outside good implied by sum of inside product shares. Price of outside good fixed at 0.")
+                                             ),
+
+                                             hr(),
+                                             fluidRow(
+                                               column(width=12, align = "center",
+                                                      tags$div(
+                                                        HTML("<font size=\"2\"> Supported by </font>"),
+                                                        HTML(logo)
+                                                      )
+                                               )
+                                             )
+                                           ),
+
+                                           mainPanel(
+                                             h2("Enter Inputs"),
+                                              rHandsontableOutput("hotVertical"), br(),
+                                             # #tags$head(
+                                             #  tags$style(HTML('#run{color:white;background-color:black}'))
+                                             #),
+                                             actionButton(inputId = "simulateVertical", label = "", icon = icon("play"), width = '60px', style = 'padding:4px')
+                                             #)
+                                             ,
+                                             br(), br(),br(),
+                                             tabsetPanel(id = "inTabsetVertical",
+                                                         tabPanel("Summary", value = "respanelVertical", br(), br(), tableOutput("resultsVertical"), br(),
+                                                                  helpText(tags$b("Note:"), "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages.
+                                                                           A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.
+                                                                           Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues.")
+                                                                  ),
+                                                         tabPanel("Details", value = "detpanelVertical", br(), br(), tableOutput("results_shareOutVertical"), br(), tableOutput("results_detailedVertical")
+
+                                                                  #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
+                                                                  #                  helpText(tags$b("Note:"), "shares are revenue-based.")
+                                                                  #)
+                                                         ),
+                                                         tabPanel("Elasticities", value = "elastpanelVertical",  br(),br(),
+                                                                  radioButtons("pre_elastVertical", "",
+                                                                               choices = c("Pre-Merger",
+                                                                                           "Post-Merger"
+                                                                               ), inline = TRUE),
+                                                                  br(),
+                                                                  tableOutput("results_mktelastVertical"),br(),
+                                                                  tableOutput("results_elastVertical"),
+                                                                  conditionalPanel("input.supplyVertical != 'Cournot'",
+                                                                                   checkboxInput("diversionsVertical", "Report diversion ratios", value = FALSE),
+                                                                                   helpText(tags$b("Note:"), "diagonal elements are own-price elasticities.", "Off-diagonal elements are the cross-price elasticities of row with respect to column.")
+                                                                  ),
+                                                                  conditionalPanel("input.supplyVertical == 'Cournot'",
+                                                                                   helpText(tags$b("Note:"), "above are own-price elasticities")
+                                                                  )
+                                                         ),
+                                                         tabPanel("Diagnostics", value = "diagpanelVertical", br(),br(), h4("Inputted vs. Fitted Values"),
+                                                                  tableOutput("results_diag_elastVertical"),
+                                                                  tableOutput("results_diagnosticsVertical"),
+                                                                  htmlOutput("overIDTextVertical"),br(),
+                                                                  #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
+                                                                  h4("Parameters"),verbatimTextOutput("parametersVertical"),
+                                                                  helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the parameters displayed here." )
+                                                         ),
+                                                         tabPanel("R Code",  value = "codepanelVertical", br(),verbatimTextOutput("results_codeVertical")),
+                                                         tabPanel("Messages", value = "msgpanelVertical", br(), h4("Warnings"), span(textOutput("warningsVertical"), style="color:orange"), br(),
+                                                                  h4("Errors"), span(textOutput("errorsVertical"), style="color:red"))
+
+                                                )
+
+                                           )
+
+                                         )
+                                       )
+                                    ),
 
 
                               tabPanel("Documentation",

@@ -58,29 +58,29 @@ shinyServer(function(input, output, session) {
     source(paste0(getwd(), "/Simulations/mergersSims.R"), local = TRUE)
     source(paste0(getwd(), "/Simulations/tradeSims.R"), local = TRUE)
 
-    ## No-purchase Shares
-    source(paste0(getwd(), "/No-purchase Shares/mergersNoPurch.R"), local = TRUE)
-    source(paste0(getwd(), "/No-purchase Shares/tradeNoPurch.R"), local = TRUE)
-
     ## Summary Tables
-    source(paste0(getwd(), "/Summary Tables/mergersSummary.R"), local = TRUE)
-    source(paste0(getwd(), "/Summary Tables/tradeSummary.R"), local = TRUE)
+    source(paste0(getwd(), "/Summary/mergersSummary.R"), local = TRUE)
+    source(paste0(getwd(), "/Summary/tradeSummary.R"), local = TRUE)
+
+    ## No-purchase Shares
+    source(paste0(getwd(), "/Details/mergersNoPurch.R"), local = TRUE)
+    source(paste0(getwd(), "/Details/tradeNoPurch.R"), local = TRUE)
 
     ## Diagnostics Data
-    source(paste0(getwd(), "/Diagnostics Data/mergersDiag.R"), local = TRUE)
-    source(paste0(getwd(), "/Diagnostics Data/tradeDiag.R"), local = TRUE)
-
+    source(paste0(getwd(), "/Diagnostics/mergersDiag.R"), local = TRUE)
+    source(paste0(getwd(), "/Diagnostics/tradeDiag.R"), local = TRUE)
     ## Identification
-    source(paste0(getwd(), "/Identification/isOverID.R"), local = TRUE)
+    source(paste0(getwd(), "/Diagnostics/isOverID.R"), local = TRUE)
 
     ## Template Code
-    source(paste0(getwd(), "/Template Code/mergersTemplateCode.R"), local = TRUE)
-    source(paste0(getwd(), "/Template Code/tradeTemplateCode.R"), local = TRUE)
+    source(paste0(getwd(), "/R Code/mergersTemplateCode.R"), local = TRUE)
+    source(paste0(getwd(), "/R Code/tradeTemplateCode.R"), local = TRUE)
 
 
     ## Create a series of reactive values
     valuesQuota <- reactiveValues(inputData = tradeInputs(nPossProds), sim = NULL, msg = NULL)
     valuesTariffs <- reactiveValues(inputData = tradeInputs(nPossProds), sim = NULL, msg = NULL)
+    valuesVertical <- reactiveValues(inputData = mergersInputs(), sim = NULL, msg = NULL)
     values <- reactiveValues(inputData = mergersInputs(), sim = NULL, msg = NULL)
 
 
@@ -93,8 +93,12 @@ shinyServer(function(input, output, session) {
       valuesQuota[["inputData"]] <- tradeInputs(nrow = input$addRowsQuota, type = "Quotas")
     })
 
+    observeEvent(input$menu == "Vertical", {
+      valuesVertical[["inputData"]] <- mergersInputs(type = "Vertical")
+    })
+
     observeEvent(input$menu == "Horizontal", {
-      values[["inputData"]] <- mergersInputs()
+      values[["inputData"]] <- mergersInputs(type = "Horizontal")
     })
 
 
@@ -108,6 +112,12 @@ shinyServer(function(input, output, session) {
         valuesQuota[["inputData"]] <- hot_to_r(input$hotQuota)
       }
 
+      if(!is.null(input$hotVertical)){
+        #valuesVertical[["inputData"]] <- mergersInputs(type = "Vertical")
+        valuesVertical$inputData <- hot_to_r(input$hotVertical)
+        valuesVertical$inputData[!is.na(valuesVertical$inputData$Name) & valuesVertical$inputData$Name != '', ]
+      }
+
       if(!is.null(input$hot)){
         #values[["inputData"]] <- mergersInputs()
         values$inputData <- hot_to_r(input$hot)
@@ -117,43 +127,56 @@ shinyServer(function(input, output, session) {
 
 
     ## Simulate Mergers and Trade when corresponding "simulate" button is clicked by the observer
-    observeEvent(input$simulate | input$simulateTariffs | input$simulateQuota, {
+    observeEvent(input$simulate | input$simulateVertical | input$simulateTariffs | input$simulateQuota, {
 
       if(input$menu == "Tariffs"){
         valuesTariffs[["sim"]] <- valuesTariffs[["msg"]] <-  NULL
-        updateTabsetPanel(session,inputId  = "inTabsetTariffs", selected = "respanelTariffs")
+        updateTabsetPanel(session, inputId  = "inTabsetTariffs", selected = "respanelTariffs")
         indata <- valuesTariffs[["inputData"]]
 
       } else if (input$menu == "Quotas"){
         valuesQuota[["sim"]] <- valuesQuota[["msg"]] <-  NULL
-        updateTabsetPanel(session,inputId  = "inTabsetQuota", selected = "respanelQuota")
+        updateTabsetPanel(session, inputId  = "inTabsetQuota", selected = "respanelQuota")
         indata <-   valuesQuota[["inputData"]]
+
+      } else if (input$menu == "Vertical") {
+        valuesVertical[["sim"]] <- valuesVertical[["msg"]] <-  NULL
+        updateTabsetPanel(session, inputId  = "inTabsetVertical", selected = "respanelVertical")
+        indata <- valuesVertical[["inputData"]]
 
       } else {
         values[["sim"]] <- values[["msg"]] <-  NULL
-        updateTabsetPanel(session,inputId  = "inTabset", selected = "respanel")
+        updateTabsetPanel(session, inputId  = "inTabset", selected = "respanel")
         indata <- values[["inputData"]]
       }
 
-      isOutput <-  grepl("Quantities|Revenues", colnames(indata), perl = TRUE)
+      # Standardize "Margin" and "Output" column names of horizontal merger sims
+      # Drop products from horizontal merger sim inputs that have missing market shares
+      if (input$menu != "Vertical") {
+        colnames(indata)[grepl("Margins", colnames(indata), perl = TRUE)] <- "Margins"
+        colnames(indata)[grepl("Quantities|Revenues", colnames(indata), perl = TRUE)] <- "Output"
 
-      colnames(indata)[ grepl("Margins", colnames(indata), perl = TRUE)] <- "Margins"
-      colnames(indata)[isOutput] <- "Output"
+        indata <- indata[!is.na(indata[, "Output"]), ]
+        indata$mcDelta <- 0
+      }
 
-      indata <- indata[!is.na(indata[,"Output"]),]
-      indata$mcDelta <- 0
+      # Drop products from vertical merger sim inputs that have missing downstream market shares
+      if (input$menu == "Vertical") {
+        indata <- indata[!is.na(indata[, "sharesDown"]), ]
+      }
 
-      if(input$menu == "Tariffs"){
+      if (input$menu == "Tariffs") {
         tariffPost <- indata[,grep('New.*\\n(Tariff)',colnames(indata), perl=TRUE), drop = TRUE]
         tariffPost[is.na(tariffPost)] <- 0
 
         tariffPre <- indata[,grep('Cur.*\\n(Tariff)',colnames(indata), perl = TRUE), drop= TRUE]
         tariffPre[is.na(tariffPre)] <- 0
-        indata$mcDelta <-  (tariffPost - tariffPre)
-        indata$mcDelta <-  indata$mcDelta/(1 - tariffPost)
+        indata$mcDelta <- (tariffPost - tariffPre)
+        indata$mcDelta <- indata$mcDelta/(1 - tariffPost)
       }
 
-      ##### Run simulations based on input menu:
+
+      ##### Run simulations based on input$menu:
       if (req(input$menu) == "Tariffs") {
         indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
 
@@ -178,12 +201,25 @@ shinyServer(function(input, output, session) {
                     type = input$menu)
         )
 
+      } else if (input$menu == "Vertical") {
+
+        ## For diagnostic purposes: output the two key inputs for the vertical merger simulation
+        print(c(supply(), demand()))
+
+        thisSim <- msgCatcher(
+          # Run merger simulation
+          mergersSims(supply = supply(), indata = indata,
+                      type = "Vertical")
+        )
+
+        thisSim <<- thisSim  # Delete later
+
       } else {
 
-        indata$mcDelta <- indata[,grep('Cost Changes',colnames(indata))]
+        indata$mcDelta <- indata[, grep('Cost Changes', colnames(indata))]
         indata$mcDelta[is.na(indata$mcDelta)] <- 0
 
-        indata$'Pre-merger\n Owner' <- factor(indata$'Pre-merger\n Owner',levels=unique(indata$'Pre-merger\n Owner') )
+        indata$'Pre-merger\n Owner' <- factor(indata$'Pre-merger\n Owner',levels=unique(indata$'Pre-merger\n Owner'))
         indata$'Post-merger\n Owner' <- factor(indata$'Post-merger\n Owner',levels=unique(indata$'Post-merger\n Owner'))
 
         ## For diagnostic purposes: output the three key inputs for the merger simulation
@@ -191,33 +227,39 @@ shinyServer(function(input, output, session) {
 
         thisSim <- msgCatcher(
           # Run merger simulation
-          mergersSims(supply = supply(), demand = demand(), indata = indata, mktElast = elasticity())
+          mergersSims(supply = supply(), demand = demand(), indata = indata, mktElast = elasticity(),
+                      type = "Horizontal")
         )
 
         thisSim <<- thisSim  # Delete later...
       }
 
-      thisSim$warning <- grep("are the same|INCREASE in marginal costs", thisSim$warning, value= TRUE, invert=TRUE, perl=TRUE)
+      thisSim$warning <- grep("are the same|INCREASE in marginal costs", thisSim$warning, value = TRUE, invert = TRUE, perl = TRUE)
       if(length(thisSim$warning) == 0){thisSim$warning = NULL}
 
       if (input$menu == "Tariffs") {
-        valuesTariffs[["sim"]]<-  thisSim$value
-        valuesTariffs[["msg"]]<-  list(error=thisSim$error,warning=thisSim$warning)
+        valuesTariffs[["sim"]] <- thisSim$value
+        valuesTariffs[["msg"]] <- list(error = thisSim$error, warning = thisSim$warning)
       } else if (input$menu =="Quotas") {
-        valuesQuota[["sim"]]<-  thisSim$value
-        valuesQuota[["msg"]]<-  list(error=thisSim$error,warning=thisSim$warning)
+        valuesQuota[["sim"]] <- thisSim$value
+        valuesQuota[["msg"]] <- list(error = thisSim$error, warning = thisSim$warning)
+      } else if (input$menu == "Vertical") {
+        valuesVertical[["sim"]] <- thisSim$value
+        valuesVertical[["msg"]] <- list(error = thisSim$error, warning = thisSim$warning)
       } else {
-        values[["sim"]] <-  thisSim$value
-        values[["msg"]] <-  list(error=thisSim$error,warning=thisSim$warning)
+        values[["sim"]] <- thisSim$value
+        values[["msg"]] <- list(error = thisSim$error, warning = thisSim$warning)
       }
 
       if (!is.null(thisSim$error) || !is.null(thisSim$warning)){
-        if (input$menu == "Tariffs" ) {
-          updateTabsetPanel(session,inputId  = "inTabsetTariffs", selected = "msgpanelTariffs")
-        } else if(input$menu == "Quotas" ) {
-          updateTabsetPanel(session,inputId  = "inTabsetQuota", selected = "msgpanelQuota")
-        } else if(input$menu == "Horizontal" ){
-          updateTabsetPanel(session,inputId  = "inTabset", selected = "msgpanel")
+        if (input$menu == "Tariffs") {
+          updateTabsetPanel(session, inputId = "inTabsetTariffs", selected = "msgpanelTariffs")
+        } else if(input$menu == "Quotas") {
+          updateTabsetPanel(session, inputId = "inTabsetQuota", selected = "msgpanelQuota")
+        } else if(input$menu == "Vertical") {
+          updateTabsetPanel(session, inputId = "inTabsetVertical", selected = "msgpanelVertical")
+        } else if(input$menu == "Horizontal") {
+          updateTabsetPanel(session, inputId = "inTabset", selected = "msgpanel")
         }
       }
     })
@@ -231,7 +273,7 @@ shinyServer(function(input, output, session) {
 
 
     ## Identify server as Internal, Local, or Public
-    output$urlTextQuota <- output$urlTextTariffs <- output$urlText <- renderText({
+    output$urlTextQuota <- output$urlTextTariffs <- output$urlTextVertical <- output$urlText <- renderText({
 
       thisurl <- session$clientData$url_hostname
 
