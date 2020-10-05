@@ -3,8 +3,10 @@ mergersDiag <- function(res, mktElast = FALSE){
   #a function to generate diagnostic data
 
   isCournot <- grepl("Cournot", class(res))
+  isVertical <- grepl("Vert", class(res))
 
-  if(isCournot){labels= res@labels[[1]]}
+  if(isCournot){labels = res@labels[[1]]}
+  else if(isVertical){labels = res@down@labels}
   else{labels=res@labels}
 
   obsPrices <- res@prices

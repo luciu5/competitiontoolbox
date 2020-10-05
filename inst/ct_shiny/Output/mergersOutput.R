@@ -193,7 +193,7 @@ output$results_mktelastVertical <- renderTable({
   if(input$pre_elastVertical == "Pre-Merger"){preMerger = TRUE}
   else{preMerger = FALSE}
 
-  result <- as.matrix(elast(valuesVertical[["sim"]], preMerger = preMerger, market = TRUE))  # Returns an error; need to code elast() in -antitrust-
+  res <- as.matrix(elast(valuesVertical[["sim"]], preMerger = preMerger, market = TRUE))  # Returns an error; need to code elast() in -antitrust-
   colnames(res) <- "Market"
   res
 
@@ -205,9 +205,9 @@ output$results_mktelastVertical <- renderTable({
 # Horizontal
 output$results_elast <- renderTable({
 
-  if(input$inTabset!= "elastpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
+  if(input$inTabset != "elastpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
-  isCournot <- grepl("Cournot",class(values[["sim"]]))
+  isCournot <- grepl("Cournot", class(values[["sim"]]))
 
   if(input$pre_elast == "Pre-Merger"){preMerger = TRUE}
   else{preMerger = FALSE}
@@ -223,6 +223,24 @@ output$results_elast <- renderTable({
 }, rownames = TRUE)
 
 # Vertical
+output$results_elastVertical <- renderTable({
+
+  if(input$inTabsetVertical != "elastpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
+
+  isCournot <- grepl("Cournot", class(valuesVertical[["sim"]]))
+
+  if(input$pre_elastVertical == "Pre-Merger"){preMerger = TRUE}
+  else{preMerger = FALSE}
+
+  if(!isCournot && input$diversionsVertical){
+    res <- diversion(valuesVertical[["sim"]], preMerger = preMerger)
+  }
+  else{res <- elast(valuesVertical[["sim"]], preMerger = preMerger)}
+  if(isCournot){colnames(res) <- "Elasticity"}
+
+  res
+
+}, rownames = TRUE)
 
 
 
@@ -243,11 +261,12 @@ output$results_diag_elastVertical <- renderTable({
   if(input$inTabsetVertical != "diagpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
 
   ##
-  ## UNCLEAR what to do here. Should we look at upstream or downstream margins/prices/etc. to calculate the fitted mkt elasticity?
+  ## UNCLEAR what to do here. Should we look at upstream or downstream margins/prices/etc to calculate the fitted mkt elasticity?
+  ## See mergersDiag.R
   ##
 
-  # res <- mergersDiag(valuesVertical[["sim"]], mktElast = TRUE)
-  # res
+  res <- mergersDiag(valuesVertical[["sim"]], mktElast = TRUE)
+  res
 
 }, digits = 2, rownames = FALSE, align = "c")
 
@@ -271,10 +290,12 @@ output$results_diagnosticsVertical <- renderTable({
 
   ##
   ## UNCLEAR what to do here. Should we look at upstream or downstream margins/prices/etc. to calculate the diagnostic data?
+  ## See mergersDiag.R
   ##
 
-  # res <- mergersDiag(valuesVertical[["sim"]])
-  # res
+  #res <- mergersDiag(valuesVertical[["sim"]])
+  res <- calcDiagnostics(thisSim$value)  # Why does this looks different than the -horizontal- merger sim Diagnostic table?
+  res
 
 }, digits = 2, rownames = FALSE, align = "c")
 
@@ -295,10 +316,11 @@ output$overIDTextVertical <- renderText({
   if(is.null(valuesVertical[["inputData"]])){return()}
 
   ##
-  ## UNCLEAR what to do here. Market elasticity is not a user input and there is never a Cournot demand system assumed under vertical simulation.
+  ## UNCLEAR what to do here. Market elasticity (calcElastVertical) is not a user input...
+  ## I think all the vertical merger sims are just-identified?
   ##
 
-  #isOverID(input$supplyVertical, input$calcElastVertical, valuesVertical[["inputData"]])  # There is no "calcElastVertical"!
+  isOverID(input$supplyVertical, input$calcElastVertical, valuesVertical[["inputData"]])  # There is no "calcElastVertical"!
 })
 
 
