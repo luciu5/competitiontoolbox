@@ -140,19 +140,19 @@ navbarPage("", id = "menu",
                                                                                              A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.
                                                                                              Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues.")
                                                          ),
-                                                         tabPanel("Details", value = "detpanel", br(), br(), tableOutput("results_shareOut"), br(), tableOutput("results_detailed")
+                                                         tabPanel("Details", value = "detpanel", br(), tableOutput("results_shareOut"), br(), tableOutput("results_detailed")
 
                                                                   #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
                                                                   #                  helpText(tags$b("Note:"), "shares are revenue-based.")
                                                                   #)
                                                          ),
-                                                         tabPanel("Elasticities", value = "elastpanel",  br(),br(),
+                                                         tabPanel("Elasticities", value = "elastpanel", br(),
                                                                   radioButtons("pre_elast", "",
                                                                                choices = c("Pre-Merger",
                                                                                            "Post-Merger"
                                                                                ), inline = TRUE),
                                                                   br(),
-                                                                  tableOutput("results_mktelast"),br(),
+                                                                  tableOutput("results_mktelast"),
                                                                   tableOutput("results_elast"),
                                                                   conditionalPanel("input.supply != 'Cournot'",
                                                                                    checkboxInput("diversions", "Report diversion ratios", value =FALSE),
@@ -162,7 +162,7 @@ navbarPage("", id = "menu",
                                                                                    helpText(tags$b("Note:"), "above are own-price elasticities")
                                                                   )
                                                          ),
-                                                         tabPanel("Diagnostics", value = "diagpanel", br(),br(), h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"),
+                                                         tabPanel("Diagnostics", value = "diagpanel", br(), h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"), br(),
                                                                   tableOutput("results_diag_elast"),
                                                                   tableOutput("results_diagnostics"),
                                                                   htmlOutput("overIDText"),br(),
@@ -264,21 +264,22 @@ navbarPage("", id = "menu",
                                                          tabPanel("Summary", value = "respanelVertical", br(), br(), tableOutput("resultsVertical"), br(),
                                                                   helpText(tags$b("Note:"), "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages.
                                                                            A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.
-                                                                           Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues.")
+                                                                           Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues. TELL CHARLES THAT THERE ARE
+                                                                           NO 'NUMBERS IN PARENTHESES' FOR VERTICAL!")
                                                                   ),
-                                                         tabPanel("Details", value = "detpanelVertical", br(), br(), tableOutput("results_shareOutVertical"), br(), tableOutput("results_detailedVertical")
+                                                         tabPanel("Details", value = "detpanelVertical", br(), tableOutput("results_shareOutVertical"), br(), tableOutput("results_detailedVertical")
 
                                                                   #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
                                                                   #                  helpText(tags$b("Note:"), "shares are revenue-based.")
                                                                   #)
                                                          ),
-                                                         tabPanel("Elasticities", value = "elastpanelVertical",  br(),br(),
+                                                         tabPanel("Elasticities", value = "elastpanelVertical", br(),
                                                                   radioButtons("pre_elastVertical", "",
                                                                                choices = c("Pre-Merger",
                                                                                            "Post-Merger"
                                                                                ), inline = TRUE),
                                                                   br(),
-                                                                  tableOutput("results_mktelastVertical"),br(),
+                                                                  tableOutput("results_mktelastVertical"),
                                                                   tableOutput("results_elastVertical"),
                                                                   conditionalPanel("input.supplyVertical != 'Cournot'",
                                                                                    checkboxInput("diversionsVertical", "Report diversion ratios", value = FALSE),
@@ -288,10 +289,10 @@ navbarPage("", id = "menu",
                                                                                    helpText(tags$b("Note:"), "above are own-price elasticities")
                                                                   )
                                                          ),
-                                                         tabPanel("Diagnostics", value = "diagpanelVertical", br(),br(), h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"),
+                                                         tabPanel("Diagnostics", value = "diagpanelVertical", br(), h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"), br(),
                                                                   tableOutput("results_diag_elastVertical"),
                                                                   tableOutput("results_diagnosticsVertical"),
-                                                                  htmlOutput("overIDTextVertical"),br(),
+                                                                  htmlOutput("overIDTextVertical"),
                                                                   #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
                                                                   h4("Parameters"),verbatimTextOutput("parametersVertical"),
                                                                   helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the parameters displayed here." )
