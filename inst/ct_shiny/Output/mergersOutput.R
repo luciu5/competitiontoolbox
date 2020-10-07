@@ -30,13 +30,13 @@ output$hotVertical <- renderRHandsontable({
   #inputData <- valuesVertical[["inputData"]]
 
   if (input$mergerTypeVertical == "Upstream"){
-    inputData <- mergersInputs(type = "Vertical", typeVertical = "Upstream")
+    inputData <- mergersInputs(nrow = input$addRowsVertical, type = "Vertical", typeVertical = "Upstream")
   }
   if (input$mergerTypeVertical == "Downstream"){
-    inputData <- mergersInputs(type = "Vertical", typeVertical = "Downstream")
+    inputData <- mergersInputs(nrow = input$addRowsVertical, type = "Vertical", typeVertical = "Downstream")
   }
   if (input$mergerTypeVertical == "Vertical"){
-    inputData <- mergersInputs(type = "Vertical", typeVertical = "Vertical")
+    inputData <- mergersInputs(nrow = input$addRowsVertical, type = "Vertical", typeVertical = "Vertical")
   }
 
   missPricesDown <- isTRUE(any(is.na(inputData$pricesDown[!is.na(inputData$sharesDown)])))
@@ -317,10 +317,10 @@ output$overIDTextVertical <- renderText({
 
   ##
   ## UNCLEAR what to do here. Market elasticity (calcElastVertical) is not a user input...
-  ## I think all the vertical merger sims are just-identified?
+  ## I think all the vertical merger sims are just-identified if bargaining parameter is held fixed?
   ##
 
-  isOverID(input$supplyVertical, input$calcElastVertical, valuesVertical[["inputData"]])  # There is no "calcElastVertical"!
+  #isOverID(input$supplyVertical, input$calcElastVertical, valuesVertical[["inputData"]])  # There is no "calcElastVertical"!
 })
 
 

@@ -203,6 +203,7 @@ navbarPage("", id = "menu",
                                                #tags$li("Margins should exclude fixed costs.")
                                              )
                                              ),hr(),
+                                             sliderInput("addRowsVertical", "Add rows to Inputs table:", value=10,min=5,max=50,step=5),
                                              # radioButtons("calcElast", "Calibrate model parameters using:",
                                              #              choices = c("market elasticity and 1 or more margins",
                                              #                          "2 or more margins")
@@ -228,14 +229,14 @@ navbarPage("", id = "menu",
                                                condition = "input.supplyVertical == 'Bertrand'",
                                                selectInput("demandVertical1", "Downstream Demand Specification:",
                                                            choices = c("logit")),
-                                               helpText(tags$b("Note:"), "Share of outside good implied by sum of inside product shares. Price of outside good fixed at 0.")
+                                               helpText(tags$b("Note:"), "Share of outside good implied by the sum of inside product shares. Price of outside good fixed at 0.")
                                              ),
                                              # 2nd Score Auction
                                              conditionalPanel(
                                                condition = "input.supplyVertical == '2nd Score Auction'",
                                                selectInput("demandVertical2", "Downstream Demand Specification:",
                                                            choices = c("logit")),
-                                               helpText(tags$b("Note:"), "Share of outside good implied by sum of inside product shares. Price of outside good fixed at 0.")
+                                               helpText(tags$b("Note:"), "Share of outside good implied by the sum of inside product shares. Price of outside good fixed at 0.")
                                              ),
 
                                              hr(),
@@ -329,8 +330,8 @@ navbarPage("", id = "menu",
                                                             h5(tags$b("Overview:")),
                                                             helpText(tags$ul(
                                                               tags$li(htmlOutput('sumNumMergerATR')),
-                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "
-                                                                                             (Taragin and Loudermilk 2019)"),"for further details." ))
+                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                             "Taragin and Loudermilk (2019)"),"for further details." ))
                                                               )
                                                             ),
                                                             # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
@@ -366,7 +367,7 @@ navbarPage("", id = "menu",
                                                             helpText(tags$ul(
                                                               tags$li(htmlOutput('indicNumMergerATR')),
                                                               tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                                                             "(Taragin and Loudermilk 1019)"),"for further details." ))
+                                                                                             "Taragin and Loudermilk (2019)"),"for further details." ))
                                                             )
                                                             ),
                                                             # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",

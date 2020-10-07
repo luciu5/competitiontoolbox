@@ -94,7 +94,7 @@ shinyServer(function(input, output, session) {
     })
 
     observeEvent(input$menu == "Vertical", {
-      valuesVertical[["inputData"]] <- mergersInputs(type = "Vertical")
+      valuesVertical[["inputData"]] <- mergersInputs(nrow = input$addRowsVertical, type = "Vertical")
     })
 
     observeEvent(input$menu == "Horizontal", {
