@@ -436,9 +436,9 @@ navbarPage("", id = "menu",
                                                           ),
                                                           mainPanel(
                                                             br(),
-                                                            #fillPage(plotOutput('plotSumATR')),
+                                                            fillPage(imageOutput("figSummary")),
                                                             wellPanel(h5(tags$b("Description:")),
-                                                                      helpText('capSumATR'))
+                                                                      textOutput('capSummary'))
 
                                                           )
 
@@ -469,9 +469,9 @@ navbarPage("", id = "menu",
                                                           ),
                                                           mainPanel(
                                                             br(),
-                                                            #fillPage(plotOutput('plotIndATR')),
+                                                            fillPage(imageOutput("figUpstream")),
                                                             wellPanel(h5(tags$b("Description:")),
-                                                                      helpText('capIndATR'))
+                                                                      textOutput('capUpstream'))
                                                           )
 
 
@@ -492,7 +492,7 @@ navbarPage("", id = "menu",
                                                           # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
                                                           #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
                                                           #                    selected = "Bertrand ces"),
-                                                          radioButtons("upstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
+                                                          radioButtons("downstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
                                                           fluidRow(
                                                             column(width=12, align = "center",
                                                                    tags$div(
@@ -504,9 +504,9 @@ navbarPage("", id = "menu",
                                                         ),
                                                         mainPanel(
                                                           br(),
-                                                          #fillPage(plotOutput('plotIndATR')),
+                                                          fillPage(imageOutput("figDownstream")),
                                                           wellPanel(h5(tags$b("Description:")),
-                                                                    helpText('capIndATR'))
+                                                                    textOutput('capDownstream'))
                                                         )
 
                                                       )
@@ -526,7 +526,7 @@ navbarPage("", id = "menu",
                                                           # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
                                                           #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
                                                           #                    selected = "Bertrand ces"),
-                                                          radioButtons("upstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
+                                                          radioButtons("verticalPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
                                                           fluidRow(
                                                             column(width=12, align = "center",
                                                                    tags$div(
@@ -538,9 +538,9 @@ navbarPage("", id = "menu",
                                                         ),
                                                         mainPanel(
                                                           br(),
-                                                          #fillPage(plotOutput('plotIndATR')),
+                                                          fillPage(imageOutput("figVertical")),
                                                           wellPanel(h5(tags$b("Description:")),
-                                                                    helpText('capIndATR'))
+                                                                    textOutput('capVertical'))
                                                         )
 
                                                       )

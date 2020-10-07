@@ -96,3 +96,67 @@ captionIndATR <- reactive({
          'Harm2nd' = "2nd Harm: Coming Soon")
 
 })
+
+
+
+
+
+
+# ## Embed PNG figure for Summary tab of Vertical Numerical Simulations
+# # Vertical
+# output$figSummary <-
+#
+# ## Embed PNG figure for Upstream tab of Vertical Numerical Simulations
+# # Vertical
+# output$figUpstream <-
+#
+# ## Embed PNG figure for Downstream tab of Vertical Numerical Simulations
+# # Vertical
+# output$figDownstream <-
+#
+# ## Embed PNG figure for Vertical tab of Vertical Numerical Simulations
+# # Vertical
+# output$figVertical <-
+
+
+
+
+
+## Generate captions for Summary tab of Vertical Numerical Simulations
+# Vertical
+output$capSummary <- renderText({
+  "Caption for Summary Table"
+})
+
+## Generate captions for Upstream tab of Vertical Numerical Simulations
+# Vertical
+output$capUpstream <- renderText({
+  captionUpstream()
+})
+
+captionUpstream <- reactive({
+  switch(input$upstreamPlot, 'By Bargaining Parameter' = "by bargaining parameter, upstream",
+                             'By Number of Firms' = "by number of firms, upstream")
+})
+
+## Generate captions for Downstream tab of Vertical Numerical Simulations
+# Vertical
+output$capDownstream <- renderText({
+  captionDownstream()
+})
+
+captionDownstream <- reactive({
+  switch(input$downstreamPlot, 'By Bargaining Parameter' = "by bargaining parameter, downstream",
+                               'By Number of Firms' = "by number of firms, downstream")
+})
+
+## Generate captions for Vertical tab of Vertical Numerical Simulations
+# Vertical
+output$capVertical <- renderText({
+  captionVertical()
+})
+
+captionVertical <- reactive({
+  switch(input$verticalPlot, 'By Bargaining Parameter' = "by bargaining parameter, vertical",
+                             'By Number of Firms' = "by number of firms, vertical")
+})
