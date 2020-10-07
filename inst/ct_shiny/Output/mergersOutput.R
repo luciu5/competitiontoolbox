@@ -293,8 +293,8 @@ output$results_diagnosticsVertical <- renderTable({
   ## See mergersDiag.R
   ##
 
-  #res <- mergersDiag(valuesVertical[["sim"]])
-  res <- calcDiagnostics(thisSim$value)  # Why does this looks different than the -horizontal- merger sim Diagnostic table?
+  res <- mergersDiag(valuesVertical[["sim"]])
+  #res <- calcDiagnostics(thisSim$value)  # Why does this looks different than the -horizontal- merger sim Diagnostic table?
   res
 
 }, digits = 2, rownames = FALSE, align = "c")
@@ -317,7 +317,7 @@ output$overIDTextVertical <- renderText({
 
   ##
   ## UNCLEAR what to do here. Market elasticity (calcElastVertical) is not a user input...
-  ## I think all the vertical merger sims are just-identified if bargaining parameter is held fixed?
+  ## I think all the vertical merger sims are just-identified if the bargaining parameter is held fixed?
   ##
 
   #isOverID(input$supplyVertical, input$calcElastVertical, valuesVertical[["inputData"]])  # There is no "calcElastVertical"!

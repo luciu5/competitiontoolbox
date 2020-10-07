@@ -162,7 +162,7 @@ navbarPage("", id = "menu",
                                                                                    helpText(tags$b("Note:"), "above are own-price elasticities")
                                                                   )
                                                          ),
-                                                         tabPanel("Diagnostics", value = "diagpanel", br(),br(), h4("Inputted vs. Fitted Values"),
+                                                         tabPanel("Diagnostics", value = "diagpanel", br(),br(), h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"),
                                                                   tableOutput("results_diag_elast"),
                                                                   tableOutput("results_diagnostics"),
                                                                   htmlOutput("overIDText"),br(),
@@ -288,7 +288,7 @@ navbarPage("", id = "menu",
                                                                                    helpText(tags$b("Note:"), "above are own-price elasticities")
                                                                   )
                                                          ),
-                                                         tabPanel("Diagnostics", value = "diagpanelVertical", br(),br(), h4("Inputted vs. Fitted Values"),
+                                                         tabPanel("Diagnostics", value = "diagpanelVertical", br(),br(), h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"),
                                                                   tableOutput("results_diag_elastVertical"),
                                                                   tableOutput("results_diagnosticsVertical"),
                                                                   htmlOutput("overIDTextVertical"),br(),

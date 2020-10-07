@@ -189,6 +189,8 @@ shinyServer(function(input, output, session) {
                     type = input$menu)
         )
 
+        thisSim <<- thisSim  # Delete later
+
       } else if (input$menu == "Quotas") {
         indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
 
@@ -200,6 +202,8 @@ shinyServer(function(input, output, session) {
           tradeSims(supply = supply(),demand = demand(), indata = indata, mktElast = elasticity(),
                     type = input$menu)
         )
+
+        thisSim <<- thisSim  # Delete later
 
       } else if (input$menu == "Vertical") {
 
@@ -231,7 +235,7 @@ shinyServer(function(input, output, session) {
                       type = "Horizontal")
         )
 
-        thisSim <<- thisSim  # Delete later...
+        thisSim <<- thisSim  # Delete later
       }
 
       thisSim$warning <- grep("are the same|INCREASE in marginal costs", thisSim$warning, value = TRUE, invert = TRUE, perl = TRUE)
