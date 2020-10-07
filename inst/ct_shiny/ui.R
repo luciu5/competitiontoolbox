@@ -406,12 +406,148 @@ navbarPage("", id = "menu",
 
                               ),
 
-                              tabPanel("Vertical",
+                              tabPanel("Vertical", style = "overflow-y:scroll; max-height: 90vh",
                                        fluidPage(
                                          titlePanel("Vertical Simulations"),
-                                         p(em("Coming Soon"))
-                                       ))
-                   ),
+
+                                         mainPanel(
+                                           tabsetPanel(
+                                             tabPanel("Summary",
+                                                      fluidPage(
+                                                        sidebarLayout(
+                                                          sidebarPanel(
+                                                            h5(tags$b("Overview:")),
+                                                            helpText(tags$ul(
+                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                             "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                            )
+                                                            ),
+                                                            # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                            #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                            #                    selected = "Bertrand ces"),
+                                                            fluidRow(
+                                                              column(width=12, align = "center",
+                                                                     tags$div(
+                                                                       HTML("<font size=\"2\"> Supported by </font>"),
+                                                                       HTML(logo)
+                                                                     )
+                                                              )
+                                                            )
+                                                          ),
+                                                          mainPanel(
+                                                            br(),
+                                                            #fillPage(plotOutput('plotSumATR')),
+                                                            wellPanel(h5(tags$b("Description:")),
+                                                                      helpText('capSumATR'))
+
+                                                          )
+
+                                                        )
+                                                      )),
+                                             tabPanel("Upstream",
+                                                      fluidPage(
+                                                        sidebarLayout(
+                                                          sidebarPanel(
+                                                            h5(tags$b("Overview:")),
+                                                            helpText(tags$ul(
+                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                             "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                            )
+                                                            ), hr(),
+                                                            # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                            #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                            #                    selected = "Bertrand ces"),
+                                                            radioButtons("upstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
+                                                            fluidRow(
+                                                              column(width=12, align = "center",
+                                                                     tags$div(
+                                                                       HTML("<font size=\"2\"> Supported by </font>"),
+                                                                       HTML(logo)
+                                                                     )
+                                                              )
+                                                            )
+                                                          ),
+                                                          mainPanel(
+                                                            br(),
+                                                            #fillPage(plotOutput('plotIndATR')),
+                                                            wellPanel(h5(tags$b("Description:")),
+                                                                      helpText('capIndATR'))
+                                                          )
+
+
+                                                        )
+
+                                                      )
+                                             ),
+                                           tabPanel("Downstream",
+                                                    fluidPage(
+                                                      sidebarLayout(
+                                                        sidebarPanel(
+                                                          h5(tags$b("Overview:")),
+                                                          helpText(tags$ul(
+                                                            tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                           "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                          )
+                                                          ), hr(),
+                                                          # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                          #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                          #                    selected = "Bertrand ces"),
+                                                          radioButtons("upstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
+                                                          fluidRow(
+                                                            column(width=12, align = "center",
+                                                                   tags$div(
+                                                                     HTML("<font size=\"2\"> Supported by </font>"),
+                                                                     HTML(logo)
+                                                                   )
+                                                            )
+                                                          )
+                                                        ),
+                                                        mainPanel(
+                                                          br(),
+                                                          #fillPage(plotOutput('plotIndATR')),
+                                                          wellPanel(h5(tags$b("Description:")),
+                                                                    helpText('capIndATR'))
+                                                        )
+
+                                                      )
+
+                                                    )
+                                           ),
+                                           tabPanel("Vertical",
+                                                    fluidPage(
+                                                      sidebarLayout(
+                                                        sidebarPanel(
+                                                          h5(tags$b("Overview:")),
+                                                          helpText(tags$ul(
+                                                            tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                           "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                          )
+                                                          ), hr(),
+                                                          # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                          #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                          #                    selected = "Bertrand ces"),
+                                                          radioButtons("upstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
+                                                          fluidRow(
+                                                            column(width=12, align = "center",
+                                                                   tags$div(
+                                                                     HTML("<font size=\"2\"> Supported by </font>"),
+                                                                     HTML(logo)
+                                                                   )
+                                                            )
+                                                          )
+                                                        ),
+                                                        mainPanel(
+                                                          br(),
+                                                          #fillPage(plotOutput('plotIndATR')),
+                                                          wellPanel(h5(tags$b("Description:")),
+                                                                    helpText('capIndATR'))
+                                                        )
+
+                                                      )
+
+                                                    )
+                                           )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
+                   )))),
 
                    navbarMenu("Trade",
 
