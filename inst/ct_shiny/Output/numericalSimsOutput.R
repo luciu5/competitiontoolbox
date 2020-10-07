@@ -102,23 +102,76 @@ captionIndATR <- reactive({
 
 
 
-# ## Embed PNG figure for Summary tab of Vertical Numerical Simulations
-# # Vertical
-# output$figSummary <-
-#
-# ## Embed PNG figure for Upstream tab of Vertical Numerical Simulations
-# # Vertical
-# output$figUpstream <-
-#
-# ## Embed PNG figure for Downstream tab of Vertical Numerical Simulations
-# # Vertical
-# output$figDownstream <-
-#
-# ## Embed PNG figure for Vertical tab of Vertical Numerical Simulations
-# # Vertical
-# output$figVertical <-
+## Embed PNG figure for Summary tab of Vertical Numerical Simulations
+# Vertical
+output$figSummary <- renderImage({
+  return(list(
+    src = "www/surplussum.png",
+    contentType = "image/png",
+    width = "100%",
+    height = "100%"
+  ))
+}, deleteFile = FALSE)
 
+## Embed PNG figure for Upstream tab of Vertical Numerical Simulations
+# Vertical
+output$figUpstream <- renderImage({
+  if (input$upstreamPlot == "By Bargaining Parameter") {
+    return(list(
+      src = "www/CVbargupBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "100%"
+    ))
+  } else if (input$upstreamPlot == "By Number of Firms") {
+    return(list(
+      src = "www/CVfirmsupBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "100%"
+    ))
+  }
+}, deleteFile = FALSE)
 
+## Embed PNG figure for Downstream tab of Vertical Numerical Simulations
+# Vertical
+output$figDownstream <- renderImage({
+  if (input$downstreamPlot == "By Bargaining Parameter") {
+    return(list(
+      src = "www/CVbargdownBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "100%"
+    ))
+  } else if (input$downstreamPlot == "By Number of Firms") {
+    return(list(
+      src = "www/CVfirmsdownBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "100%"
+    ))
+  }
+}, deleteFile = FALSE)
+
+## Embed PNG figure for Vertical tab of Vertical Numerical Simulations
+# Vertical
+output$figVertical <- renderImage({
+  if (input$verticalPlot == "By Bargaining Parameter") {
+    return(list(
+      src = "www/CVbargvertBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "100%"
+    ))
+  } else if (input$verticalPlot == "By Number of Firms") {
+    return(list(
+      src = "www/CVfirmsvertBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "100%"
+    ))
+  }
+}, deleteFile = FALSE)
 
 
 
