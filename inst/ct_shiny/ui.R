@@ -418,8 +418,8 @@ navbarPage("", id = "menu",
                                                           sidebarPanel(
                                                             h5(tags$b("Overview:")),
                                                             helpText(tags$ul(
-                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                                                             "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
+                                                                                             "Sheu and Taragin (2020)"),"for further details."))
                                                             )
                                                             ),
                                                             # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
@@ -450,8 +450,8 @@ navbarPage("", id = "menu",
                                                           sidebarPanel(
                                                             h5(tags$b("Overview:")),
                                                             helpText(tags$ul(
-                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                                                             "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
+                                                                                             "Sheu and Taragin (2020)"),"for further details."))
                                                             )
                                                             ), hr(),
                                                             # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
@@ -485,8 +485,8 @@ navbarPage("", id = "menu",
                                                         sidebarPanel(
                                                           h5(tags$b("Overview:")),
                                                           helpText(tags$ul(
-                                                            tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                                                           "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                            tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
+                                                                                           "Sheu and Taragin (2020)"),"for further details."))
                                                           )
                                                           ), hr(),
                                                           # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
@@ -519,8 +519,8 @@ navbarPage("", id = "menu",
                                                         sidebarPanel(
                                                           h5(tags$b("Overview:")),
                                                           helpText(tags$ul(
-                                                            tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                                                           "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                            tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
+                                                                                           "Sheu and Taragin (2020)"),"for further details."))
                                                           )
                                                           ), hr(),
                                                           # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",

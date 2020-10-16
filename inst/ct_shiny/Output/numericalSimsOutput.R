@@ -175,10 +175,14 @@ output$figVertical <- renderImage({
 
 
 
-## Generate captions for Summary tab of Vertical Numerical Simulations
+## Generate caption for Summary tab of Vertical Numerical Simulations
 # Vertical
 output$capSummary <- renderText({
-  "Caption for Summary Table"
+  "Box and whisker plots summarizing the extent to which mergers affect consumer, retailer, wholesaler, and
+   total surplus. Each blue box (on the left in each pair) depicts the effects assuming that retailers are playing a Bertrand pricing
+   game, and each orange box (on the right in each pair) depicts the effects assuming that retailers are playing a second score
+   auction game. Whiskers depict the 5th and 95th percentiles of a particular outcome, boxes depict the 25th and 75th percentiles,
+   and the solid horizontal line depicts the median."
 })
 
 ## Generate captions for Upstream tab of Vertical Numerical Simulations
@@ -188,8 +192,17 @@ output$capUpstream <- renderText({
 })
 
 captionUpstream <- reactive({
-  switch(input$upstreamPlot, 'By Bargaining Parameter' = "by bargaining parameter, upstream",
-                             'By Number of Firms' = "by number of firms, upstream")
+  switch(input$upstreamPlot, 'By Bargaining Parameter' = "Box and whisker plots summarizing the extent to which mergers among two wholesalers affect consumer,
+         retailer, wholesaler, and total surplus as the bargaining power of wholesalers relative to retailers changes. Each blue box (on
+         the left in each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on
+         the right in each pair) depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the
+         5th and 95th percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts
+         the median.",
+                             'By Number of Firms' = "Box and whisker plots summarizing the extent to which mergers among two wholesalers affect consumer,
+         retailer, wholesaler, and total surplus as the number of wholesalers present in a market change. Each blue box (on the left in
+         each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on the right in
+         each pair) depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the 5th and 95th
+         percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts the median.")
 })
 
 ## Generate captions for Downstream tab of Vertical Numerical Simulations
@@ -199,8 +212,16 @@ output$capDownstream <- renderText({
 })
 
 captionDownstream <- reactive({
-  switch(input$downstreamPlot, 'By Bargaining Parameter' = "by bargaining parameter, downstream",
-                               'By Number of Firms' = "by number of firms, downstream")
+  switch(input$downstreamPlot, 'By Bargaining Parameter' = "Box and whisker plots summarizing the extent to which mergers among two retailers affect consumer, retailer,
+         wholesaler, and total surplus as the bargaining power of wholesalers relative to retailers changes. Each blue box (on the left in
+         each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on the right in
+         each pair) depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the 5th and 95th
+         percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts the median.",
+                               'By Number of Firms' = "Box and whisker plots summarizing the extent to which mergers among two retailers affect consumer, retailer,
+         wholesaler, and total surplus as the number of retailers present in a market change. Each blue box (on the left in each pair)
+         depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on the right in each pair)
+         depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the 5th and 95th percentiles
+         of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts the median.")
 })
 
 ## Generate captions for Vertical tab of Vertical Numerical Simulations
@@ -210,6 +231,15 @@ output$capVertical <- renderText({
 })
 
 captionVertical <- reactive({
-  switch(input$verticalPlot, 'By Bargaining Parameter' = "by bargaining parameter, vertical",
-                             'By Number of Firms' = "by number of firms, vertical")
+  switch(input$verticalPlot, 'By Bargaining Parameter' = "Box and whisker plots summarizing the extent to which vertical mergers between a wholesaler and retailer
+         affect consumer, retailer, wholesaler, and total surplus as the bargaining power of wholesalers relative to retailers changes. Each
+         blue box (on the left in each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each
+         orange box (on the right in each pair) depicts the effects assuming that retailers are playing a second score auction game.
+         Whiskers depict the 5th and 95th percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid
+         horizontal line depicts the median.",
+                             'By Number of Firms' = "Box and whisker plots summarizing the extent to which vertical mergers between a wholesaler and retailer affect consumer,
+         retailer, wholesaler, and total surplus as the number of wholesalers and retailers present in a market change. Each blue box (on the left in
+         each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on the right in
+         each pair) depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the 5th and 95th
+         percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts the median.")
 })
