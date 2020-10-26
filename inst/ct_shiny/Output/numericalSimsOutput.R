@@ -109,7 +109,7 @@ output$figSummary <- renderImage({
     src = "www/surplussum.png",
     contentType = "image/png",
     width = "100%",
-    height = "100%"
+    height = "70%"
   ))
 }, deleteFile = FALSE)
 
@@ -121,14 +121,14 @@ output$figUpstream <- renderImage({
       src = "www/CVbargupBW.png",
       contentType = "image/png",
       width = "100%",
-      height = "100%"
+      height = "70%"
     ))
   } else if (input$upstreamPlot == "By Number of Firms") {
     return(list(
       src = "www/CVfirmsupBW.png",
       contentType = "image/png",
       width = "100%",
-      height = "100%"
+      height = "70%"
     ))
   }
 }, deleteFile = FALSE)
@@ -141,14 +141,14 @@ output$figDownstream <- renderImage({
       src = "www/CVbargdownBW.png",
       contentType = "image/png",
       width = "100%",
-      height = "100%"
+      height = "70%"
     ))
   } else if (input$downstreamPlot == "By Number of Firms") {
     return(list(
       src = "www/CVfirmsdownBW.png",
       contentType = "image/png",
       width = "100%",
-      height = "100%"
+      height = "70%"
     ))
   }
 }, deleteFile = FALSE)
@@ -161,14 +161,14 @@ output$figVertical <- renderImage({
       src = "www/CVbargvertBW.png",
       contentType = "image/png",
       width = "100%",
-      height = "100%"
+      height = "70%"
     ))
   } else if (input$verticalPlot == "By Number of Firms") {
     return(list(
       src = "www/CVfirmsvertBW.png",
       contentType = "image/png",
       width = "100%",
-      height = "100%"
+      height = "70%"
     ))
   }
 }, deleteFile = FALSE)

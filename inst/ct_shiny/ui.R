@@ -436,7 +436,7 @@ navbarPage("", id = "menu",
                                                           ),
                                                           mainPanel(
                                                             br(),
-                                                            imageOutput("figSummary"),
+                                                            fillPage(imageOutput("figSummary", width = "100%", height = "100%")),
                                                             wellPanel(h5(tags$b("Description:")),
                                                                       textOutput('capSummary'))
 
@@ -469,7 +469,7 @@ navbarPage("", id = "menu",
                                                           ),
                                                           mainPanel(
                                                             br(),
-                                                            imageOutput("figUpstream"),
+                                                            fillPage(imageOutput("figUpstream", width = "100%", height = "100%")),
                                                             wellPanel(h5(tags$b("Description:")),
                                                                       textOutput('capUpstream'))
                                                           )
@@ -504,7 +504,7 @@ navbarPage("", id = "menu",
                                                         ),
                                                         mainPanel(
                                                           br(),
-                                                          imageOutput("figDownstream"),
+                                                          fillPage(imageOutput("figDownstream", width = "100%", height = "100%")),
                                                           wellPanel(h5(tags$b("Description:")),
                                                                     textOutput('capDownstream'))
                                                         )
@@ -538,7 +538,7 @@ navbarPage("", id = "menu",
                                                         ),
                                                         mainPanel(
                                                           br(),
-                                                          imageOutput("figVertical"),
+                                                          fillPage(imageOutput("figVertical", width = "100%", height = "100%")),
                                                           wellPanel(h5(tags$b("Description:")),
                                                                     textOutput('capVertical'))
                                                         )
