@@ -1,5 +1,5 @@
 
-mergersInputs <- function(type = c("Horizontal", "Vertical"), typeVertical = "Upstream") {
+mergersInputs <- function(nrows, type = c("Horizontal", "Vertical"), typeVertical = "Upstream") {
   # a function to generate default input data set for simulations
 
   type = match.arg(type)
@@ -17,6 +17,9 @@ mergersInputs <- function(type = c("Horizontal", "Vertical"), typeVertical = "Up
       stringsAsFactors = FALSE,
       check.names = FALSE
     )
+
+    nDefProd <- nrow(inputData)
+    inputData[(nDefProd + 1):nPossProds, ] <- NA
 
     # if(req(input$menu) == "Horizontal"){
     #   if (req(supply()) == "Bertrand" & (req(demand()) == "logit (unknown elasticity)" | req(demand()) == "aids (unknown elasticity)")){
@@ -82,15 +85,10 @@ mergersInputs <- function(type = c("Horizontal", "Vertical"), typeVertical = "Up
       )
 
     }
+
+    nDefProd <- nrow(inputData)
+    inputData[(nDefProd + 1):nrows, ] <- NA
   }
-
-  nDefProd <- nrow(inputData)
-  #inputData <- inputData[c(1:nDefProd,rep(1, nPossProds - nDefProd)),]
-  #if(input$incEff) inputData$mcDelta <- 0
-
-  inputData[(nDefProd + 1):nPossProds, ] <- NA
-  #inputData <- inputData[order(inputData$`Quantities`, decreasing = TRUE),]
-  #rownames(inputData) <- NULL
 
   return(inputData)
 

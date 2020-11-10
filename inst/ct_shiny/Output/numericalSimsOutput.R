@@ -96,3 +96,150 @@ captionIndATR <- reactive({
          'Harm2nd' = "2nd Harm: Coming Soon")
 
 })
+
+
+
+
+
+
+## Embed PNG figure for Summary tab of Vertical Numerical Simulations
+# Vertical
+output$figSummary <- renderImage({
+  return(list(
+    src = "www/surplussum.png",
+    contentType = "image/png",
+    width = "100%",
+    height = "70%"
+  ))
+}, deleteFile = FALSE)
+
+## Embed PNG figure for Upstream tab of Vertical Numerical Simulations
+# Vertical
+output$figUpstream <- renderImage({
+  if (input$upstreamPlot == "By Bargaining Parameter") {
+    return(list(
+      src = "www/CVbargupBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "70%"
+    ))
+  } else if (input$upstreamPlot == "By Number of Firms") {
+    return(list(
+      src = "www/CVfirmsupBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "70%"
+    ))
+  }
+}, deleteFile = FALSE)
+
+## Embed PNG figure for Downstream tab of Vertical Numerical Simulations
+# Vertical
+output$figDownstream <- renderImage({
+  if (input$downstreamPlot == "By Bargaining Parameter") {
+    return(list(
+      src = "www/CVbargdownBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "70%"
+    ))
+  } else if (input$downstreamPlot == "By Number of Firms") {
+    return(list(
+      src = "www/CVfirmsdownBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "70%"
+    ))
+  }
+}, deleteFile = FALSE)
+
+## Embed PNG figure for Vertical tab of Vertical Numerical Simulations
+# Vertical
+output$figVertical <- renderImage({
+  if (input$verticalPlot == "By Bargaining Parameter") {
+    return(list(
+      src = "www/CVbargvertBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "70%"
+    ))
+  } else if (input$verticalPlot == "By Number of Firms") {
+    return(list(
+      src = "www/CVfirmsvertBW.png",
+      contentType = "image/png",
+      width = "100%",
+      height = "70%"
+    ))
+  }
+}, deleteFile = FALSE)
+
+
+
+## Generate caption for Summary tab of Vertical Numerical Simulations
+# Vertical
+output$capSummary <- renderText({
+  "Box and whisker plots summarizing the extent to which mergers affect consumer, retailer, wholesaler, and
+   total surplus. Each blue box (on the left in each pair) depicts the effects assuming that retailers are playing a Bertrand pricing
+   game, and each orange box (on the right in each pair) depicts the effects assuming that retailers are playing a second score
+   auction game. Whiskers depict the 5th and 95th percentiles of a particular outcome, boxes depict the 25th and 75th percentiles,
+   and the solid horizontal line depicts the median."
+})
+
+## Generate captions for Upstream tab of Vertical Numerical Simulations
+# Vertical
+output$capUpstream <- renderText({
+  captionUpstream()
+})
+
+captionUpstream <- reactive({
+  switch(input$upstreamPlot, 'By Bargaining Parameter' = "Box and whisker plots summarizing the extent to which mergers among two wholesalers affect consumer,
+         retailer, wholesaler, and total surplus as the bargaining power of wholesalers relative to retailers changes. Each blue box (on
+         the left in each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on
+         the right in each pair) depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the
+         5th and 95th percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts
+         the median.",
+                             'By Number of Firms' = "Box and whisker plots summarizing the extent to which mergers among two wholesalers affect consumer,
+         retailer, wholesaler, and total surplus as the number of wholesalers present in a market change. Each blue box (on the left in
+         each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on the right in
+         each pair) depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the 5th and 95th
+         percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts the median.")
+})
+
+## Generate captions for Downstream tab of Vertical Numerical Simulations
+# Vertical
+output$capDownstream <- renderText({
+  captionDownstream()
+})
+
+captionDownstream <- reactive({
+  switch(input$downstreamPlot, 'By Bargaining Parameter' = "Box and whisker plots summarizing the extent to which mergers among two retailers affect consumer, retailer,
+         wholesaler, and total surplus as the bargaining power of wholesalers relative to retailers changes. Each blue box (on the left in
+         each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on the right in
+         each pair) depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the 5th and 95th
+         percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts the median.",
+                               'By Number of Firms' = "Box and whisker plots summarizing the extent to which mergers among two retailers affect consumer, retailer,
+         wholesaler, and total surplus as the number of retailers present in a market change. Each blue box (on the left in each pair)
+         depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on the right in each pair)
+         depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the 5th and 95th percentiles
+         of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts the median.")
+})
+
+## Generate captions for Vertical tab of Vertical Numerical Simulations
+# Vertical
+output$capVertical <- renderText({
+  captionVertical()
+})
+
+captionVertical <- reactive({
+  switch(input$verticalPlot, 'By Bargaining Parameter' = "Box and whisker plots summarizing the extent to which vertical mergers between a wholesaler and retailer
+         affect consumer, retailer, wholesaler, and total surplus as the bargaining power of wholesalers relative to retailers changes. Each
+         blue box (on the left in each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each
+         orange box (on the right in each pair) depicts the effects assuming that retailers are playing a second score auction game.
+         Whiskers depict the 5th and 95th percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid
+         horizontal line depicts the median.",
+                             'By Number of Firms' = "Box and whisker plots summarizing the extent to which vertical mergers between a wholesaler and retailer affect consumer,
+         retailer, wholesaler, and total surplus as the number of wholesalers and retailers present in a market change. Each blue box (on the left in
+         each pair) depicts the effects assuming that retailers are playing a Bertrand pricing game, and each orange box (on the right in
+         each pair) depicts the effects assuming that retailers are playing a second score auction game. Whiskers depict the 5th and 95th
+         percentiles of a particular outcome, boxes depict the 25th and 75th percentiles, and the solid horizontal line depicts the median.")
+})
