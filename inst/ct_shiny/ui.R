@@ -22,7 +22,7 @@ navbarPage("", id = "menu",
                                      <li>and visualize the estimated impact these transactions have on various market outcomes.</li>
                                    </ul>"), br(),
                               p("The app uses methods defined in the", tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust"), "and",
-                                tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade"), "packages in the backend to run various types of simulations and display estimated effects. By doing so, the app provides a user interface for practicioners
+                                tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade"), "R packages in the backend to run various types of simulations and display estimated effects. By doing so, the app provides a user interface for practicioners
                                 interested in gaining a more visual understanding of the economics embedded in", em("antitrust"), "and", em("trade.")),
                               p("Users may input different simulation parameters on the lefthand-side panels found in the pages linked by the tabs above. These parameters include
                                 the assumed competitive environment and market demand system. Users may also edit market conditions listed in the Inputs tables such as firm prices, margins,
@@ -76,8 +76,9 @@ navbarPage("", id = "menu",
 
                                              h5(tags$b("Directions:")),
                                              helpText(tags$ul(
-                                               tags$li("Copy and paste (or enter) data into Inputs table to simulate a merger between 'Firm1' and 'Firm2'."),
-                                               tags$li(helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the models used." ))
+                                               tags$li("Copy and paste or manually enter market data into the Inputs table."),
+                                               tags$li("Click on the Play button to simulate a merger between 'Firm1' and 'Firm2'."),
+                                               tags$li("See the", tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the models used." )
                                                #tags$li("Shares must be between 0 and 1."),
                                                #tags$li("Margins should exclude fixed costs.")
                                              )
@@ -202,7 +203,7 @@ navbarPage("", id = "menu",
                                                                   htmlOutput("overIDText"),br(),
                                                                   #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
                                                                   h4("Parameters"),verbatimTextOutput("parameters"),
-                                                                  helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the parameters displayed here." )
+                                                                  helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the parameters displayed here." )
                                                          ),
                                                          tabPanel("R Code",  value = "codepanel", br(),verbatimTextOutput("results_code")),
                                                          tabPanel("Messages", value = "msgpanel", br(),h4("Warnings"),  span(textOutput("warnings"), style="color:orange"), br(),
@@ -231,8 +232,9 @@ navbarPage("", id = "menu",
 
                                              h5(tags$b("Directions:")),
                                              helpText(tags$ul(
+                                               tags$li("Copy and paste or manually enter market data into the Inputs table."),
                                                tags$li(htmlOutput("directionsVertical")),
-                                               tags$li(helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the models used." ))
+                                               tags$li("See the", tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the models used." )
                                                #tags$li("Shares must be between 0 and 1."),
                                                #tags$li("Margins should exclude fixed costs.")
                                              )
@@ -329,7 +331,7 @@ navbarPage("", id = "menu",
                                                                   htmlOutput("overIDTextVertical"),
                                                                   #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
                                                                   h4("Parameters"),verbatimTextOutput("parametersVertical"),
-                                                                  helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the parameters displayed here." )
+                                                                  helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the parameters displayed here." )
                                                          ),
                                                          tabPanel("R Code",  value = "codepanelVertical", br(),verbatimTextOutput("results_codeVertical")),
                                                          tabPanel("Messages", value = "msgpanelVertical", br(), h4("Warnings"), span(textOutput("warningsVertical"), style="color:orange"), br(),
@@ -598,10 +600,11 @@ navbarPage("", id = "menu",
 
                                                          h5(tags$b("Directions:")),
                                                          helpText(tags$ul(
-                                                           tags$li("Copy and paste (or enter) information into Inputs table (right) to simulate an", tags$em("ad valorem"),"tariff."),
+                                                           tags$li("Copy and paste or manually enter market data into the Inputs table."),
+                                                           tags$li("Click on the Play button to simulate an", tags$em("ad valorem"), "tariff."),
                                                            tags$li("Default example simulates an increase in the ", tags$em("ad valorem"),"tariff (expressed as a proportion of consumer price) from 5% to 25% on products produced by 'Firm1' and 'Firm2'."),
                                                            tags$li("Products without current or new tariffs are assumed to be produced domestically. Otherwise, products are assumed to be produced abroad.")
-                                                           #,tags$li(helpText("See the",tags$a(href=system.file('trade_shiny', package='trade'), "trade"),"R package vignette for more details about the models used here." ))
+                                                           #,tags$li(helpText("See the",tags$a(href=system.file('trade_shiny', package='trade'), "trade"),"package vignette for more details about the models used here." ))
                                                            #tags$li("Shares must be between 0 and 1."),
                                                            #tags$li("Margins should exclude fixed costs.")
                                                          )
@@ -720,7 +723,7 @@ navbarPage("", id = "menu",
                                                                               htmlOutput("overIDTextTariffs"),br(),
                                                                               #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
                                                                               h4("Parameters"),verbatimTextOutput("parametersTariffs"),
-                                                                              helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the parameters displayed here." )
+                                                                              helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the parameters displayed here." )
                                                                      ),
                                                                      tabPanel("R Code", value = "codepanelTariffs", br(),verbatimTextOutput("results_codeTariffs")),
                                                                      tabPanel("Messages", value = "msgpanelTariffs", br(),h4("Warnings"),  verbatimTextOutput("warningsTariffs"), br(),h4("Errors"),  verbatimTextOutput("errorsTariffs"))
@@ -748,10 +751,11 @@ navbarPage("", id = "menu",
 
                                               h5(tags$b("Directions:")),
                                               helpText(tags$ul(
-                                                tags$li("Copy and paste (or enter) information into Inputs table (right) to simulate a quota."),
+                                                tags$li("Copy and paste or manually enter market data into the Inputs table."),
+                                                tags$li("Click on the Play button to simulate a quota."),
                                                 tags$li("Default example simulates an increase in the quota from 100% of current output to 75% of current output on products produced by 'Firm1' and 'Firm2'."),
                                                 tags$li("Products without current or new quotas are assumed to be produced domestically. Otherwise, products are assumed to be produced abroad.")
-                                                #,tags$li(helpText("See the",tags$a(href=system.file('trade_shiny', package='trade'), "trade"),"R package vignette for more details about the models used here." ))
+                                                #,tags$li(helpText("See the",tags$a(href=system.file('trade_shiny', package='trade'), "trade"),"package vignette for more details about the models used here." ))
                                                 #tags$li("Shares must be between 0 and 1."),
                                                 #tags$li("Margins should exclude fixed costs.")
                                               )
@@ -860,7 +864,7 @@ navbarPage("", id = "menu",
                                                                    htmlOutput("overIDTextQuota"),br(),
                                                                    #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
                                                                    h4("Parameters"),verbatimTextOutput("parametersQuota"),
-                                                                   helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"R package vignette for more details about the parameters displayed here." )
+                                                                   helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"), "package vignette for more details about the parameters displayed here." )
                                                           ),
                                                           tabPanel("R Code", value = "codepanelQuota", br(),verbatimTextOutput("results_codeQuota")),
                                                           tabPanel("Messages", value = "msgpanelQuota", br(),h4("Warnings"),  verbatimTextOutput("warningsQuota"), br(),h4("Errors"),  verbatimTextOutput("errorsQuota"))

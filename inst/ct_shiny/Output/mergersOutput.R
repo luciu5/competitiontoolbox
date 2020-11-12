@@ -407,10 +407,10 @@ output$errorsVertical <- renderText({
 output$directionsVertical <- renderUI({
   #sumNumMerg <- subset(sumboxmktCnt, Outcome == input$outcomeSumATR & shareOutThresh == input$shareOutSumATR)
   if (input$mergerTypeVertical == "Upstream") {
-    HTML(paste("Copy and paste (or enter) numerical data into Inputs table to simulate an upstream merger between 'U1' and 'U2'."))
+    HTML(paste("Click on the Play button to simulate an upstream merger between 'U1' and 'U2'."))
   } else if (input$mergerTypeVertical == "Downstream") {
-    HTML(paste("Copy and paste (or enter) numerical data into Inputs table to simulate a downstream merger between 'D1' and 'D2'."))
+    HTML(paste("Click on the Play button to simulate a downstream merger between 'D1' and 'D2'."))
   } else if (input$mergerTypeVertical == "Vertical") {
-    HTML(paste("Copy and paste (or enter) numerical data into Inputs table to simulate a vertical merger between 'U1' and 'D1'."))
+    HTML(paste("Click on the Play button to simulate a vertical merger between 'U1' and 'D1'."))
   }
 })
