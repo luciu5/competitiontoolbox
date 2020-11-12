@@ -15,32 +15,21 @@ navbarPage("", id = "menu",
                             fluidPage(
                               titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
                               h3("Overview"),
-                              p("The", em("competitiontoolbox"), "app is an interactive web environment that allows users to "),
+                              p("The", tags$a(href="https://cran.r-project.org/web/packages/competitiontoolbox/index.html", "competitiontoolbox"), "app is an interactive web environment that allows users to "),
                               HTML("<ul>
                                      <li>simulate mergers, tariffs, and quotas under various specifications and market conditions,</li>
                                      <li>numerically simulate horizontal and vertical mergers,</li>
                                      <li>and visualize the estimated impact these transactions have on various market outcomes.</li>
                                    </ul>"), br(),
-                              p("The app uses methods defined in the", em("antitrust"), "and",
-                                em("trade"), "packages in the backend to run various types of simulations and display estimated effects. By doing so, the app provides a user interface for practicioners
+                              p("The app uses methods defined in the", tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust"), "and",
+                                tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade"), "packages in the backend to run various types of simulations and display estimated effects. By doing so, the app provides a user interface for practicioners
                                 interested in gaining a more visual understanding of the economics embedded in", em("antitrust"), "and", em("trade.")),
                               p("Users may input different simulation parameters on the lefthand-side panels found in the pages linked by the tabs above. These parameters include
                                 the assumed competitive environment and market demand system. Users may also edit market conditions listed in the Inputs tables such as firm prices, margins,
                                 and shares. Both horizontal and supply chain mergers are available for simulation, including upstream, downstream, and vertical
-                                mergers. Default inputs for each type of simulation are provided to users in the corresponding Inputs table for ease of use."), br(),
-                              p("When run, each simulation outputs a series of tabs which provides detailed information on the simulated merger, tariff,
-                                or quota. These are:"),
-
-                              HTML("<ul>
-                                      <li><em>Summary</em>: Outputs summary statistics of the simulation, including changes in HHI, consumer and producer surplus, and share-weighted prices.</li>
-                                      <li><em>Details</em>: Outputs product-level changes in prices and compensating marginal cost reductions. For supply chain mergers, both upstream and downstream price changes and share changes are reported.</li>
-                                      <li><em>Elasticities</em>: Outputs matrices of estimated elasticities and diversion ratios.</li>
-                                      <li><em>Diagnostics</em>: Outputs differences between outputted and fitted values to diagnose the simulation. Key underlying parameters are also reported.</li>
-                                      <li><em>R Code</em>: Outputs the corresponding R code which runs the inputted simulation. This provides practioners reproducible code when they transition towards scripting their own analyses.</li>
-                                      <li><em>Messages</em>: Outputs any error or warning messages encountered by the app.</li>
-                                   </ul>"), br(),
-
-                              p("Users may also run numerical simulations which [insert Charles' description here]. See Taragin and Loudermilk (2019) and Taragin and Sheu (2020) for more details."),
+                                mergers. Default inputs for each type of simulation are provided to users in the corresponding Inputs table for ease of use."),
+                              p("Users may also run numerical simulations that [insert Charles' description here]. See", tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)"),
+                                "and", tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining", "Sheu and Taragin (2020)"), "for more details."),
 
                               hr(),
                               h3("Get Started"),
@@ -51,7 +40,18 @@ navbarPage("", id = "menu",
                               p("To numerically simulate a merger in a supply chain, proceed to", strong("Vertical"), "listed under the", strong("Numerical Simulations"), "tab."),
                               br(),
                               p("To simulate a tariff, proceed to", strong("Tariffs"), "listed under the", strong("Trade"), "tab."),
-                              p("To simulate a quota, proceed to", strong("Quotas"), "listed under the", strong("Trade"), "tab.")
+                              p("To simulate a quota, proceed to", strong("Quotas"), "listed under the", strong("Trade"), "tab."), br(),
+
+                              p("When run, each simulation outputs a series of tabs which provides detailed information on the simulated merger, tariff,
+                                or quota. They are:"),
+                              HTML("<ul>
+                                      <li><em>Summary</em>: Outputs summary statistics of the simulation, including changes in HHI, consumer and producer surplus, and share-weighted prices.</li>
+                                      <li><em>Details</em>: Outputs product-level changes in prices and compensating marginal cost reductions. For supply chain mergers, both upstream and downstream price changes and share changes are reported.</li>
+                                      <li><em>Elasticities</em>: Outputs matrices of estimated elasticities and diversion ratios.</li>
+                                      <li><em>Diagnostics</em>: Outputs differences between outputted and fitted values to diagnose the simulation. Key underlying parameters are also reported.</li>
+                                      <li><em>R Code</em>: Outputs the corresponding R code which runs the inputted simulation. This provides practioners reproducible code when they transition towards scripting their own analyses.</li>
+                                      <li><em>Messages</em>: Outputs any error or warning messages encountered by the app.</li>
+                                   </ul>")
                             ),
                             hr(),
                             fluidRow(
