@@ -14,9 +14,11 @@ load("./data-raw/results.RData")
 
 indicdata <- ungroup(res_flat)%>% filter(isMarket & isHSR) %>% mutate_if(is.factor,factor) %>%
   select(supply,demand,shareOut,`Industry Price Change (%)` ,nFirms,#partyShare,upp,cmcr,harm_2nd,
-         hhicut,hhideltacut,uppcut,cmcrcut,harm_2ndcut,`Party Gap`)
+         hhicut,hhideltacut,uppcut,cmcrcut,harm_2ndcut#,`Party Gap`
+         )
 
-indicdata <- gather(indicdata, key=Cut_type,value=Cut_value,contains("cut"),nFirms,`Party Gap`) %>%
+indicdata <- gather(indicdata, key=Cut_type,value=Cut_value,contains("cut"),nFirms#,`Party Gap`
+                    ) %>%
   mutate( Cut_type=ifelse(Cut_type == "hhicut","HHI",Cut_type),
           Cut_type=ifelse(Cut_type == "hhideltacut","Delta HHI",Cut_type),
           Cut_type=ifelse(Cut_type == "uppcut","UPP",Cut_type),
@@ -111,7 +113,7 @@ else{
                   bp_value=boxplot.stats(.$value )$stats)) %>%
     mutate(
       Model = interaction(Supply, Demand, sep = ":",drop = TRUE),
-      Model = factor(Model, levels = c("cournot:log", "cournot:linear", "bertrand:aids", "bertrand:logit", "bertrand:ces", "auction:logit")),
+      Model = factor(Model, levels = c("cournot:log", "cournot:linear", "bertrand:aids", "bertrand:logit", "bertrand:ces", "auction:logit","bargaining:logit")),
       shareOutThresh = as.integer(thresh*100))%>% spread(key=bp_stat,value=bp_value)
 }
 
