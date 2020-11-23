@@ -299,9 +299,7 @@ navbarPage("", id = "menu",
                                              tabsetPanel(id = "inTabsetVertical",
                                                          tabPanel("Summary", value = "respanelVertical", br(), br(), tableOutput("resultsVertical"), br(),
                                                                   helpText(tags$b("Note:"), "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages.
-                                                                           A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.
-                                                                           Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues. TELL CHARLES THAT THERE ARE
-                                                                           NO 'NUMBERS IN PARENTHESES' FOR VERTICAL!")
+                                                                           A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.")
                                                                   ),
                                                          tabPanel("Details", value = "detpanelVertical", br(), tableOutput("results_shareOutVertical"), br(), tableOutput("results_detailedVertical")
 
@@ -412,7 +410,7 @@ navbarPage("", id = "menu",
                                                             #                    selected = "Bertrand ces"),
                                                             radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
                                                             selectInput("indexIndATR", "Index:",
-                                                                        choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd", "Party Gap")),
+                                                                        choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd")),
                                                             sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
                                                             fluidRow(
                                                               column(width=12, align = "center",
