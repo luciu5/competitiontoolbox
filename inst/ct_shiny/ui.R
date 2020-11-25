@@ -46,10 +46,10 @@ navbarPage("", id = "menu",
                                 or quota. They are:"),
                               HTML("<ul>
                                       <li><em>Summary</em>: Outputs summary statistics of the simulation, including changes in HHI, consumer and producer surplus, and share-weighted prices.</li>
-                                      <li><em>Details</em>: Outputs product-level changes in prices and compensating marginal cost reductions. For supply chain mergers, both upstream and downstream price changes and share changes are reported.</li>
+                                      <li><em>Details</em>: Outputs product-level changes in prices and compensating marginal cost reductions. For supply chain mergers, both upstream and downstream price and share changes are reported.</li>
                                       <li><em>Elasticities</em>: Outputs matrices of estimated elasticities and diversion ratios.</li>
-                                      <li><em>Diagnostics</em>: Outputs differences between outputted and fitted values to diagnose the simulation. Key underlying parameters are also reported.</li>
-                                      <li><em>R Code</em>: Outputs the corresponding R code which runs the inputted simulation. This provides practioners reproducible code when they transition towards scripting their own analyses.</li>
+                                      <li><em>Diagnostics</em>: Outputs differences between outputted and fitted values in order to diagnose the simulation. Key underlying parameters are also reported.</li>
+                                      <li><em>R Code</em>: Outputs the corresponding R code that runs the inputted simulation. This provides practioners reproducible code as they transition to scripting analyses.</li>
                                       <li><em>Messages</em>: Outputs any error or warning messages encountered by the app.</li>
                                    </ul>")
                             ),
