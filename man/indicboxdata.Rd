@@ -4,7 +4,8 @@
 \name{indicboxdata}
 \alias{indicboxdata}
 \title{Box Plot Statistics for "Indices" Tab}
-\format{A data frame with 2,303 rows and 10 variables
+\format{
+A data frame with 2,303 rows and 10 variables
 \describe{
   \item{Cut_type}{Firm Count, HHI, Delta HHI, UPP, CMCR, Harm 2nd, Party Gap}
   \item{Cut_value}{axis units depending on Cut_type}
@@ -16,7 +17,8 @@
   \item{pct25}{25th percentile boxplot line}
   \item{pct50}{50th percentile boxplot line}
   \item{pct75}{75th percentile boxplot line}
-}}
+}
+}
 \usage{
 indicboxdata
 }

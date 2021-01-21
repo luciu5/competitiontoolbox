@@ -4,12 +4,14 @@
 \name{indicboxmktCnt}
 \alias{indicboxmktCnt}
 \title{Number of Monte Carlo Simulations Performed in "Indices" Tab}
-\format{A data frame with 35 rows and 3 variables
+\format{
+A data frame with 35 rows and 3 variables
 \describe{
   \item{Cut_type}{Firm Count, HHI, Delta HHI, UPP, CMCR, Harm 2nd, Party Gap}
   \item{Cnt}{number of horizontal merger simulations (25,890 -- 184,254)}
   \item{shareOutThresh}{outside share threshold in percent (20--70)}
-}}
+}
+}
 \usage{
 indicboxmktCnt
 }

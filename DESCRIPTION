@@ -5,9 +5,9 @@ Version: 0.1.3
 Authors@R: c(person("Charles", "Taragin", email = "ctaragin@ftc.gov",
                   role = c("aut", "cre")),
              person("Kenneth", "Rios", email = "krios@ftc.gov",
-                  role = c("ctb")),
+                  role = c("aut")),
              person("Paulette", "Wolak", email = "",
-                  role = c("ctb"))     
+                  role = c("aut"))     
                   )
 Depends: R (>= 2.10), antitrust (>= 0.99.11), trade (>= 0.5.4), shiny, rhandsontable
 Imports: ggplot2
