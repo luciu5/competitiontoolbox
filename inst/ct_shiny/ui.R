@@ -28,7 +28,7 @@ navbarPage("", id = "menu",
                                 the assumed competitive environment and market demand system. Users may also edit market conditions listed in the Inputs tables such as firm prices, margins,
                                 and shares. Both horizontal and supply chain mergers are available for simulation, including upstream, downstream, and vertical
                                 mergers. Default inputs for each type of simulation are provided to users in the corresponding Inputs table for ease of use."),
-                              p("Users may also run numerical simulations that [insert Charles' description here]. See", tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)"),
+                              p("To better understand how these models perform, users may also view the distribution of outcomes from thousands of numerical simulations. See", tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)"),
                                 "and", tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining", "Sheu and Taragin (2020)"), "for more details."),
 
                               hr(),
