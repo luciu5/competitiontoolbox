@@ -24,6 +24,7 @@ tradeTemplateCode <- function(type){
   )
 
   argvalues   <- paste0(argnames," = simdata$`",cnames,"`")
+  summary_code <- "summary(simres, revenues = FALSE, levels = FALSE, market=FALSE)"
 
   if(!is.null(demand()) & !is.null(supply())){
 
@@ -67,6 +68,13 @@ tradeTemplateCode <- function(type){
         argvalues <- argvalues[grep("insideSize", argvalues, invert = TRUE)]
       }
       else if( input$supplyTariffs =="Bertrand"){atrfun <- "bertrand_tariff"}
+      else if( input$supplyTariffs =="Monopolistic Competition"){
+        atrfun <- "monopolistic_competition_tariff"
+
+        argvalues <- argvalues[grep("owner", argvalues, invert = TRUE)]
+
+        summary_code <- "summary(simres, levels = FALSE, market=FALSE)"
+        }
       else{atrfun <- "auction2nd.logit.alm"
       argvalues <- argvalues[-1]
       argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum( simdata$`Quantities` ) "
@@ -143,9 +151,10 @@ tradeTemplateCode <- function(type){
       "\n\n ## Run Simulation: \n",
       atrfun,
       "\n\n ## Summary Tab Results:\n",
-      "summary(simres, revenues = FALSE, levels = FALSE, market=TRUE)",
+      gsub("market\\s*=\\s*FALSE","market=TRUE",summary_code,perl=TRUE),
       "\n\n ## Details Tab Results:\n",
-      "summary(simres, revenues = FALSE, levels = FALSE, market=FALSE)\n\n",
+      summary_code,
+      "\n\n",
       "\n ## Elasticities Tab Results  (Pre-tariff Only):\n",
       "elast(simres, preMerger = TRUE, market=TRUE)\n elast(simres, preMerger = TRUE, market=FALSE)",
       "\n\n ## Diagnostics Tab Results:\n",

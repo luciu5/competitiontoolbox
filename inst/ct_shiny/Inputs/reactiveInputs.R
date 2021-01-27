@@ -66,6 +66,12 @@ demand <- reactive({
     if (input$supplyTariffs == "Cournot" & !grepl('elasticity', input$calcElastTariffs)){
       return(input$demandTariffs4)
     }
+    if (input$supplyTariffs == "Monopolistic Competition" & grepl('elasticity', input$calcElastTariffs)){
+      return(input$demandTariffs5)
+    }
+    if (input$supplyTariffs == "Monopolistic Competition" & !grepl('elasticity', input$calcElastTariffs)){
+      return(input$demandTariffs6)
+    }
   }
 
   if (req(input$menu) == "Quotas"){

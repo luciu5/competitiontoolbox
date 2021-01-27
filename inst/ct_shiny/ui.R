@@ -15,20 +15,18 @@ navbarPage("", id = "menu",
                             fluidPage(
                               titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
                               h3("Overview"),
-                              p("The", tags$a(href="https://cran.r-project.org/web/packages/competitiontoolbox/index.html", "competitiontoolbox"), "app is an interactive web environment that allows users to "),
+                              p("The", tags$a(href="https://cran.r-project.org/web/packages/competitiontoolbox/index.html", "competitiontoolbox"), "is a browser-based interface to some of functions in the ", tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust"), "and",
+                                tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade"), "R packages. It allows users to "),
                               HTML("<ul>
                                      <li>simulate mergers, tariffs, and quotas under various specifications and market conditions,</li>
                                      <li>numerically simulate horizontal and vertical mergers,</li>
                                      <li>and visualize the estimated impact these transactions have on various market outcomes.</li>
                                    </ul>"), br(),
-                              p("The app uses methods defined in the", tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust"), "and",
-                                tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade"), "R packages in the backend to run various types of simulations and display estimated effects. By doing so, the app provides a user interface for practicioners
-                                interested in gaining a more visual understanding of the economics embedded in", em("antitrust"), "and", em("trade.")),
                               p("Users may input different simulation parameters on the lefthand-side panels found in the pages linked by the tabs above. These parameters include
                                 the assumed competitive environment and market demand system. Users may also edit market conditions listed in the Inputs tables such as firm prices, margins,
                                 and shares. Both horizontal and supply chain mergers are available for simulation, including upstream, downstream, and vertical
-                                mergers. Default inputs for each type of simulation are provided to users in the corresponding Inputs table for ease of use."),
-                              p("To better understand how these models perform, users may also view the distribution of outcomes from thousands of numerical simulations. See", tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)"),
+                                mergers. Example inputs for each type of simulation are provided to users in the corresponding Inputs table."),
+                              p("To better understand the types of predictions that these models make, users may also view the distribution of outcomes from thousands of numerical simulations. See", tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)"),
                                 "and", tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining", "Sheu and Taragin (2020)"), "for more details."),
 
                               hr(),
@@ -620,8 +618,9 @@ navbarPage("", id = "menu",
 
                                                          radioButtons("supplyTariffs", "Competitive Interaction:",
                                                                       choices = c("Bertrand",
-                                                                                  # "2nd Score Auction",
+                                                                                  "Monopolistic Competition",
                                                                                   "Cournot"
+
                                                                       )),
 
                                                          # selectInput("demandTariffs", "Demand Specification:",
@@ -651,6 +650,17 @@ navbarPage("", id = "menu",
                                                            selectInput("demandTariffs4", "Demand Specification:",
                                                                        choices = c("linear (unknown elasticity)", "loglinear (unknown elasticity)")),
                                                            helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
+                                                         ),
+                                                         # Monopolistic Competition
+                                                         conditionalPanel(
+                                                           condition = "input.supplyTariffs == 'Monopolistic Competition' & input.calcElastTariffs.includes('elasticity') == true",
+                                                           selectInput("demandTariffs5", "Demand Specification:",
+                                                                       choices = c("logit", "ces"))
+                                                         ),
+                                                         conditionalPanel(
+                                                           condition = "input.supplyTariffs == 'Monopolistic Competition' & input.calcElastTariffs.includes('elasticity') == false",
+                                                           selectInput("demandTariffs6", "Demand Specification:",
+                                                                       choices = c("logit (unknown elasticity)", "ces (unknown elasticity)"))
                                                          ),
                                                          hr(),
                                                          fluidRow(

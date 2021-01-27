@@ -32,7 +32,7 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
     if(any(grepl("ces|aids", demand, perl=TRUE, ignore.case=TRUE))) insideSize <- sum(prices * indata[,"Output"], na.rm =TRUE)
 
     shares_revenue <- prices * shares_revenue / sum(prices * shares_revenue)
-    if(supply == "2nd Score Auction") margins <- margins * prices  # convert to level margins
+
   }
 
   firstMargin <- which(!is.na(margins))[1]
@@ -44,7 +44,7 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
   ownerPost = ownerPre
 
 
-  if(supply != "Cournot" && type == "Tariffs" ){
+  if(supply == "Bertrand" && type == "Tariffs" ){
     ownerPost =ownerPost*(1-tariffPost)
     ownerPre =ownerPre*(1-tariffPre)
   }
@@ -65,6 +65,45 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
 
   if( type == "Tariffs"){
     switch(supply,
+           `Monopolistic Competition` =
+             switch(demand,
+                    `logit (unknown elasticity)`      =          monopolistic_competition_tariff(
+                                                                         demand="logit",
+                                                                         prices=prices,
+                                                                         quantities = indata$Output,
+                                                                         margins= margins,
+                                                                         tariffPre=tariffPre,
+                                                                         tariffPost=tariffPost,
+                                                                         labels=indata$Name
+                                                                        ),
+                    `ces (unknown elasticity)`      =          monopolistic_competition_tariff(
+                      demand="ces",
+                      prices=prices,
+                      quantities = indata$Output,
+                      margins= margins,
+                      tariffPre=tariffPre,
+                      tariffPost=tariffPost,
+                      labels=indata$Name
+                    ),
+                    `logit`                           =          monopolistic_competition_tariff(
+                                                                          demand=demand,
+                      prices=prices,
+                      quantities = indata$Output,
+                      margins= margins,
+                      tariffPre=tariffPre,
+                      tariffPost=tariffPost,
+                      labels=indata$Name,mktElast = mktElast
+                    ),
+                    `ces`                           =          monopolistic_competition_tariff(
+                      demand=demand,
+                      prices=prices,
+                      quantities = indata$Output,
+                      margins= margins,
+                      tariffPre=tariffPre,
+                      tariffPost=tariffPost,
+                      labels=indata$Name,mktElast = mktElast
+                    )
+             ),
            Bertrand =
              switch(demand,
                     `logit (unknown elasticity)`= logit.alm(prices= prices,
