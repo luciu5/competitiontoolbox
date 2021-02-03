@@ -671,10 +671,10 @@ navbarPage("", id = "menu",
                                                                   )
                                                            )
                                                          ),
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Cournot'",
-                                                           helpText(tags$b("Note:"), "only the first non-missing inputted price and product name is used for Cournot.")
-                                                         ),
+                                                         # conditionalPanel(
+                                                         #   condition = "input.supplyTariffs == 'Cournot'",
+                                                         #   helpText(tags$b("Note:"), "only the first non-missing inputted price and product name is used for Cournot.")
+                                                         # ),
                                                          conditionalPanel(
                                                            condition = "input.supplyTariffs == '2nd Score Auction' && input.calcElastTariffs.includes('elasticity') == true",
                                                            helpText(tags$b("Note:"), "2nd score Auction only requires a single price.")
@@ -684,9 +684,12 @@ navbarPage("", id = "menu",
                                                            helpText(tags$b("Note:"), "2nd Score Auction does not require prices.")
                                                          ),
                                                          conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Bertrand' && input.demandTariffs == 'aids'",
+                                                           condition = "input.supplyTariffs == 'Bertrand' && input.calcElastTariffs.includes('elasticity') == true && input.demandTariffs1 == 'aids'",
                                                            helpText(tags$b("Note:"), "aids does not require pricing information.")
-                                                         )
+                                                         ),
+                                                         conditionalPanel(
+                                                           condition = "input.supplyTariffs == 'Bertrand' && input.calcElastTariffs.includes('elasticity') == false && input.demandTariffs2 == 'aids (unknown elasticity)'",
+                                                           helpText(tags$b("Note:"), "aids does not require pricing information."))
                                                        ),
                                                        mainPanel(
                                                          h2("Enter Inputs"),

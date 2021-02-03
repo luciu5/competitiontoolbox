@@ -181,7 +181,7 @@ shinyServer(function(input, output, session) {
         indata$Owner <- factor(indata$Owner,levels=unique(indata$Owner))
 
         ## For diagnostic purposes: output the three key inputs for the merger simulation
-        #print(c(supply(), demand(), as.character(elasticity())))
+        print(c(supply(), demand(), as.character(elasticity())))
 
         thisSim <- msgCatcher(
           # Run merger simulation
@@ -227,7 +227,7 @@ shinyServer(function(input, output, session) {
         indata$'Post-merger\n Owner' <- factor(indata$'Post-merger\n Owner',levels=unique(indata$'Post-merger\n Owner'))
 
         ## For diagnostic purposes: output the three key inputs for the merger simulation
-        #print(c(supply(), demand(), as.character(elasticity())))
+        print(c(supply(), demand(), as.character(elasticity())))
 
         thisSim <- msgCatcher(
           # Run merger simulation
