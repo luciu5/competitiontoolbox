@@ -33,10 +33,10 @@ tradeSummary <- function(res, indata,type = c("Tariffs", "Quotas")){
 
   if(isCournot){
     capture.output( s <- summary(res, market = FALSE))
-    theseshares <- drop(res@quantities/sum(res@quantities))
-
-    totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
-    s$sharesPost <- s$quantityPost/totQuantPost*100
+    # theseshares <- drop(res@quantities/sum(res@quantities))
+    #
+    # totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
+    # s$sharesPost <- s$quantityPost/totQuantPost*100
   }
 
   else{
