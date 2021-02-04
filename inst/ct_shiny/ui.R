@@ -606,19 +606,9 @@ navbarPage("", id = "menu",
                                                          )
                                                          ),hr(),
                                                          sliderInput("addRowsTariffs", "Add rows to Inputs table:", value=10,min=5,max=50,step=5),
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Monopolistic Competition'",
                                                          radioButtons("calcElastTariffs", "Calibrate model parameters using:",
                                                                       choices = c("market elasticity AND 1 or more margins",
-                                                                                  "1 or more margins"), selected="market elasticity AND 1 or more margins"
-                                                         )
-                                                         ),
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs != 'Monopolistic Competition'",
-                                                           radioButtons("calcElastTariffs", "Calibrate model parameters using:",
-                                                                        choices = c("market elasticity AND 1 or more margins",
-                                                                                    "2 or more margins"), selected="market elasticity AND 1 or more margins"
-                                                           )
+                                                                                  "2 or more margins")
                                                          ),
                                                          conditionalPanel(
                                                            condition = "input.calcElastTariffs.includes('elasticity') == true ",

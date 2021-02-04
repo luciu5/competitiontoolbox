@@ -48,6 +48,26 @@ shinyServer(function(input, output, session) {
     }
 
 
+    ## Update calcElastTariffs radio button
+    observe({
+      if (input$supplyTariffs == "Bertrand") {
+        updateRadioButtons(
+          session,
+          inputId = "calcElastTariffs",
+          choices = c("market elasticity AND 1 or more margins",
+                      "2 or more margins")
+        )
+      } else {
+        updateRadioButtons(
+          session,
+          inputId = "calcElastTariffs",
+          choices = c("market elasticity AND 1 or more margins",
+                      "1 or more margins")
+        )
+      }
+    })
+
+
     ##### Source Mergers and Trade functions #####
     ## Inputs
     source(paste0(getwd(), "/Inputs/mergersInputs.R"), local = TRUE)
