@@ -67,6 +67,24 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
     switch(supply,
            `Monopolistic Competition` =
              switch(demand,
+                    `logit`                           =          monopolistic_competition_tariff(
+                      demand=demand,
+                      prices=prices,
+                      quantities = indata$Output,
+                      margins= margins,
+                      tariffPre=tariffPre,
+                      tariffPost=tariffPost,
+                      labels=indata$Name,mktElast = mktElast
+                    ),
+                    `ces`                           =          monopolistic_competition_tariff(
+                      demand=demand,
+                      prices=prices,
+                      quantities = indata$Output,
+                      margins= margins,
+                      tariffPre=tariffPre,
+                      tariffPost=tariffPost,
+                      labels=indata$Name,mktElast = mktElast
+                    ),
                     `logit (unknown elasticity)`      =          monopolistic_competition_tariff(
                                                                          demand="logit",
                                                                          prices=prices,
@@ -84,25 +102,7 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
                                                                                                 tariffPre=tariffPre,
                                                                                                 tariffPost=tariffPost,
                                                                                                 labels=indata$Name
-                                                                                              ),
-                    `logit`                           =          monopolistic_competition_tariff(
-                                                                          demand=demand,
-                                                                          prices=prices,
-                                                                          quantities = indata$Output,
-                                                                          margins= margins,
-                                                                          tariffPre=tariffPre,
-                                                                          tariffPost=tariffPost,
-                                                                          labels=indata$Name,mktElast = mktElast
-                                                                        ),
-                    `ces`                           =          monopolistic_competition_tariff(
-                                                                          demand=demand,
-                                                                          prices=prices,
-                                                                          quantities = indata$Output,
-                                                                          margins= margins,
-                                                                          tariffPre=tariffPre,
-                                                                          tariffPost=tariffPost,
-                                                                          labels=indata$Name,mktElast = mktElast
-                                                                        )
+                                                                                              )
              ),
            Bertrand =
              switch(demand,
@@ -196,8 +196,8 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
                                                                        quantities = as.matrix(indata$Output),
                                                                        margins= as.matrix(margins),
                                                                        owner = indata$Owner,
-                                                                       tariffPre = tariffPre,
-                                                                       tariffPost = tariffPost,
+                                                                       tariffPre = as.matrix(tariffPre),
+                                                                       tariffPost = as.matrix(tariffPost),
                                                                        labels = list(indata$Name, "Prod"))
            )
 
@@ -208,25 +208,23 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
     switch(supply,
            Bertrand =
              switch(demand,
-                    `logit (unknown elasticity)`= bertrand_quota(prices= prices,
-                                                                shares= shares_quantity,
-                                                                margins= margins,
-                                                                capacitiesPre = indata$Output*tariffPre,
-                                                                capacitiesPost = indata$Output*tariffPost,
-                                                                ownerPre= ownerPre,
-                                                                ownerPost= ownerPost,
-                                                                insideSize = insideSize ,
-                                                                mcDelta = indata$mcDelta,
-                                                                labels=indata$Name),
-                    logit = bertrand_quota(prices= prices,
-                                         shares= shares_quantity,
-                                         margins= margins,
-                                         capacitiesPre = indata$Output*tariffPre,
-                                         capacitiesPost = indata$Output*tariffPost,
-                                         ownerPre= ownerPre,
-                                         ownerPost= ownerPost,
-                                         insideSize = insideSize ,
-                                         mcDelta = indata$mcDelta, labels=indata$Name, mktElast = mktElast)
+                    logit = bertrand_quota(demand = demand,
+                                           prices = prices,
+                                           quantities = indata$Output,
+                                           margins = margins,
+                                           owner = indata$Owner,
+                                           quotaPre = tariffPre,
+                                           quotaPost = tariffPost,
+                                           mktElast = mktElast,
+                                           labels=indata$Name),
+                    `logit (unknown elasticity)`= bertrand_quota(demand = "logit",
+                                                                 prices = prices,
+                                                                 quantities = indata$Output,
+                                                                 margins = margins,
+                                                                 owner = indata$Owner,
+                                                                 quotaPre = tariffPre,
+                                                                 quotaPost = tariffPost,
+                                                                 labels=indata$Name)
              )#,
 
            # Cournot =
