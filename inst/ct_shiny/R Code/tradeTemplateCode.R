@@ -24,7 +24,7 @@ tradeTemplateCode <- function(type){
   )
 
   argvalues   <- paste0(argnames," = simdata$`",cnames,"`")
-  summary_code <- "summary(simres, revenues = FALSE, levels = FALSE, market=FALSE)"
+  summary_code <- "summary(simres, levels = FALSE, market=FALSE)"
 
   if(!is.null(demand()) & !is.null(supply())){
 
