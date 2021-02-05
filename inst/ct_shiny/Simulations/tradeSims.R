@@ -170,7 +170,7 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
                                                    tariffPre = as.matrix(tariffPre),
                                                    tariffPost = as.matrix(tariffPost),
                                                    mktElast = mktElast,
-                                                   labels = list(indata$Name, "Prod")),
+                                                   labels = list(indata$Name, indata$Name[1])),
                             loglinear = cournot_tariff(prices = na.omit(prices)[1],
                                                 demand = "log",
                                                 #cost= rep("linear", nrow(indata)),
@@ -180,7 +180,7 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
                                                 tariffPre = as.matrix(tariffPre),
                                                 tariffPost = as.matrix(tariffPost),
                                                 mktElast = mktElast,
-                                                labels = list(indata$Name, "Prod")),
+                                                labels = list(indata$Name, indata$Name[1])),
                             `linear (unknown elasticity)` = cournot_tariff(prices = na.omit(prices)[1],
                                                                     demand = "linear",
                                                                     #cost= rep("linear", nrow(indata)),
@@ -189,7 +189,7 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
                                                                     owner = indata$Owner,
                                                                     tariffPre = as.matrix(tariffPre),
                                                                     tariffPost = as.matrix(tariffPost),
-                                                                    labels=list(indata$Name, "Prod")),
+                                                                    labels=list(indata$Name, indata$Name[1])),
                             `loglinear (unknown elasticity)` = cournot_tariff(prices = na.omit(prices)[1],
                                                                        demand = "log",
                                                                        #cost= rep("linear", nrow(indata)),
@@ -198,7 +198,7 @@ tradeSims <- function(supply, demand, indata, mktElast, type = c("Tariffs", "Quo
                                                                        owner = indata$Owner,
                                                                        tariffPre = as.matrix(tariffPre),
                                                                        tariffPost = as.matrix(tariffPost),
-                                                                       labels = list(indata$Name, "Prod"))
+                                                                       labels = list(indata$Name, indata$Name[1]))
            )
 
     )
