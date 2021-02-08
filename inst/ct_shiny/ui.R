@@ -348,239 +348,6 @@ navbarPage("", id = "menu",
 
                    ),
 
-                   navbarMenu("Numerical Simulations",
-
-                              tabPanel("Horizontal", style = "overflow-y:scroll; max-height: 90vh",
-                                       fluidPage(
-                                         titlePanel("Horizontal Simulations"),
-
-                                         mainPanel(
-                                           tabsetPanel(
-                                             tabPanel("Summary",
-                                                      fluidPage(
-                                                        sidebarLayout(
-                                                          sidebarPanel(
-                                                            h5(tags$b("Overview:")),
-                                                            helpText(tags$ul(
-                                                              tags$li(htmlOutput('sumNumMergerATR')),
-                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                                                             "Taragin and Loudermilk (2019)"),"for further details." ))
-                                                              )
-                                                            ),
-                                                            # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                            #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                            #                    selected = "Bertrand ces"),
-                                                            selectInput("outcomeSumATR", "Outcomes to Report:",
-                                                                        choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                            sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),  # Ask Charles if we should go from step == 10 to step == 5
-                                                            fluidRow(
-                                                              column(width=12, align = "center",
-                                                                     tags$div(
-                                                                       HTML("<font size=\"2\"> Supported by </font>"),
-                                                                       HTML(logo)
-                                                                     )
-                                                              )
-                                                            )
-                                                            ),
-                                                          mainPanel(
-                                                            br(),
-                                                            fillPage(plotOutput('plotSumATR')),
-                                                            wellPanel(h5(tags$b("Description:")),
-                                                                      textOutput('capSumATR'))
-
-                                                          )
-
-                                                        )
-                                                      )),
-                                             tabPanel("Indices",
-                                                      fluidPage(
-                                                        sidebarLayout(
-                                                          sidebarPanel(
-                                                            h5(tags$b("Overview:")),
-                                                            helpText(tags$ul(
-                                                              tags$li(htmlOutput('indicNumMergerATR')),
-                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                                                             "Taragin and Loudermilk (2019)"),"for further details." ))
-                                                            )
-                                                            ),
-                                                            # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                            #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                            #                    selected = "Bertrand ces"),
-                                                            radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
-                                                            selectInput("indexIndATR", "Index:",
-                                                                        choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd")),
-                                                            sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
-                                                            fluidRow(
-                                                              column(width=12, align = "center",
-                                                                     tags$div(
-                                                                       HTML("<font size=\"2\"> Supported by </font>"),
-                                                                       HTML(logo)
-                                                                     )
-                                                              )
-                                                            )
-                                                          ),
-                                                          mainPanel(
-                                                            br(),
-                                                            fillPage(plotOutput('plotIndATR')),
-                                                            wellPanel(h5(tags$b("Description:")),
-                                                                      textOutput('capIndATR'))
-                                                          )
-
-
-                                                        )
-
-                                                      )
-                                             )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
-
-                                         )
-
-                                    )
-
-                              ),
-
-                              tabPanel("Vertical", style = "overflow-y:scroll; max-height: 90vh",
-                                       fluidPage(
-                                         titlePanel("Vertical Simulations"),
-
-                                         mainPanel(
-                                           tabsetPanel(
-                                             tabPanel("Summary",
-                                                      fluidPage(
-                                                        sidebarLayout(
-                                                          sidebarPanel(
-                                                            h5(tags$b("Overview:")),
-                                                            helpText(tags$ul(
-                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
-                                                                                             "Sheu and Taragin (2020)"),"for further details."))
-                                                            )
-                                                            ),
-                                                            # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                            #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                            #                    selected = "Bertrand ces"),
-                                                            fluidRow(
-                                                              column(width=12, align = "center",
-                                                                     tags$div(
-                                                                       HTML("<font size=\"2\"> Supported by </font>"),
-                                                                       HTML(logo)
-                                                                     )
-                                                              )
-                                                            )
-                                                          ),
-                                                          mainPanel(
-                                                            br(),
-                                                            fillPage(imageOutput("figSummary", width = "100%", height = "100%")),
-                                                            wellPanel(h5(tags$b("Description:")),
-                                                                      textOutput('capSummary'))
-
-                                                          )
-
-                                                        )
-                                                      )),
-                                             tabPanel("Upstream",
-                                                      fluidPage(
-                                                        sidebarLayout(
-                                                          sidebarPanel(
-                                                            h5(tags$b("Overview:")),
-                                                            helpText(tags$ul(
-                                                              tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
-                                                                                             "Sheu and Taragin (2020)"),"for further details."))
-                                                            )
-                                                            ), hr(),
-                                                            # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                            #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                            #                    selected = "Bertrand ces"),
-                                                            radioButtons("upstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
-                                                            fluidRow(
-                                                              column(width=12, align = "center",
-                                                                     tags$div(
-                                                                       HTML("<font size=\"2\"> Supported by </font>"),
-                                                                       HTML(logo)
-                                                                     )
-                                                              )
-                                                            )
-                                                          ),
-                                                          mainPanel(
-                                                            br(),
-                                                            fillPage(imageOutput("figUpstream", width = "100%", height = "100%")),
-                                                            wellPanel(h5(tags$b("Description:")),
-                                                                      textOutput('capUpstream'))
-                                                          )
-
-
-                                                        )
-
-                                                      )
-                                             ),
-                                           tabPanel("Downstream",
-                                                    fluidPage(
-                                                      sidebarLayout(
-                                                        sidebarPanel(
-                                                          h5(tags$b("Overview:")),
-                                                          helpText(tags$ul(
-                                                            tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
-                                                                                           "Sheu and Taragin (2020)"),"for further details."))
-                                                          )
-                                                          ), hr(),
-                                                          # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                          #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                          #                    selected = "Bertrand ces"),
-                                                          radioButtons("downstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
-                                                          fluidRow(
-                                                            column(width=12, align = "center",
-                                                                   tags$div(
-                                                                     HTML("<font size=\"2\"> Supported by </font>"),
-                                                                     HTML(logo)
-                                                                   )
-                                                            )
-                                                          )
-                                                        ),
-                                                        mainPanel(
-                                                          br(),
-                                                          fillPage(imageOutput("figDownstream", width = "100%", height = "100%")),
-                                                          wellPanel(h5(tags$b("Description:")),
-                                                                    textOutput('capDownstream'))
-                                                        )
-
-                                                      )
-
-                                                    )
-                                           ),
-                                           tabPanel("Vertical",
-                                                    fluidPage(
-                                                      sidebarLayout(
-                                                        sidebarPanel(
-                                                          h5(tags$b("Overview:")),
-                                                          helpText(tags$ul(
-                                                            tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
-                                                                                           "Sheu and Taragin (2020)"),"for further details."))
-                                                          )
-                                                          ), hr(),
-                                                          # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                          #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                          #                    selected = "Bertrand ces"),
-                                                          radioButtons("verticalPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
-                                                          fluidRow(
-                                                            column(width=12, align = "center",
-                                                                   tags$div(
-                                                                     HTML("<font size=\"2\"> Supported by </font>"),
-                                                                     HTML(logo)
-                                                                   )
-                                                            )
-                                                          )
-                                                        ),
-                                                        mainPanel(
-                                                          br(),
-                                                          fillPage(imageOutput("figVertical", width = "100%", height = "100%")),
-                                                          wellPanel(h5(tags$b("Description:")),
-                                                                    textOutput('capVertical'))
-                                                        )
-
-                                                      )
-
-                                                    )
-                                           )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
-                   )))),
-
                    navbarMenu("Trade",
 
                               tabPanel("Tariffs", style = "overflow-y:scroll; max-height: 90vh",
@@ -892,12 +659,295 @@ navbarPage("", id = "menu",
                                         fluidPage(htmlOutput("referenceTrade"))
                               )
                    ),
+
+           navbarMenu("Numerical Simulations",
+
+                      tabPanel("Horizontal Mergers", style = "overflow-y:scroll; max-height: 90vh",
+                               fluidPage(
+                                 titlePanel("Horizontal Simulations"),
+
+                                 mainPanel(
+                                   tabsetPanel(
+                                     tabPanel("Summary",
+                                              fluidPage(
+                                                sidebarLayout(
+                                                  sidebarPanel(
+                                                    h5(tags$b("Overview:")),
+                                                    helpText(tags$ul(
+                                                      tags$li(htmlOutput('sumNumMergerATR')),
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                     "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                    )
+                                                    ),
+                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                    #                    selected = "Bertrand ces"),
+                                                    selectInput("outcomeSumATR", "Outcomes to Report:",
+                                                                choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
+                                                    sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),  # Ask Charles if we should go from step == 10 to step == 5
+                                                    fluidRow(
+                                                      column(width=12, align = "center",
+                                                             tags$div(
+                                                               HTML("<font size=\"2\"> Supported by </font>"),
+                                                               HTML(logo)
+                                                             )
+                                                      )
+                                                    )
+                                                  ),
+                                                  mainPanel(
+                                                    br(),
+                                                    fillPage(plotOutput('plotSumATR')),
+                                                    wellPanel(h5(tags$b("Description:")),
+                                                              textOutput('capSumATR'))
+
+                                                  )
+
+                                                )
+                                              )),
+                                     tabPanel("Indices",
+                                              fluidPage(
+                                                sidebarLayout(
+                                                  sidebarPanel(
+                                                    h5(tags$b("Overview:")),
+                                                    helpText(tags$ul(
+                                                      tags$li(htmlOutput('indicNumMergerATR')),
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                     "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                    )
+                                                    ),
+                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                    #                    selected = "Bertrand ces"),
+                                                    radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
+                                                    selectInput("indexIndATR", "Index:",
+                                                                choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd")),
+                                                    sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
+                                                    fluidRow(
+                                                      column(width=12, align = "center",
+                                                             tags$div(
+                                                               HTML("<font size=\"2\"> Supported by </font>"),
+                                                               HTML(logo)
+                                                             )
+                                                      )
+                                                    )
+                                                  ),
+                                                  mainPanel(
+                                                    br(),
+                                                    fillPage(plotOutput('plotIndATR')),
+                                                    wellPanel(h5(tags$b("Description:")),
+                                                              textOutput('capIndATR'))
+                                                  )
+
+
+                                                )
+
+                                              )
+                                     )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
+
+                                 )
+
+                               )
+
+                      ),
+
+                      tabPanel("Vertical Mergers", style = "overflow-y:scroll; max-height: 90vh",
+                               fluidPage(
+                                 titlePanel("Vertical Simulations"),
+
+                                 mainPanel(
+                                   tabsetPanel(
+                                     tabPanel("Summary",
+                                              fluidPage(
+                                                sidebarLayout(
+                                                  sidebarPanel(
+                                                    h5(tags$b("Overview:")),
+                                                    helpText(tags$ul(
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
+                                                                                     "Sheu and Taragin (2020)"),"for further details."))
+                                                    )
+                                                    ),
+                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                    #                    selected = "Bertrand ces"),
+                                                    fluidRow(
+                                                      column(width=12, align = "center",
+                                                             tags$div(
+                                                               HTML("<font size=\"2\"> Supported by </font>"),
+                                                               HTML(logo)
+                                                             )
+                                                      )
+                                                    )
+                                                  ),
+                                                  mainPanel(
+                                                    br(),
+                                                    fillPage(imageOutput("figSummary", width = "100%", height = "100%")),
+                                                    wellPanel(h5(tags$b("Description:")),
+                                                              textOutput('capSummary'))
+
+                                                  )
+
+                                                )
+                                              )),
+                                     tabPanel("Upstream",
+                                              fluidPage(
+                                                sidebarLayout(
+                                                  sidebarPanel(
+                                                    h5(tags$b("Overview:")),
+                                                    helpText(tags$ul(
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
+                                                                                     "Sheu and Taragin (2020)"),"for further details."))
+                                                    )
+                                                    ), hr(),
+                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                    #                    selected = "Bertrand ces"),
+                                                    radioButtons("upstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
+                                                    fluidRow(
+                                                      column(width=12, align = "center",
+                                                             tags$div(
+                                                               HTML("<font size=\"2\"> Supported by </font>"),
+                                                               HTML(logo)
+                                                             )
+                                                      )
+                                                    )
+                                                  ),
+                                                  mainPanel(
+                                                    br(),
+                                                    fillPage(imageOutput("figUpstream", width = "100%", height = "100%")),
+                                                    wellPanel(h5(tags$b("Description:")),
+                                                              textOutput('capUpstream'))
+                                                  )
+
+
+                                                )
+
+                                              )
+                                     ),
+                                     tabPanel("Downstream",
+                                              fluidPage(
+                                                sidebarLayout(
+                                                  sidebarPanel(
+                                                    h5(tags$b("Overview:")),
+                                                    helpText(tags$ul(
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
+                                                                                     "Sheu and Taragin (2020)"),"for further details."))
+                                                    )
+                                                    ), hr(),
+                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                    #                    selected = "Bertrand ces"),
+                                                    radioButtons("downstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
+                                                    fluidRow(
+                                                      column(width=12, align = "center",
+                                                             tags$div(
+                                                               HTML("<font size=\"2\"> Supported by </font>"),
+                                                               HTML(logo)
+                                                             )
+                                                      )
+                                                    )
+                                                  ),
+                                                  mainPanel(
+                                                    br(),
+                                                    fillPage(imageOutput("figDownstream", width = "100%", height = "100%")),
+                                                    wellPanel(h5(tags$b("Description:")),
+                                                              textOutput('capDownstream'))
+                                                  )
+
+                                                )
+
+                                              )
+                                     ),
+                                     tabPanel("Vertical",
+                                              fluidPage(
+                                                sidebarLayout(
+                                                  sidebarPanel(
+                                                    h5(tags$b("Overview:")),
+                                                    helpText(tags$ul(
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
+                                                                                     "Sheu and Taragin (2020)"),"for further details."))
+                                                    )
+                                                    ), hr(),
+                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                    #                    selected = "Bertrand ces"),
+                                                    radioButtons("verticalPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
+                                                    fluidRow(
+                                                      column(width=12, align = "center",
+                                                             tags$div(
+                                                               HTML("<font size=\"2\"> Supported by </font>"),
+                                                               HTML(logo)
+                                                             )
+                                                      )
+                                                    )
+                                                  ),
+                                                  mainPanel(
+                                                    br(),
+                                                    fillPage(imageOutput("figVertical", width = "100%", height = "100%")),
+                                                    wellPanel(h5(tags$b("Description:")),
+                                                              textOutput('capVertical'))
+                                                  )
+
+                                                )
+
+                                              )
+                                     )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
+                                 ))),
+
+                      tabPanel("Tariffs", style = "overflow-y:scroll; max-height: 90vh",
+                               fluidPage(
+                                 titlePanel("Tariff Simulations"),
+
+                                 mainPanel(
+                                   tabsetPanel(
+                                     tabPanel("Summary",
+                                              fluidPage(
+                                                # sidebarLayout(
+                                                #   sidebarPanel(
+                                                #     h5(tags$b("Overview:")),
+                                                #     helpText(tags$ul(
+                                                #       tags$li(htmlOutput('sumNumMergerATR')),
+                                                #       tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                #                                      "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                #     )
+                                                #     ),
+                                                #     # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                #     #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                #     #                    selected = "Bertrand ces"),
+                                                #     selectInput("outcomeSumATR", "Outcomes to Report:",
+                                                #                 choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
+                                                #     sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),  # Ask Charles if we should go from step == 10 to step == 5
+                                                #     fluidRow(
+                                                #       column(width=12, align = "center",
+                                                #              tags$div(
+                                                #                HTML("<font size=\"2\"> Supported by </font>"),
+                                                #                HTML(logo)
+                                                #              )
+                                                #       )
+                                                #     )
+                                                #   ),
+                                                #   mainPanel(
+                                                #     br(),
+                                                #     fillPage(plotOutput('plotSumATR')),
+                                                #     wellPanel(h5(tags$b("Description:")),
+                                                #               textOutput('capSumATR'))
+                                                #
+                                                #   )
+                                                #
+                                                # )
+                                              ))), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
+
+                                 )
+
+                               )
+
+                      )),
+
            tabPanel("Other Resources",
                     fluidPage(
                       #titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
                       h3("Additional Research"),
-                      p("Other researchers have developed their own merger simulation interfaces, which may provide context for or supplement some of the features available in this app."),
-                      hr(),
+                      #p("Other researchers have developed their own merger simulation interfaces, which may provide context for or supplement some of the features available in this app."),
+                      #hr(),
                       p("Luke Froeb and Steven Tschantz (Vanderbilt University) have developed a ",  tags$a(href="https://daag.shinyapps.io/b1x2", "vertical merger simulator app"), " that allows users to compare simulated vertical merger effects across different barganining models,
                         including Nash-in-Nash two-part pricing and various models of derived demand. The app allows for a competitive landscape consisting of either one upstream firm and two downstream firms, or vice-versa."),
                       p("This vertical simulator accompanies ", tags$a(href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3760634", "Boshoff, Froeb, Minnie, and Tschantz (2020)", .noWS = "outside"), ", which provides theoretical frameworks for the various models included in the simulator.")
