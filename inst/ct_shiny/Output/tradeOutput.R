@@ -61,8 +61,10 @@ output$resultsTariffs <-
 
     if(input$inTabsetTariffs != "respanelTariffs" || input$simulateTariffs == 0|| is.null(valuesTariffs[["sim"]])){return()}
 
-    isolate(inputData <- valuesTariffs[["inputData"]])
-    tradeSummary(valuesTariffs[["sim"]], inputData, type = "Tariffs")
+    # isolate(inputData <- valuesTariffs[["inputData"]])
+    # tradeSummary(valuesTariffs[["sim"]], inputData, type = "Tariffs")
+    capture.output(result <- summary(valuesTariffs[["sim"]], levels = FALSE, market = TRUE))
+    result <- as.data.frame(result)
 
   })
 
@@ -73,8 +75,10 @@ output$resultsQuota <-
 
     if(input$inTabsetQuota != "respanelQuota" || input$simulateQuota == 0|| is.null(valuesQuota[["sim"]])){return()}
 
-    isolate(inputData <- valuesQuota[["inputData"]])
-    tradeSummary(valuesQuota[["sim"]], inputData, type = "Quotas")
+    # isolate(inputData <- valuesQuota[["inputData"]])
+    # tradeSummary(valuesQuota[["sim"]], inputData, type = "Quotas")
+    capture.output(result <- summary(valuesQuota[["sim"]], levels = FALSE, market = TRUE))
+    result <- as.data.frame(result)
 
   })
 
@@ -105,82 +109,24 @@ output$results_detailedTariffs <- renderTable({
 
   if(input$inTabsetTariffs != "detpanelTariffs" || input$simulateTariffs == 0  || is.null(valuesTariffs[["sim"]])){return()}
 
-  if(input$supplyTariffs == "Cournot"){
+  # isolate(inputData <- valuesTariffs[["inputData"]])
+  # tradeSummary(valuesTariffs[["sim"]], inputData, type = "Tariffs")
+  capture.output(result <- summary(valuesTariffs[["sim"]], levels = FALSE, market = FALSE))
+  result <- as.data.frame(result)
 
-    res <- NULL
-    capture.output(try(res <- summary(valuesTariffs[["sim"]], revenue= FALSE,market=FALSE),silent=TRUE))
-
-    res$isParty <- factor(res$mcDelta >0, labels=c("","*"))
-    res$product <- res$mcDelta <- NULL
-    try(colnames(res) <- c("Foreign Firm","Name","Current Tariff Price","New Tariff Price", "Price Change (%)","Current Tariff Quantity","New Tariff Quantity", "Output Change (%)"),silent=TRUE)
-
-  } else {
-
-    isAuction <- grepl("Auction",class(valuesTariffs[["sim"]]))
-    isRevDemand <- grepl("ces|aids",class(valuesTariffs[["sim"]]),ignore.case = TRUE)
-    inLevels <- FALSE
-    #isAIDS <- grepl("aids",class(values[["sim"]]),ignore.case = TRUE)
-    missPrice <- any(is.na(valuesTariffs[["sim"]]@prices))
-
-    if(isAuction && missPrice){inLevels = TRUE}
-
-    capture.output(res <- summary(valuesTariffs[["sim"]], revenue=isRevDemand & missPrice, insideOnly=TRUE, levels=inLevels))
-    res$Name <- rownames(res)
-    res$isParty <- factor(res$mcDelta >0, labels=c("","*"))
-    res$mcDelta <- NULL
-    res <- res[,c(1, ncol(res), 2 : (ncol(res)  - 1))]
-
-    thesenames <-  c("Foreign Firm","Name","Current Tariff Price","New Tariff Price", "Price Change (%)","Current Tariff Share (%)","New Tariff Share (%)", "Share Change (%)")
-    colnames(res) <- thesenames
-
-    if(inLevels){colnames(res)[ colnames(res) == "Price Change (%)"] = "Price Change ($/unit)"}
-
-  }
-
-  res
-
-}, digits = 2)
+})
 
 # Quota
 output$results_detailedQuota <- renderTable({
 
   if(input$inTabsetQuota != "detpanelQuota" || input$simulateQuota == 0  || is.null(valuesQuota[["sim"]])){return()}
 
-  if(input$supplyQuota == "Cournot"){
+  # isolate(inputData <- valuesTariffs[["inputData"]])
+  # tradeSummary(valuesTariffs[["sim"]], inputData, type = "Tariffs")
+  capture.output(result <- summary(valuesQuota[["sim"]], levels = FALSE, market = FALSE))
+  result <- as.data.frame(result)
 
-    res <- NULL
-    capture.output(try(res <- summary(valuesQuota[["sim"]], revenue= FALSE,market=FALSE),silent=TRUE))
-
-    res$isParty <- factor(is.finite(valuesQuota[["sim"]]@capacitiesPre) | is.finite(valuesQuota[["sim"]]@capacitiesPost), labels=c("","*"))
-    res$product <- res$mcDelta <- NULL
-    try(colnames(res) <- c("Foreign Firm","Name","Current Quota Price","New Quota Price", "Price Change (%)","Current Quota Quantity","New Quota Quantity", "Output Change (%)"),silent=TRUE)
-
-  } else {
-
-    isAuction <- grepl("Auction",class(valuesQuota[["sim"]]))
-    isRevDemand <- grepl("ces|aids",class(valuesQuota[["sim"]]),ignore.case = TRUE)
-    inLevels <- FALSE
-    #isAIDS <- grepl("aids",class(valuesQuota[["sim"]]),ignore.case = TRUE)
-    missPrice <- any(is.na(valuesQuota[["sim"]]@prices))
-    if(isAuction && missPrice){inLevels = TRUE}
-
-    capture.output(res <- summary(valuesQuota[["sim"]], revenue=isRevDemand & missPrice, insideOnly=TRUE, levels=inLevels))
-    res$Name <- rownames(res)
-
-    res$isParty <- factor(is.finite(valuesQuota[["sim"]]@capacitiesPre) | is.finite(valuesQuota[["sim"]]@capacitiesPost), labels=c("","*"))
-
-    res$mcDelta <- NULL
-    res <- res[,c(1, ncol(res), 2 : (ncol(res)  - 1))]
-
-    thesenames <-  c("Foreign Firm","Name","Current Quota Price","New Quota Price", "Price Change (%)","Current Quota Share (%)","New Quota Share (%)", "Share Change (%)")
-    colnames(res) <- thesenames
-
-    if(inLevels){colnames(res)[ colnames(res) == "Price Change (%)"] = "Price Change ($/unit)"}
-  }
-
-  res
-
-}, digits = 2)
+})
 
 
 ## Display market elasticity in Elasticities tab
