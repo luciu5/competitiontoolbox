@@ -15,7 +15,7 @@ navbarPage("", id = "menu",
                             fluidPage(
                               titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
                               h3("Overview"),
-                              p("The", tags$a(href="https://cran.r-project.org/web/packages/competitiontoolbox/index.html", "competitiontoolbox"), "is a browser-based interface to some of functions in the ", tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust"), "and",
+                              p("The", tags$a(href="https://cran.r-project.org/web/packages/competitiontoolbox/index.html", "competitiontoolbox"), "is a browser-based interface for functions defined in the ", tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust"), "and",
                                 tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade"), "R packages. It allows users to "),
                               HTML("<ul>
                                      <li>simulate mergers, tariffs, and quotas under various specifications and market conditions,</li>
@@ -891,7 +891,27 @@ navbarPage("", id = "menu",
                               ,tabPanel("Documentation",
                                         fluidPage(htmlOutput("referenceTrade"))
                               )
-                   )
+                   ),
+           tabPanel("Other Resources",
+                    fluidPage(
+                      #titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
+                      h3("Additional Research"),
+                      p("Other researchers have developed their own merger simulation interfaces, which may provide context for or supplement some of the features available in this app."),
+                      hr(),
+                      p("Luke Froeb and Steven Tschantz (Vanderbilt University) have developed a ",  tags$a(href="https://daag.shinyapps.io/b1x2", "vertical merger simulator app"), " that allows users to compare simulated vertical merger effects across different barganining models,
+                        including Nash-in-Nash two-part pricing and various models of derived demand. The app allows for a competitive landscape consisting of either one upstream firm and two downstream firms, or vice-versa."),
+                      p("This vertical simulator accompanies ", tags$a(href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3760634", "Boshoff, Froeb, Minnie, and Tschantz (2020)", .noWS = "outside"), ", which provides theoretical frameworks for the various models included in the simulator.")
+                      ),
+                    hr(),
+                    fluidRow(
+                      column(width = 12, align = "center",
+                             tags$div(
+                               HTML("<font size=\"2\"> Supported by </font>"),
+                               HTML(logo)
+                             )
+                      )
+                    )
+                  )
 )
 
 
