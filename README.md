@@ -15,8 +15,7 @@ The app allows users to
 * numerically simulate thousands of horizontal and supply chain mergers to view distributions of market outcomes
 * copy-paste auto-generated R code that runs the user-inputted simulation
 
-For more details about the models used in the app, consult the antitrust package [vignette](https://cran.r-project.org/web/packages/antitrust/index.html).
-For more details about the numerical simulations included in the app, consult [Taragin and Loudermilk (2019)](https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers) and [Sheu and Taragin (2020)](https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining).
+For more details concerning the models used in the app, consult the antitrust package [vignette](https://cran.r-project.org/web/packages/antitrust/index.html).<br>For more details concerning the numerical simulations included in the app, consult [Taragin and Loudermilk (2019)](https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers) and [Sheu and Taragin (2020)](https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining).
 
 ## Usage
 ```r
@@ -26,5 +25,5 @@ ct_shiny()
 This will open the `competitiontoolbox` web interface and the user will be greeted by the **Introduction** tab. Users may proceed to the **Mergers**, **Trade**, **Numerical Simulations**, or **Other Resources** tabs. All tabs are self-contained and provide directions on how to proceed.
 
 ## Dependencies
-`antitrust`
+`antitrust`<br>
 `trade`
