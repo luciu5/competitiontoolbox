@@ -1,6 +1,8 @@
 # competitiontoolbox
 
 `competitiontoolbox` is an R package that runs the <em>competitiontoolbox</em> RShiny web application, which is a browser-based user interface for functionality embedded in the [antitrust](https://github.com/cran/antitrust) and [trade](https://github.com/cran/trade) R packages.
+<br>
+<br>
 
 ## Why `competitiontoolbox`?
 
@@ -13,7 +15,7 @@ The app allows users to
 * simulate horizontal and vertical mergers, tariffs, and quotas assuming various competitive environments and market demand forms
 * input specific market characteristics such as product prices, margins, output, and assumed market elasticity
 * numerically simulate thousands of horizontal and supply chain mergers to view distributions of market outcomes
-* copy-paste auto-generated R code that runs the user-inputted simulation
+* copy auto-generated R code that runs the inputted simulation
 
 For more details concerning the models used in the app, consult the antitrust package [vignette](https://cran.r-project.org/web/packages/antitrust/index.html).<br>For more details concerning the numerical simulations included in the app, consult [Taragin and Loudermilk (2019)](https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers) and [Sheu and Taragin (2020)](https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining).
 
