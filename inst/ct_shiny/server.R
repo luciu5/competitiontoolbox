@@ -17,10 +17,14 @@ get_vignette_link <- function(...) {
 
 
 ## Load competitiontoolbox datasets
-data("indicboxdata", package = "competitiontoolbox")
+# Simulated outcome data
 data("sumboxdata", package = "competitiontoolbox")
-data("indicboxmktCnt", package = "competitiontoolbox")
+data("sumboxdata_trade", package = "competitiontoolbox")
+data("indicboxdata", package = "competitiontoolbox")
+# Simulation count data
 data("sumboxmktCnt", package = "competitiontoolbox")
+data("sumboxmktCnt_trade", package = "competitiontoolbox")
+data("indicboxmktCnt", package = "competitiontoolbox")
 
 
 ## Run server-side Shiny program
