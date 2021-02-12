@@ -43,7 +43,7 @@ output$plotIndATR <- renderPlot({
     theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.text.y = element_text(size=11), axis.title = element_text(size=13), axis.text.x = element_text(angle = 45,hjust = 1, size = 12)) +
     geom_hline(yintercept=0, col = "#d95f02",linetype = "dashed") +
     geom_hline(yintercept=c(1,5,10),linetype="dashed") +
-    ggtitle(paste0(input$indexIndATR,", Outside Share Less Than ",input$shareOutIndATR,"% (",input$pooledIndATR,")"))
+    ggtitle(paste0(input$indexIndATR,", Outside Share Less Than ",input$shareOutIndATR, "% (", input$pooledIndATR,")"))
 
   plot(plotInd)
 
