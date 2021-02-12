@@ -11,7 +11,22 @@ output$plotSumATR <- renderPlot({
     coord_cartesian(ylim = ylimSumATR)+
     theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title = element_text(size = 13), axis.text.x = element_text(angle = 45, hjust = 1, size = 11, face = "bold")) +
     ylab(input$outcomeSumATR) +
-    ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR,"%"))
+    ggtitle(paste0(input$outcomeSumATR, ", Outside Share Less Than ", input$shareOutSumATR, "%"))
+
+})
+
+# Tariffs
+output$plotSumTariffs <- renderPlot({
+
+  if(grepl("%", input$outcomeSumTariffs)) ylimSumTariffs <- c(0,50)
+  else{ylimSumTariffs <- c(0,350)}
+
+  ggplot(data = subset(sumboxdata_trade, Outcome == input$outcomeSumTariffs & tariffThresh == input$tariffThreshSum), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
+    geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
+    coord_cartesian(ylim = ylimSumTariffs)+
+    theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title = element_text(size = 13), axis.text.x = element_text(angle = 45, hjust = 1, size = 11, face = "bold")) +
+    ylab(input$outcomeSumTariffs) +
+    ggtitle(paste0(input$outcomeSumTariffs, ", Tariffs Less Than ", input$tariffThreshSum, "%"))
 
 })
 
@@ -47,6 +62,13 @@ output$sumNumMergerATR <- renderUI({
   HTML(paste("Examine the distribution of outcomes from", sumNumMerg, "simulated horizontal mergers."))
 })
 
+# Tariffs
+output$sumNumMergerTariffs <- renderUI({
+  sumNumMerg <- subset(sumboxmktCnt_trade, Outcome == input$outcomeSumTariffs & tariffThresh == input$tariffThreshSum)
+  sumNumMerg <- prettyNum(sum(sumNumMerg$Cnt), big.mark = ",")
+  HTML(paste("Examine the distribution of outcomes from", sumNumMerg, "tariffs."))
+})
+
 
 ## Number of Simulated Mergers for Indices Tab of ATR Numerical Simulation
 # Horizontal
@@ -64,10 +86,26 @@ output$capSumATR <- renderText({
 
 captionSumATR <- reactive({
   switch(input$outcomeSumATR, 'Consumer Harm ($)' = "Consumer Harm Measured in Dollars.",
-         'Producer Benefit ($)' = "Producer Benefit Measured in Dollars.",
-         'Net Harm ($)' = "Net Harm Caused to Consumer Measured in Dollars.",
-         'Industry Price Change (%)' = "Industry Price Change Measured as a Percent Change from Pre-Merger Price",
-         'Merging Party Price Change (%)' = "Merging Party Price Change as a Percent Change from Pre-Merger Price")
+                              'Producer Benefit ($)' = "Producer Benefit Measured in Dollars.",
+                              'Net Harm ($)' = "Net Harm Caused to Consumer Measured in Dollars.",
+                              'Industry Price Change (%)' = "Industry Price Change Measured as a Percent Change from Pre-Merger Price",
+                              'Merging Party Price Change (%)' = "Merging Party Price Change as a Percent Change from Pre-Merger Price")
+})
+
+# Tariffs
+output$capSumTariffs <- renderText({
+  captionSumTariffs()
+})
+
+captionSumTariffs <- reactive({
+  switch(input$outcomeSumTariffs, 'Domestic Firm Benefit' = "Domestic Firm Benefit Measured in ?",
+                                  'Domestic Firm Price Change' = "Domestic Firm Price Change Measured in ?",
+                                  'Foreign Firm Harm' = "Foreign Firm Harm Measured in ?",
+                                  'Foreign Firm Price Change' = "Foreign Firm Price Change Measured in ?",
+                                  'Industry Price Change' = "Industry Price Change Measured as a ?Percent Change from Pre-Merger Price?",
+                                  'Consumer Harm' = "Consumer Harm Measured in ?",
+                                  'Net Domestic Harm' = "Net Domestic Harm Measured in ?",
+                                  'Net Total Harm' = "Net Total Harm Measured in ?")
 })
 
 

@@ -682,9 +682,9 @@ navbarPage("", id = "menu",
                                                     # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
                                                     #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
                                                     #                    selected = "Bertrand ces"),
-                                                    selectInput("outcomeSumATR", "Outcomes to Report:",
+                                                    selectInput("outcomeSumATR", "Outcome to Report:",
                                                                 choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                    sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),  # Ask Charles if we should go from step == 10 to step == 5
+                                                    sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),
                                                     fluidRow(
                                                       column(width=12, align = "center",
                                                              tags$div(
@@ -901,39 +901,40 @@ navbarPage("", id = "menu",
                                    tabsetPanel(
                                      tabPanel("Summary",
                                               fluidPage(
-                                                # sidebarLayout(
-                                                #   sidebarPanel(
-                                                #     h5(tags$b("Overview:")),
-                                                #     helpText(tags$ul(
-                                                #       tags$li(htmlOutput('sumNumMergerATR')),
-                                                #       tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
-                                                #                                      "Taragin and Loudermilk (2019)"),"for further details." ))
-                                                #     )
-                                                #     ),
-                                                #     # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                #     #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                #     #                    selected = "Bertrand ces"),
-                                                #     selectInput("outcomeSumATR", "Outcomes to Report:",
-                                                #                 choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                #     sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),  # Ask Charles if we should go from step == 10 to step == 5
-                                                #     fluidRow(
-                                                #       column(width=12, align = "center",
-                                                #              tags$div(
-                                                #                HTML("<font size=\"2\"> Supported by </font>"),
-                                                #                HTML(logo)
-                                                #              )
-                                                #       )
-                                                #     )
-                                                #   ),
-                                                #   mainPanel(
-                                                #     br(),
-                                                #     fillPage(plotOutput('plotSumATR')),
-                                                #     wellPanel(h5(tags$b("Description:")),
-                                                #               textOutput('capSumATR'))
-                                                #
-                                                #   )
-                                                #
-                                                # )
+                                                sidebarLayout(
+                                                  sidebarPanel(
+                                                    h5(tags$b("Overview:")),
+                                                    helpText(tags$ul(
+                                                      tags$li(htmlOutput('sumNumMergerTariffs')),
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                                                     "Taragin and Loudermilk (2019)"),"for further details." ))
+                                                    )
+                                                    ),
+                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
+                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
+                                                    #                    selected = "Bertrand ces"),
+                                                    selectInput("outcomeSumTariffs", "Outcome to Report:",
+                                                                choices = c( "Domestic Firm Benefit", "Domestic Firm Price Change", "Foreign Firm Harm", "Foreign Firm Price Change", "Industry Price Change",
+                                                                             "Consumer Harm", "Net Domestic Harm", "Net Total Harm")),
+                                                    sliderInput("tariffThreshSum", "Restrict Market by Tariff (%):", value = 20, min = 10, max = 30, step = 10),
+                                                    fluidRow(
+                                                      column(width=12, align = "center",
+                                                             tags$div(
+                                                               HTML("<font size=\"2\"> Supported by </font>"),
+                                                               HTML(logo)
+                                                             )
+                                                      )
+                                                    )
+                                                  ),
+                                                  mainPanel(
+                                                    br(),
+                                                    fillPage(plotOutput('plotSumTariffs')),
+                                                    wellPanel(h5(tags$b("Description:")),
+                                                              textOutput('capSumTariffs'))
+
+                                                  )
+
+                                                )
                                               ))), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
 
                                  )
