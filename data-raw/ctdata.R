@@ -121,6 +121,8 @@ else{
 
 }
 
+
+
 sumboxdata <- lapply(seq(.2,.7,.1),calcBoxStatsSum)
 sumboxdata <- do.call("rbind",sumboxdata)
 sumboxmktCnt <-  do.call("rbind",lapply(seq(.2,.7,.1),calcBoxStatsSum,reportN=TRUE))
@@ -131,5 +133,63 @@ ggplot(filter(indicboxdata,Cut_type=="UPP" & Supply == "Pooled" & shareOutThresh
 ggplot(filter(sumboxdata,Outcome=="Consumer Harm ($)" & shareOutThresh == 30),
        aes(x=Model,ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+geom_boxplot(stat = "identity")
 
+load("../moncombert/data/results.RData")
 
-usethis::use_data(sumboxdata, indicboxdata, sumboxmktCnt ,indicboxmktCnt ,overwrite = TRUE)
+## summarize simulation outcomes
+
+
+calcBoxStatsSum_trade <- function(thresh=1,reportN=FALSE){
+
+  if(reportN){
+
+
+    res <-   filter(sumdata ,as.numeric(as.character(tariffPost)) == thresh & !is.na(value) ) %>% select(Supply,Demand,Outcome) %>%
+      group_by(Outcome) %>% summarise(Cnt=n()) %>%
+      mutate(
+        tariffThresh = as.integer(thresh))
+
+  }
+
+  else{
+    res <- filter(sumdata ,as.numeric(as.character(tariffPost))  == thresh & !is.na(value) ) %>% select(Supply,Demand,Outcome,value) %>%
+      group_by(Supply,Demand,Outcome) %>%
+      do(data.frame(bp_stat=c("low_wisk","pct25","pct50","pct75","high_wisk"),
+                    bp_value=boxplot.stats(.$value )$stats)) %>%
+      mutate(
+        Model = interaction(Supply, Demand, sep = ":",drop = TRUE),
+        tariffThresh = as.integer(thresh))%>% spread(key=bp_stat,value=bp_value)
+  }
+
+
+
+}
+sumdata <- ungroup(res_flat) %>% select(supply,demand,
+                                        `Domestic Firm Price Change (%)`,
+                                        `Foreign Firm Price Change (%)`,
+                                        `Industry Price Change (%)`,
+                                        `Consumer Harm ($)`,
+                                        `Domestic Firm Benefit ($)`,
+                                        `Foreign Firm Harm ($)`,
+                                        `Net Domestic Harm ($)`,
+                                        `Net Total Harm ($)`, tariffPost)   %>%
+  rename(Supply=supply, Demand = demand)
+
+
+sumdata <- gather(sumdata, Outcome, value, -Supply, -Demand, -tariffPost,factor_key = TRUE) %>%
+  mutate(#Type=grepl("%",Outcome),Type=factor(Type,labels=c("Welfare","Price")),
+                                             Outcome=gsub("\\s*\\(.\\)","",Outcome,perl=TRUE),
+                                             value=value*100)
+
+sumboxdata_trade <- lapply(seq(10,30,10),calcBoxStatsSum_trade)
+sumboxdata_trade <- do.call("rbind",sumboxdata_trade)
+sumboxmktCnt_trade <-  do.call("rbind",lapply(seq(10,30,10),calcBoxStatsSum_trade,reportN=TRUE))
+
+sumboxdata_trade$Model <- with(sumboxdata_trade,reorder(Model,
+                                                        ifelse(Outcome=="Consumer Harm",-pct50,NA),min,na.rm=TRUE))
+
+ggplot(filter(sumboxdata_trade,Outcome=="Consumer Harm" & tariffThresh == 30),
+       aes(x=Model,ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+geom_boxplot(stat = "identity")
+
+
+usethis::use_data(sumboxdata, sumboxdata_trade,indicboxdata, sumboxmktCnt ,sumboxmktCnt_trade,indicboxmktCnt ,overwrite = TRUE)
+
