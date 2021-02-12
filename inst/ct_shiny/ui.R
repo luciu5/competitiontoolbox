@@ -13,7 +13,7 @@ logo <- HTML(paste(tags$a(href=logoURL, tags$img(src= logoSrc,alt= logoAlt,style
 navbarPage("", id = "menu",
                    tabPanel("Introduction",
                             fluidPage(
-                              titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
+                              titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App"))),
                               h3("Overview"),
                               p("The", tags$a(href="https://cran.r-project.org/web/packages/competitiontoolbox/index.html", "competitiontoolbox"), "RShiny application is a browser-based user interface for functionality embedded in the ", tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust"), "and",
                                 tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade"), "R packages. It allows users to "),
