@@ -19,11 +19,11 @@ output$plotSumATR <- renderPlot({
 output$plotSumTariffs <- renderPlot({
 
   if(grepl("%", input$outcomeSumTariffs)) ylimSumTariffs <- c(0,50)
-  else{ylimSumTariffs <- c(0,350)}
+  else{ylimSumTariffs <- c(0,350)}  # Set scale appropriately by inspection. However, some axes seem way off, so Charles will investigate more prior to making this change...
 
   ggplot(data = subset(sumboxdata_trade, Outcome == input$outcomeSumTariffs & tariffThresh == input$tariffThreshSum), aes(x=Model, ymin=low_wisk,lower=pct25,middle=pct50,upper=pct75,ymax=high_wisk))+
     geom_boxplot(stat = "identity", lwd = 0.75, fatten = 1) +
-    coord_cartesian(ylim = ylimSumTariffs)+
+    #coord_cartesian(ylim = ylimSumTariffs)+
     theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.title = element_text(size = 13), axis.text.x = element_text(angle = 45, hjust = 1, size = 11, face = "bold")) +
     ylab(input$outcomeSumTariffs) +
     ggtitle(paste0(input$outcomeSumTariffs, ", Tariffs Less Than ", input$tariffThreshSum, "%"))
@@ -42,7 +42,8 @@ output$plotIndATR <- renderPlot({
     xlab(input$indexIndATR) + ylab("Industry Price Change (%)") +
     theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), axis.text.y = element_text(size=11), axis.title = element_text(size=13), axis.text.x = element_text(angle = 45,hjust = 1, size = 12)) +
     geom_hline(yintercept=0, col = "#d95f02",linetype = "dashed") +
-    geom_hline(yintercept=c(1,5,10),linetype="dashed") +
+    geom_hline(yintercept=c(1,5,10), linetype="dashed") +
+    scale_y_continuous(breaks = c(seq(from=0, to=30, by=10), 1, 5, 10)) +
     ggtitle(paste0(input$indexIndATR,", Outside Share Less Than ",input$shareOutIndATR, "% (", input$pooledIndATR,")"))
 
   plot(plotInd)
