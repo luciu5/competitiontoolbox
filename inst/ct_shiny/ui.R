@@ -15,8 +15,9 @@ navbarPage("", id = "menu",
                             fluidPage(
                               titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
                               h3("Overview"),
-                              p("The", tags$a(href="https://cran.r-project.org/web/packages/competitiontoolbox/index.html", "competitiontoolbox"), "RShiny application is a browser-based user interface for functionality embedded in the ", tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust"), "and",
-                                tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade"), "R packages. It allows users to "),
+                              p("The", tags$a(href="https://cran.r-project.org/web/packages/competitiontoolbox/index.html", "competitiontoolbox", target = '_blank'), "RShiny application is a browser-based user interface for functionality embedded in the ",
+                                tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust", target = '_blank'), "and",
+                                tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade", target = '_blank'), "R packages. It allows users to "),
                               HTML("<ul>
                                      <li>simulate mergers, tariffs, and quotas under various specifications and market conditions,</li>
                                      <li>numerically simulate horizontal and vertical mergers,</li>
@@ -26,8 +27,9 @@ navbarPage("", id = "menu",
                                 the assumed competitive environment and market demand system. Users may also edit market conditions listed in the Inputs tables such as firm prices, margins,
                                 and shares. Both horizontal and supply chain mergers are available for simulation, including upstream, downstream, and vertical
                                 mergers. Example inputs for each type of simulation are provided to users by default in the Inputs table."),
-                              p("To better understand the types of predictions that these models make, users may also view the distribution of outcomes from thousands of numerical simulations. See", tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)"),
-                                "and", tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining", "Sheu and Taragin (2020)"), "for more details."),
+                              p("To better understand the types of predictions that these models make, users may also view the distribution of outcomes from thousands of numerical simulations. See",
+                                tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)", target = '_blank'),
+                                "and", tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining", "Sheu and Taragin (2020)", target = '_blank'), "for more details."),
 
                               hr(),
                               h3("Get Started"),
@@ -342,8 +344,8 @@ navbarPage("", id = "menu",
                                     ),
 
 
-                              tabPanel("Documentation",
-                                       fluidPage(htmlOutput("referenceATR"))
+                              tabPanel(tags$a(href="https://cran.r-project.org/web/packages/antitrust/vignettes/Reference.html", "Documentation", target = '_blank'),
+                                       #fluidPage(htmlOutput("referenceATR"))
                               )
 
                    ),
@@ -655,8 +657,8 @@ navbarPage("", id = "menu",
                                         )
 
                               )
-                              ,tabPanel("Documentation",
-                                        fluidPage(htmlOutput("referenceTrade"))
+                              ,tabPanel(tags$a(href="https://cran.r-project.org/web/packages/trade/vignettes/Reference.html", "Documentation", target = '_blank'),
+                                        #fluidPage(htmlOutput("referenceTrade"))
                               )
                    ),
 
@@ -949,9 +951,11 @@ navbarPage("", id = "menu",
                       h3("Additional Research"),
                       #p("Other researchers have developed their own merger simulation interfaces, which may provide context for or supplement some of the features available in this app."),
                       #hr(),
-                      p("Luke Froeb and Steven Tschantz (Vanderbilt University) have developed a ",  tags$a(href="https://daag.shinyapps.io/b1x2", "vertical merger simulator app"), " that allows users to compare simulated vertical merger effects across different barganining models,
+                      p("Luke Froeb and Steven Tschantz (Vanderbilt University) have developed a ",  tags$a(href="https://daag.shinyapps.io/b1x2", "vertical merger simulator app", target = '_blank'),
+                      " that allows users to compare simulated vertical merger effects across different barganining models,
                         including Nash-in-Nash two-part pricing and various models of derived demand. The app allows for a competitive landscape consisting of either one upstream firm and two downstream firms, or vice-versa."),
-                      p("This vertical simulator accompanies ", tags$a(href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3760634", "Boshoff, Froeb, Minnie, and Tschantz (2020)", .noWS = "outside"), ", which provides theoretical frameworks for the various models included in the simulator.")
+                      p("This vertical simulator accompanies ", tags$a(href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3760634", "Boshoff, Froeb, Minnie, and Tschantz (2020)", target = '_blank', .noWS = "outside"),
+                        ", which provides theoretical frameworks for the various models included in the simulator.")
                       ),
                     hr(),
                     fluidRow(
