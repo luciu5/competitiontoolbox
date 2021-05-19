@@ -97,8 +97,8 @@ shinyServer(function(input, output, session) {
     source(paste0(getwd(), "/Diagnostics/isOverID.R"), local = TRUE)
 
     ## Template Code
-    source(paste0(getwd(), "/R Code/mergersTemplateCode.R"), local = TRUE)
-    source(paste0(getwd(), "/R Code/tradeTemplateCode.R"), local = TRUE)
+    source(paste0(getwd(), "/R/mergersTemplateCode.R"), local = TRUE)
+    source(paste0(getwd(), "/R/tradeTemplateCode.R"), local = TRUE)
 
 
     ## Create a series of reactive values
