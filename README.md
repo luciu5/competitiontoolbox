@@ -26,6 +26,8 @@ ct_shiny()
 ```
 This will open the `competitiontoolbox` web interface and the user will be greeted by the **Introduction** tab. Users may proceed to the **Mergers**, **Trade**, **Numerical Simulations**, or **Other Resources** tabs. All tabs are self-contained and provide directions on how to proceed.
 
+A public instance of the `competitiontoolbox` web interface is located [here](https://daag.shinyapps.io/ct_shiny/).
+
 ## Dependencies
 `antitrust`<br>
 `trade`
