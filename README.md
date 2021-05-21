@@ -30,4 +30,6 @@ A public instance of the `competitiontoolbox` web interface is located [here](ht
 
 ## Dependencies
 `antitrust`<br>
-`trade`
+`trade`<br>
+`shiny`<br>
+`rhandsontable`
