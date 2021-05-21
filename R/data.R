@@ -18,7 +18,7 @@
 #'   \item{pct50}{50th percentile boxplot line}
 #'   \item{pct75}{75th percentile boxplot line}
 #' }
-#' @references \href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
+#' @references \href{https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 "indicboxdata"
 
 
@@ -34,7 +34,7 @@
 #'   \item{Cnt}{number of horizontal merger simulations (25,890 -- 184,254)}
 #'   \item{shareOutThresh}{outside share threshold in percent (20--70)}
 #' }
-#' @references \href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
+#' @references \href{https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 "indicboxmktCnt"
 
 
@@ -57,7 +57,7 @@
 #'   \item{pct75}{75th percentile boxplot line}
 #'   \item{shareOutThresh}{outside share threshold in percent (20--70) }
 #' }
-#' @references \href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
+#' @references \href{https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 "sumboxdata"
 
 
@@ -72,7 +72,7 @@
 #'   \item{Cnt}{number of horizontal merger simulations}
 #'   \item{shareOutThresh}{outside share threshold in percent (20--70)}
 #' }
-#' @references \href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
+#' @references \href{https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 "sumboxmktCnt"
 
 
@@ -95,7 +95,7 @@
 #'   \item{pct75}{75th percentile boxplot line}
 #'   \item{tariffThresh}{tariff threshold in percent (10--30)}
 #' }
-#' @references \href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
+#' @references \href{https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 "sumboxdata_trade"
 
 
@@ -110,5 +110,5 @@
 #'   \item{Cnt}{number of tariffs simulated}
 #'   \item{tariffThresh}{tariff threshold in percent (10--30)}
 #' }
-#' @references \href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
+#' @references \href{https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 "sumboxmktCnt_trade"

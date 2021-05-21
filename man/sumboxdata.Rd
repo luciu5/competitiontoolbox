@@ -3,9 +3,9 @@
 \docType{data}
 \name{sumboxdata}
 \alias{sumboxdata}
-\title{Box Plot Statistics for "Summary" Tab}
+\title{Box Plot Statistics for "Summary" Tab for Horizontal Mergers}
 \format{
-A data frame with 180 rows and 10 variables
+A data frame with 210 rows and 10 variables
 \describe{
   \item{Demand}{log, logit, aids, ces, linear}
   \item{Model}{cournot:log, cournot: linear, bertrand:aids, bertrand:logit, bertrand:ces, auction:logit}
@@ -28,6 +28,6 @@ and percent of outside share for horizontal mergers so as to examine the
 distribution of outcomes.
 }
 \references{
-\href{https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
+\href{https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
 }
 \keyword{datasets}

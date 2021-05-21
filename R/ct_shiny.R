@@ -4,7 +4,9 @@
 #'
 #' Launch a shiny interface to simulate the effects of tariffs and mergers
 #'
-#' @import antitrust trade shiny rhandsontable
+#' @rawNamespace import(antitrust, except = sim)
+#' @rawNamespace import(trade, except = sim)
+#' @import shiny rhandsontable
 #' @details
 #'
 #' \code{ct_shiny} launches a shiny interface for the \code{antitrust} and \code{trade} packages.

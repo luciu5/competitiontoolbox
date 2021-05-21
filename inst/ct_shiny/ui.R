@@ -4,7 +4,7 @@ require(competitiontoolbox)
 require(ggplot2)
 
 ## Sponsor Footer for Shiny Interface
-logoURL <- "https://cran.r-project.org/web/packages/antitrust/index.html"
+logoURL <- " https://CRAN.R-project.org/package=antitrust"
 logoSrc <- "logo.png"
 logoAlt <- "Insert Logo Here"
 logo <- HTML(paste(tags$a(href=logoURL, tags$img(src= logoSrc,alt= logoAlt,style='height:40px'))))
@@ -15,9 +15,9 @@ navbarPage("", id = "menu",
                             fluidPage(
                               titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
                               h3("Overview"),
-                              p("The", tags$a(href="https://cran.r-project.org/web/packages/competitiontoolbox/index.html", "competitiontoolbox", target = '_blank'), "RShiny application is a browser-based user interface for functionality embedded in the ",
-                                tags$a(href="https://cran.r-project.org/web/packages/antitrust/index.html", "antitrust", target = '_blank'), "and",
-                                tags$a(href="https://cran.r-project.org/web/packages/trade/index.html", "trade", target = '_blank'), "R packages. It allows users to "),
+                              p("The", tags$a(href="https://CRAN.R-project.org/package=competitiontoolbox", "competitiontoolbox", target = '_blank'), "RShiny application is a browser-based user interface for functionality embedded in the ",
+                                tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust", target = '_blank'), "and",
+                                tags$a(href="https://CRAN.R-project.org/package=antitrust", "trade", target = '_blank'), "R packages. It allows users to "),
                               HTML("<ul>
                                      <li>simulate mergers, tariffs, and quotas under various specifications and market conditions,</li>
                                      <li>numerically simulate horizontal and vertical mergers,</li>
@@ -28,7 +28,7 @@ navbarPage("", id = "menu",
                                 and shares. Both horizontal and supply chain mergers are available for simulation, including upstream, downstream, and vertical
                                 mergers. Example inputs for each type of simulation are provided to users by default in the Inputs table."),
                               p("To better understand the types of predictions that these models make, users may also view the distribution of outcomes from thousands of numerical simulations. See",
-                                tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)", target = '_blank'),
+                                tags$a(href="https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)", target = '_blank'),
                                 "and", tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining", "Sheu and Taragin (2020)", target = '_blank'), "for more details."),
 
                               hr(),
@@ -677,7 +677,7 @@ navbarPage("", id = "menu",
                                                     h5(tags$b("Overview:")),
                                                     helpText(tags$ul(
                                                       tags$li(htmlOutput('sumNumMergerATR')),
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers",
                                                                                      "Taragin and Loudermilk (2019)"),"for further details." ))
                                                     )
                                                     ),
@@ -713,7 +713,7 @@ navbarPage("", id = "menu",
                                                     h5(tags$b("Overview:")),
                                                     helpText(tags$ul(
                                                       tags$li(htmlOutput('indicNumMergerATR')),
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers",
                                                                                      "Taragin and Loudermilk (2019)"),"for further details." ))
                                                     )
                                                     ),
@@ -908,7 +908,7 @@ navbarPage("", id = "menu",
                                                     h5(tags$b("Overview:")),
                                                     helpText(tags$ul(
                                                       tags$li(htmlOutput('sumNumMergerTariffs')),
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_concentration_measures_for_optimal_screening_of_horizontal_mergers",
+                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers",
                                                                                      "Taragin and Loudermilk (2019)"),"for further details." ))
                                                     )
                                                     ),
