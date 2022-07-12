@@ -3,6 +3,9 @@
 `competitiontoolbox` is an R package that runs the <em>competitiontoolbox</em> RShiny web application, which is a browser-based user interface for functionality embedded in the [antitrust](https://github.com/cran/antitrust) and [trade](https://github.com/cran/trade) R packages.
 <br>
 <br>
+An accessible public instance of the `competitiontoolbox` web interface is located [**here**](https://daag.shinyapps.io/ct_shiny/).
+<br>
+<br>
 
 ## Why `competitiontoolbox`?
 
@@ -25,8 +28,6 @@ library(competitiontoolbox)
 ct_shiny()
 ```
 This will open the `competitiontoolbox` web interface and the user will be greeted by the **Introduction** tab. Users may proceed to the **Mergers**, **Trade**, **Numerical Simulations**, or **Other Resources** tabs. All tabs are self-contained and provide directions on how to proceed.
-
-A public instance of the `competitiontoolbox` web interface is located [here](https://daag.shinyapps.io/ct_shiny/).
 
 ## Dependencies
 `antitrust`<br>
