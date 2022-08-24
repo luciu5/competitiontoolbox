@@ -1,4 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^data-raw$
+^README\.md$
 ^CRAN-RELEASE$
+^cran-comments\.md$

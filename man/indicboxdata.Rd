@@ -28,6 +28,6 @@ and percent of outside share for horizontal mergers. This allows for examination
 relationship between industry price changes and commonly used merger indices.
 }
 \references{
-\href{https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers}{Taragin and Loudermilk 2019}
+Taragin, C., & Loudermilk, M. (2019). Using measures of competitive harm for optimal screening of horizontal mergers. mimeo.\doi{10.13140/RG.2.2.30872.85760/1}.
 }
 \keyword{datasets}

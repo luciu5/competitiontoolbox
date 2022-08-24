@@ -1,7 +1,7 @@
 Package: competitiontoolbox
 Type: Package
 Title: A Graphical User Interface for Antitrust and Trade Practitioners
-Version: 0.7.0
+Version: 0.7.1
 Authors@R: c(person("Charles", "Taragin", email = "ctaragin+competitiontoolbox@gmail.com",
                   role = c("aut", "cre")),
              person("Kenneth", "Rios", email = "krios@ftc.gov",
