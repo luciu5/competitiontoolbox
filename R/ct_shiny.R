@@ -43,6 +43,7 @@ ct_shiny <- function() {
 
 
 trade_shiny <- function() {
+  cruft <- ggplot2::is.ggplot(NA)
   ct_shiny()
 }
 

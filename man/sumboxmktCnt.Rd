@@ -7,7 +7,7 @@
 \format{
 A data frame with 30 rows and 3 variables
 \describe{
-  \item{Outcome}{post-Merger indice of interest (Industry Price Change (\%), Merging Party Price Change (\%), Consumer Harm (\$), Producer Benefit (\$), Net Harm (\$)}
+  \item{Outcome}{post-Merger indice of interest (Industry Price Change (percent), Merging Party Price Change (percent), Consumer Harm (dollars), Producer Benefit (dollars), Net Harm (dollars)}
   \item{Cnt}{number of horizontal merger simulations}
   \item{shareOutThresh}{outside share threshold in percent (20--70)}
 }
