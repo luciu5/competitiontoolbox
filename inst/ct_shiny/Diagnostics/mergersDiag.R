@@ -2,8 +2,8 @@
 mergersDiag <- function(res, mktElast = FALSE){
   #a function to generate diagnostic data
 
-  # isCournot <- grepl("Cournot", class(res))
-  # isVertical <- grepl("Vert", class(res))
+  # isCournot <- model_is_cournot(res)
+  # isVertical <- model_is_vertical(res)
   #
   # if(isCournot){labels = res@labels[[1]]}
   # else if(isVertical){labels = res@down@labels}
@@ -23,7 +23,7 @@ mergersDiag <- function(res, mktElast = FALSE){
   # preElast <- elast(res, preMerger=TRUE, market=TRUE)
 
   diagnosticData <- calcDiagnostics(res)
-  isVertical <- grepl("Vert", class(res))
+  isVertical <- model_is_vertical(res)
 
   if (!mktElast) {
 

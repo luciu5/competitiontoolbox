@@ -13,6 +13,7 @@ Author: Charles Taragin [aut, cre], Kenneth Rios [aut], Paulette Wolak [aut]
 Maintainer: Charles Taragin <ctaragin+competitiontoolbox@gmail.com>
 Depends: R (>= 2.10), antitrust (>= 0.99.32), trade (>= 0.8.3), shiny, rhandsontable
 Imports: bslib, ggplot2
+Suggests: testthat
 Description: A graphical user interface for simulating the effects of mergers, tariffs, and quotas under an
              assortment of different economic models. The interface is powered by the 'Shiny' web application framework from 
              'RStudio'.

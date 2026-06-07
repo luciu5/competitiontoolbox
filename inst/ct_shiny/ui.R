@@ -2,6 +2,8 @@
 require(competitiontoolbox)
 require(ggplot2)
 
+source(file.path(getwd(), "R/modelRegistry.R"))
+
 ## Sponsor footer for Shiny interface
 logoURL <- "https://CRAN.R-project.org/package=antitrust"
 logoSrc <- "logo.png"
@@ -361,30 +363,30 @@ horizontal_merger_page <- function() {
       radioButtons("supply", "Competitive Interaction:", choices = c("Bertrand", "2nd Score Auction", "Cournot")),
       conditionalPanel(
         condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == true",
-        selectInput("demand1", "Demand Specification:", choices = c("logit", "ces", "aids"))
+        selectInput("demand1", "Demand Specification:", choices = model_demand_choices("Horizontal", "Bertrand", TRUE))
       ),
       conditionalPanel(
         condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == false",
-        selectInput("demand2", "Demand Specification:", choices = c("logit (unknown elasticity)", "ces (unknown elasticity)", "aids (unknown elasticity)"))
+        selectInput("demand2", "Demand Specification:", choices = model_demand_choices("Horizontal", "Bertrand", FALSE))
       ),
       conditionalPanel(
         condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == true",
-        selectInput("demand3", "Demand Specification:", choices = "logit"),
+        selectInput("demand3", "Demand Specification:", choices = model_demand_choices("Horizontal", "2nd Score Auction", TRUE)),
         helpText(tags$b("Note:"), "2nd Score Auction only requires a single price.")
       ),
       conditionalPanel(
         condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == false",
-        selectInput("demand4", "Demand Specification:", choices = "logit (unknown elasticity)"),
+        selectInput("demand4", "Demand Specification:", choices = model_demand_choices("Horizontal", "2nd Score Auction", FALSE)),
         helpText(tags$b("Note:"), "2nd Score Auction does not require prices.")
       ),
       conditionalPanel(
         condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == true",
-        selectInput("demand5", "Demand Specification:", choices = c("logit", "linear", "loglinear")),
+        selectInput("demand5", "Demand Specification:", choices = model_demand_choices("Horizontal", "Cournot", TRUE)),
         helpText(tags$b("Note:"), "Linear and loglinear Cournot use only the first non-missing inputted price and product name.")
       ),
       conditionalPanel(
         condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == false",
-        selectInput("demand6", "Demand Specification:", choices = c("logit (unknown elasticity)", "linear (unknown elasticity)", "loglinear (unknown elasticity)")),
+        selectInput("demand6", "Demand Specification:", choices = model_demand_choices("Horizontal", "Cournot", FALSE)),
         helpText(tags$b("Note:"), "Linear and loglinear Cournot use only the first non-missing inputted price and product name.")
       ),
       conditionalPanel(
@@ -420,12 +422,12 @@ vertical_merger_page <- function() {
       radioButtons("supplyVertical", "Competitive Interaction:", choices = c("Bertrand", "2nd Score Auction")),
       conditionalPanel(
         condition = "input.supplyVertical == 'Bertrand'",
-        selectInput("demandVertical1", "Downstream Demand Specification:", choices = c("logit")),
+        selectInput("demandVertical1", "Downstream Demand Specification:", choices = model_demand_choices("Vertical", "Bertrand", TRUE)),
         helpText(tags$b("Note:"), "Share of outside good implied by the sum of inside product shares. Price of outside good fixed at 0.")
       ),
       conditionalPanel(
         condition = "input.supplyVertical == '2nd Score Auction'",
-        selectInput("demandVertical2", "Downstream Demand Specification:", choices = c("logit")),
+        selectInput("demandVertical2", "Downstream Demand Specification:", choices = model_demand_choices("Vertical", "2nd Score Auction", TRUE)),
         helpText(tags$b("Note:"), "Share of outside good implied by the sum of inside product shares. Price of outside good fixed at 0.")
       )
     ),
@@ -459,29 +461,29 @@ tariffs_page <- function() {
       radioButtons("supplyTariffs", "Competitive Interaction:", choices = c("Bertrand", "Monopolistic Competition", "Cournot")),
       conditionalPanel(
         condition = "input.supplyTariffs == 'Bertrand' & input.calcElastTariffs.includes('elasticity') == true",
-        selectInput("demandTariffs1", "Demand Specification:", choices = c("logit", "ces", "aids"))
+        selectInput("demandTariffs1", "Demand Specification:", choices = model_demand_choices("Tariffs", "Bertrand", TRUE))
       ),
       conditionalPanel(
         condition = "input.supplyTariffs == 'Bertrand' & input.calcElastTariffs.includes('elasticity') == false",
-        selectInput("demandTariffs2", "Demand Specification:", choices = c("logit (unknown elasticity)", "ces (unknown elasticity)", "aids (unknown elasticity)"))
+        selectInput("demandTariffs2", "Demand Specification:", choices = model_demand_choices("Tariffs", "Bertrand", FALSE))
       ),
       conditionalPanel(
         condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == true",
-        selectInput("demandTariffs3", "Demand Specification:", choices = c("logit", "linear", "loglinear")),
+        selectInput("demandTariffs3", "Demand Specification:", choices = model_demand_choices("Tariffs", "Cournot", TRUE)),
         helpText(tags$b("Note:"), "Linear and loglinear Cournot use only the first non-missing inputted price and product name.")
       ),
       conditionalPanel(
         condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == false",
-        selectInput("demandTariffs4", "Demand Specification:", choices = c("logit (unknown elasticity)", "linear (unknown elasticity)", "loglinear (unknown elasticity)")),
+        selectInput("demandTariffs4", "Demand Specification:", choices = model_demand_choices("Tariffs", "Cournot", FALSE)),
         helpText(tags$b("Note:"), "Linear and loglinear Cournot use only the first non-missing inputted price and product name.")
       ),
       conditionalPanel(
         condition = "input.supplyTariffs == 'Monopolistic Competition' & input.calcElastTariffs.includes('elasticity') == true",
-        selectInput("demandTariffs5", "Demand Specification:", choices = c("logit", "ces"))
+        selectInput("demandTariffs5", "Demand Specification:", choices = model_demand_choices("Tariffs", "Monopolistic Competition", TRUE))
       ),
       conditionalPanel(
         condition = "input.supplyTariffs == 'Monopolistic Competition' & input.calcElastTariffs.includes('elasticity') == false",
-        selectInput("demandTariffs6", "Demand Specification:", choices = c("logit (unknown elasticity)", "ces (unknown elasticity)"))
+        selectInput("demandTariffs6", "Demand Specification:", choices = model_demand_choices("Tariffs", "Monopolistic Competition", FALSE))
       ),
       conditionalPanel(
         condition = "input.supplyTariffs == 'Bertrand' && input.calcElastTariffs.includes('elasticity') == true && input.demandTariffs1 == 'aids'",
@@ -522,11 +524,11 @@ quotas_page <- function() {
       radioButtons("supplyQuota", "Competitive Interaction:", choices = c("Bertrand")),
       conditionalPanel(
         condition = "input.supplyQuota == 'Bertrand' & input.calcElastQuota.includes('elasticity') == true",
-        selectInput("demandQuota1", "Demand Specification:", choices = c("logit"))
+        selectInput("demandQuota1", "Demand Specification:", choices = model_demand_choices("Quotas", "Bertrand", TRUE))
       ),
       conditionalPanel(
         condition = "input.supplyQuota == 'Bertrand' & input.calcElastQuota.includes('elasticity') == false",
-        selectInput("demandQuota2", "Demand Specification:", choices = c("logit (unknown elasticity)"))
+        selectInput("demandQuota2", "Demand Specification:", choices = model_demand_choices("Quotas", "Bertrand", FALSE))
       )
     ),
     rHandsontableOutput("hotQuota"),

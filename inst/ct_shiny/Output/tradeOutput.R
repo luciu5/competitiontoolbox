@@ -18,7 +18,7 @@ output$hotTariffs <- renderRHandsontable({
   if(missPrices && input$supplyTariffs =="2nd Score Auction"){colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n ($/unit)"}
   else{colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n (p-c)/p"}
 
-  if (missPrices && any(grepl("ces|aids", demand(), perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
+  if (missPrices && model_demand_id(demand()) %in% c("ces", "aids")){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
   else{{colnames(inputData)[grepl("Revenues",colnames(inputData))] <- "Quantities"}}
 
   if (!is.null(inputData))
@@ -44,7 +44,7 @@ output$hotQuota <- renderRHandsontable({
   if(missPrices && input$supplyQuota =="2nd Score Auction"){colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n ($/unit)"}
   else{colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n (p-c)/p"}
 
-  if (missPrices && any(grepl("ces|aids", demand(), perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
+  if (missPrices && model_demand_id(demand()) %in% c("ces", "aids")){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
   else{{colnames(inputData)[grepl("Revenues",colnames(inputData))] <- "Quantities"}}
 
   if (!is.null(inputData))
@@ -165,16 +165,14 @@ output$results_elastTariffs <- renderTable({
 
   if(input$inTabsetTariffs!= "elastpanelTariffs" || input$simulateTariffs == 0 || is.null(valuesTariffs[["sim"]])){return()}
 
-  isCournot <- grepl("Cournot",class(valuesTariffs[["sim"]]))
-
   if(input$pre_elastTariffs == "Current Tariff"){preMerger = TRUE}
   else{preMerger = FALSE}
 
-  if(!isCournot && input$diversionsTariffs){
+  if(model_supports_diversion(valuesTariffs[["sim"]]) && input$diversionsTariffs){
     res <- diversion(valuesTariffs[["sim"]], preMerger=preMerger)
   }
   else{  res <- elast(valuesTariffs[["sim"]], preMerger=preMerger)}
-  if(isCournot && ncol(res) == 1){colnames(res) <- "Elasticity"}
+  res <- format_elasticity_table(res, valuesTariffs[["sim"]])
 
   res
 
@@ -185,16 +183,14 @@ output$results_elastQuota <- renderTable({
 
   if(input$inTabsetQuota != "elastpanelQuota" || input$simulateQuota == 0 || is.null(valuesQuota[["sim"]])){return()}
 
-  isCournot <- grepl("Cournot",class(valuesQuota[["sim"]]))
-
   if(input$pre_elastQuota == "Current Quota"){ preMerger = TRUE}
   else{preMerger =FALSE}
 
-  if(!isCournot && input$diversionsQuota){
+  if(model_supports_diversion(valuesQuota[["sim"]]) && input$diversionsQuota){
     res <- diversion(valuesQuota[["sim"]], preMerger=preMerger)
   }
   else{  res <- elast(valuesQuota[["sim"]], preMerger=preMerger)}
-  if(isCournot && ncol(res) == 1){colnames(res) <- "Elasticity"}
+  res <- format_elasticity_table(res, valuesQuota[["sim"]])
 
   res
 

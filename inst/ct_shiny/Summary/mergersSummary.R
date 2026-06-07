@@ -2,10 +2,9 @@
 mergersSummary <- function(res){
   #a function to generate summary stats for results tab
 
-  isCournot <- grepl("Cournot",class(res))
-  isAuction <- grepl("Auction",class(res))
-  isRevDemand <- grepl("ces|aids",class(res),ignore.case = TRUE)
-  isLogit <- grepl("logit",class(res),ignore.case = TRUE)
+  isCournot <- model_is_cournot(res)
+  isAuction <- model_is_auction(res)
+  isRevDemand <- model_uses_revenue_shares(res)
 
   missPrices <- any(is.na(res@prices))
 
@@ -17,7 +16,7 @@ mergersSummary <- function(res){
 
     capture.output(s <- summary(res, market = FALSE))
 
-    if ("quantities" %in% slotNames(res)) {
+    if (model_has_quantities(res)) {
       theseshares <- drop(res@quantities / sum(res@quantities))
       # Fixed HHI share calculations for Cournot results
       totQuantPost <- sum(s$quantityPost, na.rm = TRUE)

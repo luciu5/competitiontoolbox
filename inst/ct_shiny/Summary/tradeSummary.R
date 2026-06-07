@@ -4,10 +4,9 @@ tradeSummary <- function(res, indata,type = c("Tariffs", "Quotas")){
 
   type=match.arg(type)
 
-  isCournot <- grepl("Cournot",class(res))
-  isAuction <- grepl("Auction",class(res))
-  isRevDemand <- grepl("ces|aids",class(res),ignore.case = TRUE)
-  isLogit <- grepl("logit",class(res),ignore.case = TRUE)
+  isCournot <- model_is_cournot(res)
+  isAuction <- model_is_auction(res)
+  isRevDemand <- model_uses_revenue_shares(res)
 
   missPrices <- any(is.na(res@prices))
 

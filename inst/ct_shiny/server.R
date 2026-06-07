@@ -73,6 +73,9 @@ shinyServer(function(input, output, session) {
 
 
     ##### Source Mergers and Trade functions #####
+    ## Model registry
+    source(paste0(getwd(), "/R/modelRegistry.R"), local = TRUE)
+
     ## Inputs
     source(paste0(getwd(), "/Inputs/mergersInputs.R"), local = TRUE)
     source(paste0(getwd(), "/Inputs/tradeInputs.R"), local = TRUE)

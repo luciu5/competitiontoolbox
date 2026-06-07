@@ -31,6 +31,8 @@ mergersTemplateCode <- function(type){
 
     if(!is.null(demand()) & !is.null(supply())){
 
+      spec <- model_spec("Horizontal", supply(), demand())
+
       if(grepl("logit", demand(), ignore.case = TRUE)){
         thisSize <- "sum(simdata$`Quantities`)"
       }
@@ -43,7 +45,7 @@ mergersTemplateCode <- function(type){
         thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
       }
 
-      thisdemand <- gsub("\\s*\\(.*","", demand() ,perl=TRUE)
+      thisdemand <- spec$demand_id
 
       argvalues[1] <- paste(c("demand = ", shQuote(thisdemand)), collapse = "")
 
@@ -54,13 +56,13 @@ mergersTemplateCode <- function(type){
       )
 
 
-      if(supply() == "Cournot"){
-        if(grepl("logit", demand(), ignore.case = TRUE)){
-          atrfun <- "logit.cournot.alm"
+      if(spec$supply == "Cournot"){
+        if(spec$demand_id == "logit"){
+          atrfun <- spec$simulation_fn
           argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
           argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum(simdata$`Quantities`)"
         } else {
-          atrfun <- "cournot"
+          atrfun <- spec$simulation_fn
           if(thisdemand == "loglinear"){argvalues[grep("^demand\\s*=", argvalues)] <- "demand = 'log'"}
           argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
           argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
@@ -70,13 +72,13 @@ mergersTemplateCode <- function(type){
           #argvalues[grep("insideSize", argvalues)] <- NULL
         }
       }
-      else if(supply() =="Bertrand"){
-        if(grepl("logit", demand(), ignore.case = TRUE)){
-          atrfun <- "logit.alm"
+      else if(spec$supply =="Bertrand"){
+        if(spec$demand_id == "logit"){
+          atrfun <- spec$simulation_fn
           argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
           argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum(simdata$`Quantities`)"
-        } else if(grepl("ces", demand(), ignore.case = TRUE)){
-          atrfun <- "ces.alm"
+        } else if(spec$demand_id == "ces"){
+          atrfun <- spec$simulation_fn
           argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
           argvalues[grep("quantities", argvalues)] <- paste0(
             "shares = simdata$`", grep("price", cnames, ignore.case = TRUE, value = TRUE),
@@ -84,8 +86,8 @@ mergersTemplateCode <- function(type){
             grep("price", cnames, ignore.case = TRUE, value = TRUE),
             "` * simdata$`Quantities`)"
           )
-        } else if(grepl("aids", demand(), ignore.case = TRUE)){
-          atrfun <- "aids"
+        } else if(spec$demand_id == "aids"){
+          atrfun <- spec$simulation_fn
           argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
           argvalues[grep("quantities", argvalues)] <- paste0(
             "shares = simdata$`", grep("price", cnames, ignore.case = TRUE, value = TRUE),
@@ -98,7 +100,7 @@ mergersTemplateCode <- function(type){
         }
       }
 
-      else{atrfun <- "auction2nd.logit.alm"
+      else{atrfun <- spec$simulation_fn
       argvalues <- argvalues[-1]
       argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum( simdata$`Quantities` ) "
       argvalues[grep("margins", argvalues)] <- paste0("margins = simdata$`",
@@ -173,9 +175,11 @@ mergersTemplateCode <- function(type){
 
     if(!is.null(demand()) & !is.null(supply())){
 
-      if (supply() == "Bertrand") {
+      spec <- model_spec("Vertical", supply(), demand())
+
+      if (spec$supply == "Bertrand") {
         argvalues[1] <- "supplyDown = 'bertrand'"
-      } else if (supply() == "2nd Score Auction") {
+      } else if (spec$supply == "2nd Score Auction") {
         argvalues[1] <- "supplyDown = '2nd'"
       }
 
@@ -220,7 +224,7 @@ mergersTemplateCode <- function(type){
       #                                                 "` * ", "simdata$`", grep("Price", cnames, value=TRUE),"`")
       # }
 
-      atrfun <- paste0("simres_vert <- vertical.barg","(\n\t",paste0(argvalues,collapse = ",\n\t"),")",collapse = "\n")
+      atrfun <- paste0("simres_vert <- ", spec$simulation_fn, "(\n\t",paste0(argvalues,collapse = ",\n\t"),")",collapse = "\n")
 
       cnames <- colnames(indata)
       cnames <- gsub("\n","",cnames)

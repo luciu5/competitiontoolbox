@@ -16,7 +16,7 @@ output$hot <- renderRHandsontable({
   if(missPrices && input$supply == "2nd Score Auction"){colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n ($/unit)"}
   else{colnames(inputData)[grepl("Margins",colnames(inputData))] <- "Margins\n (p-c)/p"}
 
-  if (missPrices && any(grepl("ces|aids", demand(), perl=TRUE), na.rm=TRUE)){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
+  if (missPrices && model_demand_id(demand()) %in% c("ces", "aids")){colnames(inputData)[grepl("Quantities",colnames(inputData))] <- "Revenues"}
   else{{colnames(inputData)[grepl("Revenues",colnames(inputData))] <- "Quantities"}}
 
   if (!is.null(inputData))
@@ -111,7 +111,7 @@ output$results_detailed <- renderTable({
 
   if(input$inTabset != "detpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
-  if(input$supply == "Cournot" && "quantities" %in% slotNames(values[["sim"]])){
+  if(model_is_cournot(values[["sim"]]) && model_has_quantities(values[["sim"]])){
 
     res <- NULL
     capture.output(try(res <- summary(values[["sim"]], revenue= FALSE,market=FALSE),silent=TRUE))
@@ -121,8 +121,8 @@ output$results_detailed <- renderTable({
 
   } else {
 
-    isAuction <- grepl("Auction",class(values[["sim"]]))
-    isRevDemand <- grepl("ces|aids",class(values[["sim"]]),ignore.case = TRUE)
+    isAuction <- model_is_auction(values[["sim"]])
+    isRevDemand <- model_uses_revenue_shares(values[["sim"]])
     inLevels <- FALSE
     #isAIDS <- grepl("aids",class(values[["sim"]]),ignore.case = TRUE)
     missPrice <- any(is.na(values[["sim"]]@prices))
@@ -207,16 +207,14 @@ output$results_elast <- renderTable({
 
   if(input$inTabset != "elastpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
-  isCournot <- grepl("Cournot", class(values[["sim"]]))
-
   if(input$pre_elast == "Pre-Merger"){preMerger = TRUE}
   else{preMerger = FALSE}
 
-  if(!isCournot && input$diversions){
+  if(model_supports_diversion(values[["sim"]]) && input$diversions){
     res <- diversion(values[["sim"]], preMerger = preMerger)
   }
   else{res <- elast(values[["sim"]], preMerger = preMerger)}
-  if(isCournot && ncol(res) == 1){colnames(res) <- "Elasticity"}
+  res <- format_elasticity_table(res, values[["sim"]])
 
   res
 
@@ -227,16 +225,14 @@ output$results_elastVertical <- renderTable({
 
   if(input$inTabsetVertical != "elastpanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
 
-  isCournot <- grepl("Cournot", class(valuesVertical[["sim"]]))
-
   if(input$pre_elastVertical == "Pre-Merger"){preMerger = TRUE}
   else{preMerger = FALSE}
 
-  if(!isCournot && input$diversionsVertical){
+  if(model_supports_diversion(valuesVertical[["sim"]]) && input$diversionsVertical){
     res <- diversion(valuesVertical[["sim"]], preMerger = preMerger)
   }
   else{res <- elast(valuesVertical[["sim"]], preMerger = preMerger)}
-  if(isCournot && ncol(res) == 1){colnames(res) <- "Elasticity"}
+  res <- format_elasticity_table(res, valuesVertical[["sim"]])
 
   res
 

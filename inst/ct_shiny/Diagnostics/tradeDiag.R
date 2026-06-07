@@ -2,7 +2,7 @@
 tradeDiag <- function(res, mktElast = FALSE){
   #a function to generate diagnostic data
 
-  isCournot <- grepl("Cournot",class(res))
+  isCournot <- model_is_cournot(res)
 
   if(isCournot){labels= res@labels[[1]]}
   else{labels=res@labels}

@@ -24,63 +24,46 @@ supply <- reactive({
 demand <- reactive({
 
   if (req(input$menu) == "Horizontal"){
-    if (input$supply == "Bertrand" & grepl('elasticity', input$calcElast)){
-      return(input$demand1)
-    }
-    if (input$supply == "Bertrand" & !grepl('elasticity', input$calcElast)){
-      return(input$demand2)
-    }
-    if (input$supply == "2nd Score Auction" & grepl('elasticity', input$calcElast)){
-      return(input$demand3)
-    }
-    if (input$supply == "2nd Score Auction" & !grepl('elasticity', input$calcElast)){
-      return(input$demand4)
-    }
-    if (input$supply == "Cournot" & grepl('elasticity', input$calcElast)){
-      return(input$demand5)
-    }
-    if (input$supply == "Cournot" & !grepl('elasticity', input$calcElast)){
-      return(input$demand6)
-    }
+    key <- paste(input$supply, model_has_known_elasticity(input$calcElast), sep = "|")
+    demand_input <- c(
+      "Bertrand|TRUE" = "demand1",
+      "Bertrand|FALSE" = "demand2",
+      "2nd Score Auction|TRUE" = "demand3",
+      "2nd Score Auction|FALSE" = "demand4",
+      "Cournot|TRUE" = "demand5",
+      "Cournot|FALSE" = "demand6"
+    )[key]
+    return(input[[demand_input]])
   }
 
   if (req(input$menu) == "Vertical") {
-    if (input$supplyVertical == "Bertrand") {
-      return(input$demandVertical1)
-    }
-    if (input$supplyVertical == "2nd Score Auction"){
-      return(input$demandVertical2)
-    }
+    demand_input <- c(
+      "Bertrand" = "demandVertical1",
+      "2nd Score Auction" = "demandVertical2"
+    )[input$supplyVertical]
+    return(input[[demand_input]])
   }
 
   if (req(input$menu) == "Tariffs"){
-    if (input$supplyTariffs == "Bertrand" & grepl('elasticity', input$calcElastTariffs)){
-      return(input$demandTariffs1)
-    }
-    if (input$supplyTariffs == "Bertrand" & !grepl('elasticity', input$calcElastTariffs)){
-      return(input$demandTariffs2)
-    }
-    if (input$supplyTariffs == "Cournot" & grepl('elasticity', input$calcElastTariffs)){
-      return(input$demandTariffs3)
-    }
-    if (input$supplyTariffs == "Cournot" & !grepl('elasticity', input$calcElastTariffs)){
-      return(input$demandTariffs4)
-    }
-    if (input$supplyTariffs == "Monopolistic Competition" & grepl('elasticity', input$calcElastTariffs)){
-      return(input$demandTariffs5)
-    }
-    if (input$supplyTariffs == "Monopolistic Competition" & !grepl('elasticity', input$calcElastTariffs)){
-      return(input$demandTariffs6)
-    }
+    key <- paste(input$supplyTariffs, model_has_known_elasticity(input$calcElastTariffs), sep = "|")
+    demand_input <- c(
+      "Bertrand|TRUE" = "demandTariffs1",
+      "Bertrand|FALSE" = "demandTariffs2",
+      "Cournot|TRUE" = "demandTariffs3",
+      "Cournot|FALSE" = "demandTariffs4",
+      "Monopolistic Competition|TRUE" = "demandTariffs5",
+      "Monopolistic Competition|FALSE" = "demandTariffs6"
+    )[key]
+    return(input[[demand_input]])
   }
 
   if (req(input$menu) == "Quotas"){
-    if (input$supplyQuota == "Bertrand" & grepl('elasticity', input$calcElastQuota)){
-      return(input$demandQuota1)
-    }
-    if (input$supplyQuota == "Bertrand" & !grepl('elasticity', input$calcElastQuota)){
-      return(input$demandQuota2)
-    }
+    key <- paste(input$supplyQuota, model_has_known_elasticity(input$calcElastQuota), sep = "|")
+    demand_input <- c(
+      "Bertrand|TRUE" = "demandQuota1",
+      "Bertrand|FALSE" = "demandQuota2"
+    )[key]
+    return(input[[demand_input]])
   }
 })
 

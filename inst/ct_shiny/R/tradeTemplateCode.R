@@ -28,6 +28,8 @@ tradeTemplateCode <- function(type){
 
   if(!is.null(demand()) & !is.null(supply())){
 
+    spec <- model_spec(type, supply(), demand())
+
     if (type == "Tariffs"){
       thisElast <- ifelse(grepl("elast",input$calcElastTariffs),
                           input$enterElastTariffs,
@@ -47,7 +49,7 @@ tradeTemplateCode <- function(type){
         thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
       }
 
-      thisdemand <- gsub("\\s*\\(.*","", demand() ,perl=TRUE)
+      thisdemand <- spec$demand_id
 
       argvalues[1] <- paste(c("demand = ", shQuote(thisdemand)), collapse = "")
 
@@ -57,12 +59,12 @@ tradeTemplateCode <- function(type){
                      "labels = simdata$Name"
       )
 
-      if(input$supplyTariffs == "Cournot"){
-        if(grepl("logit", demand(), ignore.case = TRUE)){
-          atrfun <- "logit_cournot_tariff"
+      if(spec$supply == "Cournot"){
+        if(spec$demand_id == "logit"){
+          atrfun <- spec$simulation_fn
           argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
         } else {
-          atrfun <- "cournot_tariff"
+          atrfun <- spec$simulation_fn
           if(thisdemand == "loglinear"){argvalues[grep("^demand\\s*=", argvalues)] <- "demand = 'log'"}
           argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
           argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
@@ -73,9 +75,9 @@ tradeTemplateCode <- function(type){
           argvalues <- argvalues[grep("insideSize", argvalues, invert = TRUE)]
         }
       }
-      else if( input$supplyTariffs =="Bertrand"){atrfun <- "bertrand_tariff"}
-      else if( input$supplyTariffs =="Monopolistic Competition"){
-        atrfun <- "monopolistic_competition_tariff"
+      else if(spec$supply =="Bertrand"){atrfun <- spec$simulation_fn}
+      else if(spec$supply =="Monopolistic Competition"){
+        atrfun <- spec$simulation_fn
 
         argvalues <- argvalues[grep("owner", argvalues, invert = TRUE)]
 
@@ -95,7 +97,7 @@ tradeTemplateCode <- function(type){
                           "NA_real_"
       )
 
-      if(req(grepl("logit", demand(), ignore.case =TRUE))){
+      if(grepl("logit", demand(), ignore.case =TRUE)){
         thisSize <- "sum(simdata$`Quantities`)"
       }
       else if(all(is.na(indata[,grepl("price",cnames, ignore.case = TRUE)]))){
@@ -106,7 +108,7 @@ tradeTemplateCode <- function(type){
         thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
       }
 
-      thisdemand <- gsub("\\s*\\(.*","", demand() ,perl=TRUE)
+      thisdemand <- spec$demand_id
 
       argvalues[1] <- paste(c("demand = ", shQuote(thisdemand)), collapse = "")
 
@@ -116,8 +118,8 @@ tradeTemplateCode <- function(type){
                      "labels = simdata$Name"
       )
 
-      if(input$supplyQuota == "Cournot"){
-        atrfun <- "cournot_tariff"
+      if(spec$supply == "Cournot"){
+        atrfun <- spec$simulation_fn
         argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
         argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
         argvalues[grep("margins", argvalues)] <- paste0("margins = as.matrix(simdata$`",grep("Margin",cnames,value = TRUE),"`)")
@@ -126,7 +128,7 @@ tradeTemplateCode <- function(type){
         argvalues[grep("labels", argvalues)] <- sprintf("labels = list(as.character(simdata$Name),as.character(simdata$Name[%d]))",firstPrice)
         argvalues <- argvalues[grep("insideSize", argvalues, invert = TRUE)]
       }
-      else if( input$supplyQuota =="Bertrand"){atrfun <- "bertrand_tariff"}
+      else if(spec$supply =="Bertrand"){atrfun <- spec$simulation_fn}
       else{atrfun <- "auction2nd.logit.alm"
       argvalues <- argvalues[-1]
       argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum( simdata$`Quantities` ) "
