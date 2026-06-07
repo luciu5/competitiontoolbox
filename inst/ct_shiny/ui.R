@@ -1,979 +1,771 @@
-
 ## Load libraries
 require(competitiontoolbox)
 require(ggplot2)
 
-## Sponsor Footer for Shiny Interface
-logoURL <- " https://CRAN.R-project.org/package=antitrust"
+## Sponsor footer for Shiny interface
+logoURL <- "https://CRAN.R-project.org/package=antitrust"
 logoSrc <- "logo.png"
-logoAlt <- "Insert Logo Here"
-logo <- HTML(paste(tags$a(href=logoURL, tags$img(src= logoSrc,alt= logoAlt,style='height:40px'))))
-
-
-navbarPage("", id = "menu",
-                   tabPanel("Introduction",
-                            fluidPage(
-                              titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
-                              h3("Overview"),
-                              p("The", tags$a(href="https://CRAN.R-project.org/package=competitiontoolbox", "competitiontoolbox", target = '_blank'), "RShiny application is a browser-based user interface for functionality embedded in the ",
-                                tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust", target = '_blank'), "and",
-                                tags$a(href="https://CRAN.R-project.org/package=antitrust", "trade", target = '_blank'), "R packages. It allows users to "),
-                              HTML("<ul>
-                                     <li>simulate mergers, tariffs, and quotas under various specifications and market conditions,</li>
-                                     <li>numerically simulate horizontal and vertical mergers,</li>
-                                     <li>and visualize the estimated effects these market changes have on various outcomes.</li>
-                                   </ul>"), br(),
-                              p("Users may input different simulation parameters on the lefthand-side panels found in the pages linked by the tabs above. These parameters include
-                                the assumed competitive environment and market demand system. Users may also edit market conditions listed in the Inputs tables such as firm prices, margins,
-                                and shares. Both horizontal and supply chain mergers are available for simulation, including upstream, downstream, and vertical
-                                mergers. Example inputs for each type of simulation are provided to users by default in the Inputs table."),
-                              p("To better understand the types of predictions that these models make, users may also view the distribution of outcomes from thousands of numerical simulations. See",
-                                tags$a(href="https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)", target = '_blank'),
-                                "and", tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining", "Sheu and Taragin (2020)", target = '_blank'), "for more details."),
-
-                              hr(),
-                              h3("Get Started"),
-                              p("To simulate a horizontal merger, proceed to", strong("Horizontal"), "listed under the", strong("Mergers"), "tab."),
-                              p("To simulate a merger in a supply chain, proceed to", strong("Vertical"), "listed under the", strong("Mergers"), "tab."),
-                              br(),
-                              p("To numerically simulate a horizontal merger, proceed to", strong("Horizontal"), "listed under the", strong("Numerical Simulations"), "tab."),
-                              p("To numerically simulate a merger in a supply chain, proceed to", strong("Vertical"), "listed under the", strong("Numerical Simulations"), "tab."),
-                              br(),
-                              p("To simulate a tariff, proceed to", strong("Tariffs"), "listed under the", strong("Trade"), "tab."),
-                              p("To simulate a quota, proceed to", strong("Quotas"), "listed under the", strong("Trade"), "tab."), br(),
-
-                              p("When run, each simulation outputs a series of tabs that provide detailed information on the simulated merger, tariff,
-                                or quota. They are:"),
-                              HTML("<ul>
-                                      <li><em>Summary</em>: Outputs summary statistics of the simulation, including changes in HHI, consumer and producer surplus, and share-weighted prices.</li>
-                                      <li><em>Details</em>: Outputs product-level changes in prices and compensating marginal cost reductions. For supply chain mergers, both upstream and downstream price and share changes are reported.</li>
-                                      <li><em>Elasticities</em>: Outputs matrices of estimated elasticities and diversion ratios.</li>
-                                      <li><em>Diagnostics</em>: Outputs differences between outputted and fitted values in order to diagnose the simulation. Key underlying parameters are also reported.</li>
-                                      <li><em>R Code</em>: Outputs the corresponding R code that runs the inputted simulation. This provides practioners reproducible code as they transition to scripting their own analyses.</li>
-                                      <li><em>Messages</em>: Outputs any warning or error messages encountered by the app.</li>
-                                   </ul>")
-                            ),
-                            hr(),
-                            fluidRow(
-                              column(width = 12, align = "center",
-                                     tags$div(
-                                       HTML("<font size=\"2\"> Supported by </font>"),
-                                       HTML(logo)
-                                     )
-                              )
-                            )
-                    ),
-
-                   navbarMenu("Mergers",
-                              tabPanel("Horizontal", style = "overflow-y:scroll; max-height: 90vh",
-                                       fluidPage(
-                                         titlePanel("Simulate a Horizontal Merger") ,
-
-                                         sidebarLayout(
-                                           sidebarPanel(
-
-                                             htmlOutput("urlText"),hr(),
-
-                                             h5(tags$b("Directions:")),
-                                             helpText(tags$ul(
-                                               tags$li("Copy and paste or manually enter market data into the Inputs table."),
-                                               tags$li("Click on the Play button to simulate a merger between 'Firm1' and 'Firm2'."),
-                                               tags$li("See the", tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the models used." )
-                                               #tags$li("Shares must be between 0 and 1."),
-                                               #tags$li("Margins should exclude fixed costs.")
-                                             )
-                                             ),hr(),
-                                             radioButtons("calcElast", "Calibrate model parameters using:",
-                                                          choices = c("market elasticity and 1 or more margins",
-                                                                      "2 or more margins")
-                                             ),
-                                             conditionalPanel(
-                                               condition = "input.calcElast.includes('elasticity') == true",
-                                               numericInput("enterElast", "Enter Market Elasticity:", value = -1, min = -Inf, max = 0, step = .1  #, width='75%'
-                                               )
-                                             ),
-                                             hr(),
-                                             #checkboxInput("incEff", "Include Proportional Cost Changes (negative values imply cost reductions)", value = FALSE, width = NULL),
-
-                                             radioButtons("supply", "Competitive Interaction:",
-                                                          choices = c("Bertrand",
-                                                                      "2nd Score Auction",
-                                                                      "Cournot"
-                                                          )),
-
-                                             ## Use conditionalPanel() to select appropriate demand forms for each unique pair of competitive interaction and margin information
-                                             # Bertrand
-                                             conditionalPanel(
-                                               condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == true",
-                                               selectInput("demand1", "Demand Specification:",
-                                                           choices = c("logit", "ces", "aids"))
-                                             ),
-                                             conditionalPanel(
-                                               condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == false",
-                                               selectInput("demand2", "Demand Specification:",
-                                                           choices = c("logit (unknown elasticity)", "ces (unknown elasticity)", "aids (unknown elasticity)"))
-                                             ),
-                                             # 2nd Score Auction
-                                             conditionalPanel(
-                                               condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == true",
-                                               selectInput("demand3", "Demand Specification:",
-                                                           choices = "logit"),
-                                               helpText(tags$b("Note:"), "2nd Score Auction only requires a single price.")
-                                             ),
-                                             conditionalPanel(
-                                               condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == false",
-                                               selectInput("demand4", "Demand Specification:",
-                                                           choices = "logit (unknown elasticity)"),
-                                               helpText(tags$b("Note:"), "2nd Score Auction does not require prices.")
-                                             ),
-                                             # Cournot
-                                             conditionalPanel(
-                                               condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == true",
-                                               selectInput("demand5", "Demand Specification:",
-                                                           choices = c("linear", "loglinear")),
-                                               helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
-                                             ),conditionalPanel(
-                                               condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == false",
-                                               selectInput("demand6", "Demand Specification:",
-                                                           choices = c("linear (unknown elasticity)", "loglinear (unknown elasticity)")),
-                                               helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
-                                             ),
-                                             # Output additional note for aids/aids (unknown elasticity) demand forms under Bertrand pricing
-                                             conditionalPanel(
-                                               condition = "input.supply == 'Bertrand' & input.demand1.includes('aids') == true & input.calcElast.includes('elasticity') == true",
-                                               helpText(tags$b("Note:"), "'aids' does not require pricing information.")
-                                             ),
-                                             conditionalPanel(
-                                               condition = "input.supply == 'Bertrand' & input.demand2.includes('aids') == true & input.calcElast.includes('elasticity') == false",
-                                               helpText(tags$b("Note:"), "'aids' does not require pricing information.")
-                                             ),
-
-                                             hr(),
-                                             fluidRow(
-                                               column(width=12, align = "center",
-                                                      tags$div(
-                                                        HTML("<font size=\"2\"> Supported by </font>"),
-                                                        HTML(logo)
-                                                      )
-                                               )
-                                             )
-                                           ),
-
-                                           mainPanel(
-                                             h2("Enter Inputs"),
-                                             rHandsontableOutput("hot"), br(),
-                                             #tags$head(
-                                             #  tags$style(HTML('#run{color:white;background-color:black}'))
-                                             #),
-                                             actionButton(inputId = "simulate", label = "", icon = icon("play"), width = '60px', style='padding:4px')
-                                             #)
-                                             ,
-                                             br(), br(),br(),
-                                             tabsetPanel(id = "inTabset",
-                                                         tabPanel("Summary", value = "respanel", br(),br(),tableOutput("results"), br(),
-                                                                  helpText(tags$b("Note:"), "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages.
-                                                                                             A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.
-                                                                                             Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues.")
-                                                         ),
-                                                         tabPanel("Details", value = "detpanel", br(), tableOutput("results_shareOut"), br(), tableOutput("results_detailed")
-
-                                                                  #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
-                                                                  #                  helpText(tags$b("Note:"), "shares are revenue-based.")
-                                                                  #)
-                                                         ),
-                                                         tabPanel("Elasticities", value = "elastpanel", br(),
-                                                                  radioButtons("pre_elast", "",
-                                                                               choices = c("Pre-Merger",
-                                                                                           "Post-Merger"
-                                                                               ), inline = TRUE),
-                                                                  br(),
-                                                                  tableOutput("results_mktelast"),
-                                                                  tableOutput("results_elast"),
-                                                                  conditionalPanel("input.supply != 'Cournot'",
-                                                                                   checkboxInput("diversions", "Report diversion ratios", value =FALSE),
-                                                                                   helpText(tags$b("Note:"), "diagonal elements are own-price elasticities.","Off-diagonal elements are the cross-price elasticities of row with respect to column.")
-                                                                  ),
-                                                                  conditionalPanel("input.supply == 'Cournot'",
-                                                                                   helpText(tags$b("Note:"), "above are own-price elasticities")
-                                                                  )
-                                                         ),
-                                                         tabPanel("Diagnostics", value = "diagpanel", br(), h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"), br(),
-                                                                  tableOutput("results_diag_elast"),
-                                                                  tableOutput("results_diagnostics"),
-                                                                  htmlOutput("overIDText"),br(),
-                                                                  #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
-                                                                  h4("Parameters"),verbatimTextOutput("parameters"),
-                                                                  helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the parameters displayed here." )
-                                                         ),
-                                                         tabPanel("R Code",  value = "codepanel", br(),verbatimTextOutput("results_code")),
-                                                         tabPanel("Messages", value = "msgpanel", br(),h4("Warnings"),  span(textOutput("warnings"), style="color:orange"), br(),
-                                                                  h4("Errors"),
-                                                                  span(textOutput("errors"), style="color:red"))
-
-                                             )
-
-                                           )
-
-                                         )
-
-
-                                       )
-                              ),
-
-
-                              tabPanel("Vertical", style = "overflow-y:scroll; max-height: 90vh",
-                                       fluidPage(
-                                         titlePanel("Simulate a Merger in a Supply Chain"),
-
-                                         sidebarLayout(
-                                           sidebarPanel(
-
-                                             htmlOutput("urlTextVertical"), hr(),
-
-                                             h5(tags$b("Directions:")),
-                                             helpText(tags$ul(
-                                               tags$li("Copy and paste or manually enter market data into the Inputs table."),
-                                               tags$li(htmlOutput("directionsVertical")),
-                                               tags$li("See the", tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the models used." )
-                                               #tags$li("Shares must be between 0 and 1."),
-                                               #tags$li("Margins should exclude fixed costs.")
-                                             )
-                                             ),hr(),
-                                             sliderInput("addRowsVertical", "Add rows to Inputs table:", value=10,min=5,max=50,step=5),
-                                             # radioButtons("calcElast", "Calibrate model parameters using:",
-                                             #              choices = c("market elasticity and 1 or more margins",
-                                             #                          "2 or more margins")
-                                             # ),
-                                             # conditionalPanel(
-                                             #   condition = "input.calcElast.includes('elasticity') == true",
-                                             #   numericInput("enterElast", "Enter Market Elasticity:", value = -1, min = -Inf, max = 0, step = .1  #, width='75%'
-                                             #   )
-                                             # ),
-                                             # hr(),
-                                             #checkboxInput("incEff", "Include Proportional Cost Changes (negative values imply cost reductions)", value = FALSE, width = NULL),
-                                             selectInput("mergerTypeVertical", "Merger Type:",
-                                                         choices = c("Upstream", "Downstream", "Vertical")),
-
-                                             radioButtons("supplyVertical", "Competitive Interaction:",
-                                                          choices = c("Bertrand",
-                                                                      "2nd Score Auction")
-                                                          ),
-
-                                             ## Use conditionalPanel() to select appropriate demand forms for each unique pair of competitive interaction and margin information
-                                             # Bertrand
-                                             conditionalPanel(
-                                               condition = "input.supplyVertical == 'Bertrand'",
-                                               selectInput("demandVertical1", "Downstream Demand Specification:",
-                                                           choices = c("logit")),
-                                               helpText(tags$b("Note:"), "Share of outside good implied by the sum of inside product shares. Price of outside good fixed at 0.")
-                                             ),
-                                             # 2nd Score Auction
-                                             conditionalPanel(
-                                               condition = "input.supplyVertical == '2nd Score Auction'",
-                                               selectInput("demandVertical2", "Downstream Demand Specification:",
-                                                           choices = c("logit")),
-                                               helpText(tags$b("Note:"), "Share of outside good implied by the sum of inside product shares. Price of outside good fixed at 0.")
-                                             ),
-
-                                             hr(),
-                                             fluidRow(
-                                               column(width=12, align = "center",
-                                                      tags$div(
-                                                        HTML("<font size=\"2\"> Supported by </font>"),
-                                                        HTML(logo)
-                                                      )
-                                               )
-                                             )
-                                           ),
-
-                                           mainPanel(
-                                             h2("Enter Inputs"),
-                                              rHandsontableOutput("hotVertical"), br(),
-                                             # #tags$head(
-                                             #  tags$style(HTML('#run{color:white;background-color:black}'))
-                                             #),
-                                             actionButton(inputId = "simulateVertical", label = "", icon = icon("play"), width = '60px', style = 'padding:4px')
-                                             #)
-                                             ,
-                                             br(), br(),br(),
-                                             tabsetPanel(id = "inTabsetVertical",
-                                                         tabPanel("Summary", value = "respanelVertical", br(), br(), tableOutput("resultsVertical"), br(),
-                                                                  helpText(tags$b("Note:"), "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages.
-                                                                           A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm.")
-                                                                  ),
-                                                         tabPanel("Details", value = "detpanelVertical", br(), tableOutput("results_shareOutVertical"), br(), tableOutput("results_detailedVertical")
-
-                                                                  #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
-                                                                  #                  helpText(tags$b("Note:"), "shares are revenue-based.")
-                                                                  #)
-                                                         ),
-                                                         tabPanel("Elasticities", value = "elastpanelVertical", br(),
-                                                                  radioButtons("pre_elastVertical", "",
-                                                                               choices = c("Pre-Merger",
-                                                                                           "Post-Merger"
-                                                                               ), inline = TRUE),
-                                                                  br(),
-                                                                  tableOutput("results_mktelastVertical"),
-                                                                  tableOutput("results_elastVertical"),
-                                                                  conditionalPanel("input.supplyVertical != 'Cournot'",
-                                                                                   checkboxInput("diversionsVertical", "Report diversion ratios", value = FALSE),
-                                                                                   helpText(tags$b("Note:"), "diagonal elements are own-price elasticities.", "Off-diagonal elements are the cross-price elasticities of row with respect to column.")
-                                                                  ),
-                                                                  conditionalPanel("input.supplyVertical == 'Cournot'",
-                                                                                   helpText(tags$b("Note:"), "above are own-price elasticities")
-                                                                  )
-                                                         ),
-                                                         tabPanel("Diagnostics", value = "diagpanelVertical", br(), h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"), br(),
-                                                                  tableOutput("results_diag_elastVertical"),
-                                                                  tableOutput("results_diagnosticsVertical"),
-                                                                  htmlOutput("overIDTextVertical"),
-                                                                  #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
-                                                                  h4("Parameters"),verbatimTextOutput("parametersVertical"),
-                                                                  helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the parameters displayed here." )
-                                                         ),
-                                                         tabPanel("R Code",  value = "codepanelVertical", br(),verbatimTextOutput("results_codeVertical")),
-                                                         tabPanel("Messages", value = "msgpanelVertical", br(), h4("Warnings"), span(textOutput("warningsVertical"), style="color:orange"), br(),
-                                                                  h4("Errors"), span(textOutput("errorsVertical"), style="color:red"))
-
-                                                )
-
-                                           )
-
-                                         )
-                                       )
-                                    ),
-
-
-                              tabPanel(tags$a(href="https://cran.r-project.org/web/packages/antitrust/vignettes/Reference.html", "Documentation", target = '_blank'),
-                                       #fluidPage(htmlOutput("referenceATR"))
-                              )
-
-                   ),
-
-                   navbarMenu("Trade",
-
-                              tabPanel("Tariffs", style = "overflow-y:scroll; max-height: 90vh",
-
-                                       fluidPage(
-
-                                         titlePanel("Simulate a Tariff") ,
-
-                                         sidebarLayout(fluid=TRUE,
-                                                       sidebarPanel(
-
-                                                         htmlOutput("urlTextTariffs"),hr(),
-
-                                                         h5(tags$b("Directions:")),
-                                                         helpText(tags$ul(
-                                                           tags$li("Copy and paste or manually enter market data into the Inputs table."),
-                                                           tags$li("Click on the Play button to simulate an", tags$em("ad valorem"), "tariff."),
-                                                           tags$li("Default example simulates an increase in the ", tags$em("ad valorem"),"tariff (expressed as a proportion of consumer price) from 5% to 25% on products produced by 'Firm1' and 'Firm2'."),
-                                                           tags$li("Products without current or new tariffs are assumed to be produced domestically. Otherwise, products are assumed to be produced abroad.")
-                                                           #,tags$li(helpText("See the",tags$a(href=system.file('trade_shiny', package='trade'), "trade"),"package vignette for more details about the models used here." ))
-                                                           #tags$li("Shares must be between 0 and 1."),
-                                                           #tags$li("Margins should exclude fixed costs.")
-                                                         )
-                                                         ),hr(),
-                                                         sliderInput("addRowsTariffs", "Add rows to Inputs table:", value=10,min=5,max=50,step=5),
-                                                         radioButtons("calcElastTariffs", "Calibrate model parameters using:",
-                                                                      choices = c("market elasticity AND 1 or more margins",
-                                                                                  "2 or more margins")
-                                                         ),
-                                                         conditionalPanel(
-                                                           condition = "input.calcElastTariffs.includes('elasticity') == true ",
-                                                           numericInput("enterElastTariffs", "Enter Market Elasticity:", value=-1,min=-Inf,max=0,step=.1#, width='75%'
-                                                           )
-                                                         ),hr(),
-
-                                                         radioButtons("supplyTariffs", "Competitive Interaction:",
-                                                                      choices = c("Bertrand",
-                                                                                  "Monopolistic Competition",
-                                                                                  "Cournot"
-
-                                                                      )),
-
-                                                         # selectInput("demandTariffs", "Demand Specification:",
-                                                         #             choices = c("logit", "ces",
-                                                         #                         #"linear",
-                                                         #                         "aids")),
-                                                         ## Use conditionalPanel() to select appropriate demand forms for each unique pair of competitive interaction and margin information
-                                                         # Bertrand
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Bertrand' & input.calcElastTariffs.includes('elasticity') == true",
-                                                           selectInput("demandTariffs1", "Demand Specification:",
-                                                                       choices = c("logit", "ces", "aids"))
-                                                         ),
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Bertrand' & input.calcElastTariffs.includes('elasticity') == false",
-                                                           selectInput("demandTariffs2", "Demand Specification:",
-                                                                       choices = c("logit (unknown elasticity)", "ces (unknown elasticity)", "aids (unknown elasticity)"))
-                                                         ),
-                                                         # Cournot
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == true",
-                                                           selectInput("demandTariffs3", "Demand Specification:",
-                                                                       choices = c("linear", "loglinear")),
-                                                           helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
-                                                         ),conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == false",
-                                                           selectInput("demandTariffs4", "Demand Specification:",
-                                                                       choices = c("linear (unknown elasticity)", "loglinear (unknown elasticity)")),
-                                                           helpText(tags$b("Note:"), "Only the first non-missing inputted price and product name is used for Cournot.")
-                                                         ),
-                                                         # Monopolistic Competition
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Monopolistic Competition' & input.calcElastTariffs.includes('elasticity') == true",
-                                                           selectInput("demandTariffs5", "Demand Specification:",
-                                                                       choices = c("logit", "ces"))
-                                                         ),
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Monopolistic Competition' & input.calcElastTariffs.includes('elasticity') == false",
-                                                           selectInput("demandTariffs6", "Demand Specification:",
-                                                                       choices = c("logit (unknown elasticity)", "ces (unknown elasticity)"))
-                                                         ),
-                                                         hr(),
-                                                         fluidRow(
-                                                           column(width=12, align = "center",
-                                                                  tags$div(
-                                                                    HTML("<font size=\"2\"> Supported by </font>"),
-                                                                    HTML(logo)
-                                                                  )
-                                                           )
-                                                         ),
-                                                         # conditionalPanel(
-                                                         #   condition = "input.supplyTariffs == 'Cournot'",
-                                                         #   helpText(tags$b("Note:"), "only the first non-missing inputted price and product name is used for Cournot.")
-                                                         # ),
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == '2nd Score Auction' && input.calcElastTariffs.includes('elasticity') == true",
-                                                           helpText(tags$b("Note:"), "2nd score Auction only requires a single price.")
-                                                         ),
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == '2nd Score Auction' && input.calcElastTariffs.includes('elasticity') == false",
-                                                           helpText(tags$b("Note:"), "2nd Score Auction does not require prices.")
-                                                         ),
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Bertrand' && input.calcElastTariffs.includes('elasticity') == true && input.demandTariffs1 == 'aids'",
-                                                           helpText(tags$b("Note:"), "aids does not require pricing information.")
-                                                         ),
-                                                         conditionalPanel(
-                                                           condition = "input.supplyTariffs == 'Bertrand' && input.calcElastTariffs.includes('elasticity') == false && input.demandTariffs2 == 'aids (unknown elasticity)'",
-                                                           helpText(tags$b("Note:"), "aids does not require pricing information."))
-                                                       ),
-                                                       mainPanel(
-                                                         h2("Enter Inputs"),
-                                                         rHandsontableOutput("hotTariffs"), br(),
-                                                         #tags$head(
-                                                         #  tags$style(HTML('#run{color:white;background-color:black}'))
-                                                         #),
-                                                         actionButton(inputId ="simulateTariffs", label = "", icon = icon("play"), width = '60px', style='padding:4px')
-                                                         #)
-                                                         ,
-                                                         br(), br(),br(),
-                                                         tabsetPanel(id = "inTabsetTariffs",
-                                                                     tabPanel("Summary", value = "respanelTariffs", br(),br(),tableOutput("resultsTariffs"), br(),
-                                                                              helpText(tags$b("Note:"), "all price changes are (new tariff) share-weighted averages.
-                                                           Negative Consumer Harm or Net Harm numbers denotes benefit.")
-                                                                     ),
-                                                                     tabPanel("Details", value = "detpanelTariffs", br(),br(), tableOutput("results_shareOutTariffs"),br(), tableOutput("results_detailedTariffs")
-
-                                                                              #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
-                                                                              #                  helpText(tags$b("Note:"), "shares are revenue-based.")
-                                                                              #)
-                                                                     ),
-                                                                     tabPanel("Elasticities", value = "elastpanelTariffs",  br(),br(),
-                                                                              radioButtons("pre_elastTariffs", "",
-                                                                                           choices = c("Current Tariff",
-                                                                                                       "New Tariff"
-                                                                                           ), inline = TRUE),
-                                                                              br(),
-                                                                              tableOutput("results_mktelastTariffs"),br(),
-                                                                              tableOutput("results_elastTariffs"),
-                                                                              conditionalPanel("input.supplyTariffs !=='Cournot'",
-                                                                                               checkboxInput("diversionsTariffs", "Report diversion ratios", value =FALSE),
-                                                                                               helpText(tags$b("Note:"), "diagonal elements are own-price elasticities.","Off-diagonal elements are the cross-price elasticities of row with respect to column.")
-                                                                              ),
-                                                                              conditionalPanel("input.supplyTariffs == 'Cournot'",
-                                                                                               helpText(tags$b("Note:"), "above are own-price elasticities")
-                                                                              )
-                                                                     ),
-                                                                     tabPanel("Diagnostics", value = "diagpanelTariffs", br(),br(), h4("Inputted vs. Fitted Values"),
-                                                                              tableOutput("results_diag_elastTariffs"),
-                                                                              tableOutput("results_diagnosticsTariffs"),
-                                                                              htmlOutput("overIDTextTariffs"),br(),
-                                                                              #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
-                                                                              h4("Parameters"),verbatimTextOutput("parametersTariffs"),
-                                                                              helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"),"package vignette for more details about the parameters displayed here." )
-                                                                     ),
-                                                                     tabPanel("R Code", value = "codepanelTariffs", br(),verbatimTextOutput("results_codeTariffs")),
-                                                                     tabPanel("Messages", value = "msgpanelTariffs", br(),h4("Warnings"),  verbatimTextOutput("warningsTariffs"), br(),h4("Errors"),  verbatimTextOutput("errorsTariffs"))
-
-                                                         )
-
-                                                       )
-
-                                         )
-                                       )
-
-                              )
-
-                              ,tabPanel("Quotas", style = "overflow-y:scroll; max-height: 90vh",
-
-                                        fluidPage(
-
-
-                                          titlePanel("Simulate a Quota") ,
-
-                                          sidebarLayout(
-                                            sidebarPanel(
-
-                                              htmlOutput("urlTextQuota"),hr(),
-
-                                              h5(tags$b("Directions:")),
-                                              helpText(tags$ul(
-                                                tags$li("Copy and paste or manually enter market data into the Inputs table."),
-                                                tags$li("Click on the Play button to simulate a quota."),
-                                                tags$li("Default example simulates an increase in the quota from 100% of current output to 75% of current output on products produced by 'Firm1' and 'Firm2'."),
-                                                tags$li("Products without current or new quotas are assumed to be produced domestically. Otherwise, products are assumed to be produced abroad.")
-                                                #,tags$li(helpText("See the",tags$a(href=system.file('trade_shiny', package='trade'), "trade"),"package vignette for more details about the models used here." ))
-                                                #tags$li("Shares must be between 0 and 1."),
-                                                #tags$li("Margins should exclude fixed costs.")
-                                              )
-                                              ),hr(),
-                                              sliderInput("addRowsQuota", "Add rows to Inputs table:", value=10,min=5,max=50,step=5),
-                                              radioButtons("calcElastQuota", "Calibrate model parameters using:",
-                                                           choices = c("market elasticity and 1 or more margins",
-                                                                       "2 or more margins"), selected="market elasticity and 1 or more margins"
-                                              ),
-                                              conditionalPanel(
-                                                condition = "input.calcElastQuota.includes('elasticity') == true ",
-                                                numericInput("enterElastQuota", "Enter Market Elasticity:", value=-1,min=-Inf,max=0,step=.1#, width='75%'
-                                                )
-                                              ),hr(),
-
-                                              radioButtons("supplyQuota", "Competitive Interaction:",
-                                                           choices = c("Bertrand"
-                                                                       #, "2nd Score Auction"
-                                                                       #, "Cournot"
-                                                           )),
-
-                                              # selectInput("demandQuota1", "Demand Specification:",
-                                              #             choices = c("logit"
-                                              #                         #, "ces"
-                                              #                         #, "linear"
-                                              #                         #, "aids"
-                                              #             )),
-                                              ## Use conditionalPanel() to select appropriate demand forms for each unique pair of competitive interaction and margin information
-                                              # Bertrand
-                                              conditionalPanel(
-                                                condition = "input.supplyQuota == 'Bertrand' & input.calcElastQuota.includes('elasticity') == true",
-                                                selectInput("demandQuota1", "Demand Specification:",
-                                                            choices = c("logit"))
-                                              ),
-                                              conditionalPanel(
-                                                condition = "input.supplyQuota == 'Bertrand' & input.calcElastQuota.includes('elasticity') == false",
-                                                selectInput("demandQuota2", "Demand Specification:",
-                                                            choices = c("logit (unknown elasticity)"))
-                                              ),
-                                              hr(),
-                                              fluidRow(
-                                                column(width=12, align = "center",
-                                                       tags$div(
-                                                         HTML("<font size=\"2\"> Supported by </font>"),
-                                                         HTML(logo)
-                                                       )
-                                                )
-                                              ),
-                                              conditionalPanel(
-                                                condition = "input.supplyQuota == 'Cournot'",
-                                                helpText(tags$b("Note:"), "only the first non-missing inputted price and product name is used for Cournot.")
-                                              ),
-                                              conditionalPanel(
-                                                condition = "input.supplyQuota == '2nd Score Auction' && input.calcElastQuota.includes('elasticity') == true",
-                                                helpText(tags$b("Note:"), "2nd score Auction only requires a single price.")
-                                              ),
-                                              conditionalPanel(
-                                                condition = "input.supplyQuota == '2nd Score Auction' && input.calcElastQuota.includes('elasticity') == false",
-                                                helpText(tags$b("Note:"), "2nd Score Auction does not require prices.")
-                                              ),
-                                              conditionalPanel(
-                                                condition = "input.supplyQuota == 'Bertrand' && input.demandQuota == 'aids'",
-                                                helpText(tags$b("Note:"), "aids does not require pricing information.")
-                                              )
-                                            ),
-                                            mainPanel(
-                                              h2("Enter Inputs"),
-                                              rHandsontableOutput("hotQuota"), br(),
-                                              #tags$head(
-                                              #  tags$style(HTML('#run{color:white;background-color:black}'))
-                                              #),
-                                              actionButton(inputId ="simulateQuota" , label = "", icon = icon("play"), width = '60px', style='padding:4px')
-                                              #)
-                                              ,
-                                              br(), br(),br(),
-                                              tabsetPanel(id = "inTabsetQuota",
-                                                          tabPanel("Summary", value = "respanelQuota", br(),br(),tableOutput("resultsQuota"), br(),
-                                                                   helpText(tags$b("Note:"), "all price changes are (new quota) share-weighted averages.
-                                                Negative Consumer Harm or Net Harm numbers denotes benefit.")
-                                                          ),
-                                                          tabPanel("Details", value = "detpanelQuota", br(),br(), tableOutput("results_shareOutQuota"),br(), tableOutput("results_detailedQuota")
-
-                                                                   #,conditionalPanel("input.demand == 'aids' || input.demand == 'ces' || input.demand == 'ces (unknown elasticity)'",
-                                                                   #                  helpText(tags$b("Note:"), "shares are revenue-based.")
-                                                                   #)
-                                                          ),
-                                                          tabPanel("Elasticities", value = "elastpanelQuota",  br(),br(),
-                                                                   radioButtons("pre_elastQuota", "",
-                                                                                choices = c("Current Quota",
-                                                                                            "New Quota"
-                                                                                ), inline = TRUE),
-                                                                   br(),
-                                                                   tableOutput("results_mktelastQuota"),br(),
-                                                                   tableOutput("results_elastQuota"),
-                                                                   conditionalPanel("input.supplyQuota !=='Cournot'",
-                                                                                    checkboxInput("diversionsQuota", "Report diversion ratios", value =FALSE),
-                                                                                    helpText(tags$b("Note:"), "diagonal elements are own-price elasticities.","Off-diagonal elements are the cross-price elasticities of row with respect to column.")
-                                                                   ),
-                                                                   conditionalPanel("input.supplyQuota == 'Cournot'",
-                                                                                    helpText(tags$b("Note:"), "above are own-price elasticities")
-                                                                   )
-                                                          ),
-                                                          tabPanel("Diagnostics", value = "diagpanelQuota", br(),br(), h4("Inputted vs. Fitted Values"),
-                                                                   tableOutput("results_diag_elastQuota"),
-                                                                   tableOutput("results_diagnosticsQuota"),
-                                                                   htmlOutput("overIDTextQuota"),br(),
-                                                                   #helpText(tags$b("Note:"), "Negative numbers mean that observed values are larger than predicted values."),br(),
-                                                                   h4("Parameters"),verbatimTextOutput("parametersQuota"),
-                                                                   helpText("See the",tags$a(href="https://CRAN.R-project.org/package=antitrust", "antitrust"), "package vignette for more details about the parameters displayed here." )
-                                                          ),
-                                                          tabPanel("R Code", value = "codepanelQuota", br(),verbatimTextOutput("results_codeQuota")),
-                                                          tabPanel("Messages", value = "msgpanelQuota", br(),h4("Warnings"),  verbatimTextOutput("warningsQuota"), br(),h4("Errors"),  verbatimTextOutput("errorsQuota"))
-
-                                              )
-
-                                            )
-
-                                          )
-                                        )
-
-                              )
-                              ,tabPanel(tags$a(href="https://cran.r-project.org/web/packages/trade/vignettes/Reference.html", "Documentation", target = '_blank'),
-                                        #fluidPage(htmlOutput("referenceTrade"))
-                              )
-                   ),
-
-           navbarMenu("Numerical Simulations",
-
-                      tabPanel("Horizontal Mergers", style = "overflow-y:scroll; max-height: 90vh",
-                               fluidPage(
-                                 titlePanel("Horizontal Simulations"),
-
-                                 mainPanel(
-                                   tabsetPanel(
-                                     tabPanel("Summary",
-                                              fluidPage(
-                                                sidebarLayout(
-                                                  sidebarPanel(
-                                                    h5(tags$b("Overview:")),
-                                                    helpText(tags$ul(
-                                                      tags$li(htmlOutput('sumNumMergerATR')),
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers",
-                                                                                     "Taragin and Loudermilk (2019)"),"for further details." ))
-                                                    )
-                                                    ),
-                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                    #                    selected = "Bertrand ces"),
-                                                    selectInput("outcomeSumATR", "Outcome to Report:",
-                                                                choices = c( "Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)","Industry Price Change (%)", "Merging Party Price Change (%)")),
-                                                    sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10),
-                                                    fluidRow(
-                                                      column(width=12, align = "center",
-                                                             tags$div(
-                                                               HTML("<font size=\"2\"> Supported by </font>"),
-                                                               HTML(logo)
-                                                             )
-                                                      )
-                                                    )
-                                                  ),
-                                                  mainPanel(
-                                                    br(),
-                                                    fillPage(plotOutput('plotSumATR')),
-                                                    wellPanel(h5(tags$b("Description:")),
-                                                              textOutput('capSumATR'))
-
-                                                  )
-
-                                                )
-                                              )),
-                                     tabPanel("Indices",
-                                              fluidPage(
-                                                sidebarLayout(
-                                                  sidebarPanel(
-                                                    h5(tags$b("Overview:")),
-                                                    helpText(tags$ul(
-                                                      tags$li(htmlOutput('indicNumMergerATR')),
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers",
-                                                                                     "Taragin and Loudermilk (2019)"),"for further details." ))
-                                                    )
-                                                    ),
-                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                    #                    selected = "Bertrand ces"),
-                                                    radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
-                                                    selectInput("indexIndATR", "Index:",
-                                                                choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR",  "Harm2nd")),
-                                                    sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value=30,min=10,max=60,step=10),
-                                                    fluidRow(
-                                                      column(width=12, align = "center",
-                                                             tags$div(
-                                                               HTML("<font size=\"2\"> Supported by </font>"),
-                                                               HTML(logo)
-                                                             )
-                                                      )
-                                                    )
-                                                  ),
-                                                  mainPanel(
-                                                    br(),
-                                                    fillPage(plotOutput('plotIndATR')),
-                                                    wellPanel(h5(tags$b("Description:")),
-                                                              textOutput('capIndATR'))
-                                                  )
-
-
-                                                )
-
-                                              )
-                                     )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
-
-                                 )
-
-                               )
-
-                      ),
-
-                      tabPanel("Vertical Mergers", style = "overflow-y:scroll; max-height: 90vh",
-                               fluidPage(
-                                 titlePanel("Vertical Simulations"),
-
-                                 mainPanel(
-                                   tabsetPanel(
-                                     tabPanel("Summary",
-                                              fluidPage(
-                                                sidebarLayout(
-                                                  sidebarPanel(
-                                                    h5(tags$b("Overview:")),
-                                                    helpText(tags$ul(
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
-                                                                                     "Sheu and Taragin (2020)"),"for further details."))
-                                                    )
-                                                    ),
-                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                    #                    selected = "Bertrand ces"),
-                                                    fluidRow(
-                                                      column(width=12, align = "center",
-                                                             tags$div(
-                                                               HTML("<font size=\"2\"> Supported by </font>"),
-                                                               HTML(logo)
-                                                             )
-                                                      )
-                                                    )
-                                                  ),
-                                                  mainPanel(
-                                                    br(),
-                                                    fillPage(imageOutput("figSummary", width = "100%", height = "100%")),
-                                                    wellPanel(h5(tags$b("Description:")),
-                                                              textOutput('capSummary'))
-
-                                                  )
-
-                                                )
-                                              )),
-                                     tabPanel("Upstream",
-                                              fluidPage(
-                                                sidebarLayout(
-                                                  sidebarPanel(
-                                                    h5(tags$b("Overview:")),
-                                                    helpText(tags$ul(
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
-                                                                                     "Sheu and Taragin (2020)"),"for further details."))
-                                                    )
-                                                    ), hr(),
-                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                    #                    selected = "Bertrand ces"),
-                                                    radioButtons("upstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
-                                                    fluidRow(
-                                                      column(width=12, align = "center",
-                                                             tags$div(
-                                                               HTML("<font size=\"2\"> Supported by </font>"),
-                                                               HTML(logo)
-                                                             )
-                                                      )
-                                                    )
-                                                  ),
-                                                  mainPanel(
-                                                    br(),
-                                                    fillPage(imageOutput("figUpstream", width = "100%", height = "100%")),
-                                                    wellPanel(h5(tags$b("Description:")),
-                                                              textOutput('capUpstream'))
-                                                  )
-
-
-                                                )
-
-                                              )
-                                     ),
-                                     tabPanel("Downstream",
-                                              fluidPage(
-                                                sidebarLayout(
-                                                  sidebarPanel(
-                                                    h5(tags$b("Overview:")),
-                                                    helpText(tags$ul(
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
-                                                                                     "Sheu and Taragin (2020)"),"for further details."))
-                                                    )
-                                                    ), hr(),
-                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                    #                    selected = "Bertrand ces"),
-                                                    radioButtons("downstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
-                                                    fluidRow(
-                                                      column(width=12, align = "center",
-                                                             tags$div(
-                                                               HTML("<font size=\"2\"> Supported by </font>"),
-                                                               HTML(logo)
-                                                             )
-                                                      )
-                                                    )
-                                                  ),
-                                                  mainPanel(
-                                                    br(),
-                                                    fillPage(imageOutput("figDownstream", width = "100%", height = "100%")),
-                                                    wellPanel(h5(tags$b("Description:")),
-                                                              textOutput('capDownstream'))
-                                                  )
-
-                                                )
-
-                                              )
-                                     ),
-                                     tabPanel("Vertical",
-                                              fluidPage(
-                                                sidebarLayout(
-                                                  sidebarPanel(
-                                                    h5(tags$b("Overview:")),
-                                                    helpText(tags$ul(
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining",
-                                                                                     "Sheu and Taragin (2020)"),"for further details."))
-                                                    )
-                                                    ), hr(),
-                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                    #                    selected = "Bertrand ces"),
-                                                    radioButtons("verticalPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"),
-                                                    fluidRow(
-                                                      column(width=12, align = "center",
-                                                             tags$div(
-                                                               HTML("<font size=\"2\"> Supported by </font>"),
-                                                               HTML(logo)
-                                                             )
-                                                      )
-                                                    )
-                                                  ),
-                                                  mainPanel(
-                                                    br(),
-                                                    fillPage(imageOutput("figVertical", width = "100%", height = "100%")),
-                                                    wellPanel(h5(tags$b("Description:")),
-                                                              textOutput('capVertical'))
-                                                  )
-
-                                                )
-
-                                              )
-                                     )), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
-                                 ))),
-
-                      tabPanel("Tariffs", style = "overflow-y:scroll; max-height: 90vh",
-                               fluidPage(
-                                 titlePanel("Tariff Simulations"),
-
-                                 mainPanel(
-                                   tabsetPanel(
-                                     tabPanel("Summary",
-                                              fluidPage(
-                                                sidebarLayout(
-                                                  sidebarPanel(
-                                                    h5(tags$b("Overview:")),
-                                                    helpText(tags$ul(
-                                                      tags$li(htmlOutput('sumNumMergerTariffs')),
-                                                      tags$li(helpText("See ",tags$a(href="https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers",
-                                                                                     "Taragin and Loudermilk (2019)"),"for further details." ))
-                                                    )
-                                                    ),
-                                                    # checkboxGroupInput("supplyModel", label = "Supply Models to Include:",
-                                                    #                    choices = list("Bertrand ces", "Bertrand logit", "auction logit"),
-                                                    #                    selected = "Bertrand ces"),
-                                                    selectInput("outcomeSumTariffs", "Outcome to Report:",
-                                                                choices = c( "Domestic Firm Benefit", "Domestic Firm Price Change", "Foreign Firm Harm", "Foreign Firm Price Change", "Industry Price Change",
-                                                                             "Consumer Harm", "Net Domestic Harm", "Net Total Harm")),
-                                                    sliderInput("tariffThreshSum", "Restrict Market by Tariff (%):", value = 20, min = 10, max = 30, step = 10),
-                                                    fluidRow(
-                                                      column(width=12, align = "center",
-                                                             tags$div(
-                                                               HTML("<font size=\"2\"> Supported by </font>"),
-                                                               HTML(logo)
-                                                             )
-                                                      )
-                                                    )
-                                                  ),
-                                                  mainPanel(
-                                                    br(),
-                                                    fillPage(plotOutput('plotSumTariffs')),
-                                                    wellPanel(h5(tags$b("Description:")),
-                                                              textOutput('capSumTariffs'))
-
-                                                  )
-
-                                                )
-                                              ))), style='width: 100%; height: 100%' #https://stackoverflow.com/questions/19096439/shiny-how-to-adjust-the-width-of-the-tabsetpanel
-
-                                 )
-
-                               )
-
-                      )),
-
-           tabPanel("Other Resources",
-                    fluidPage(
-                      #titlePanel(div(HTML("Welcome to the <em>competitiontoolbox</em> RShiny App!"))),
-                      h3("Additional Research"),
-                      #p("Other researchers have developed their own merger simulation interfaces, which may provide context for or supplement some of the features available in this app."),
-                      #hr(),
-                      p("Luke Froeb and Steven Tschantz (Vanderbilt University) have developed a ",  tags$a(href="https://daag.shinyapps.io/b1x2", "vertical merger simulator app", target = '_blank'),
-                      " that allows users to compare simulated vertical merger effects across different barganining models,
-                        including Nash-in-Nash two-part pricing and various models of derived demand. The app allows for a competitive landscape consisting of either one upstream firm and two downstream firms, or vice-versa."),
-                      p("This vertical simulator accompanies ", tags$a(href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3760634", "Boshoff, Froeb, Minnie, and Tschantz (2020)", target = '_blank', .noWS = "outside"),
-                        ", which provides theoretical frameworks for the various models included in the simulator.")
-                      ),
-                    hr(),
-                    fluidRow(
-                      column(width = 12, align = "center",
-                             tags$div(
-                               HTML("<font size=\"2\"> Supported by </font>"),
-                               HTML(logo)
-                             )
-                      )
-                    )
-                  )
+logoAlt <- "competitiontoolbox sponsor logo"
+
+app_theme <- bslib::bs_theme(
+  version = 5,
+  bootswatch = "flatly",
+  primary = "#185a7d",
+  secondary = "#5f6f7a",
+  success = "#2e7d5b",
+  danger = "#a13d3d",
+  base_font = "Arial"
 )
 
+app_css <- tags$style(HTML("
+  body {
+    background: #f6f8fa;
+  }
+  .navbar-brand {
+    font-weight: 700;
+  }
+  .ct-page {
+    padding-block: 1rem 1.5rem;
+  }
+  .ct-title {
+    margin: 0 0 1rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+  .ct-section-title {
+    margin: 0 0 .75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .ct-sidebar h5 {
+    margin-top: 0;
+  }
+  .ct-sponsor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #d9e1e8;
+    color: #5f6f7a;
+    font-size: .85rem;
+  }
+  .ct-sponsor img {
+    height: 40px;
+  }
+  .ct-action-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: .75rem;
+  }
+  .ct-table-card .card-body {
+    overflow-x: auto;
+  }
+  .ct-note,
+  .ct-description {
+    margin-top: 1rem;
+    padding: .75rem 1rem;
+    border-left: 4px solid #9ab3c5;
+    background: #eef4f8;
+    color: #344552;
+  }
+  .ct-message-warning {
+    color: #9a6700;
+  }
+  .ct-message-error {
+    color: #b42318;
+  }
+  .ct-plot-output {
+    min-height: 520px;
+  }
+  pre.shiny-text-output {
+    white-space: pre-wrap;
+  }
+"))
 
-# ,tabPanel("Documentation",
-#           tags$iframe(style="height:500px; width:100%; scrolling=yes",
-#                       src="https://cran.r-project.org/web/packages/antitrust/vignettes/manual.pdf")
-#           )
-#
-#)
-#)
+sponsor_footer <- function() {
+  tags$div(
+    class = "ct-sponsor",
+    tags$span("Supported by"),
+    tags$a(
+      href = logoURL,
+      target = "_blank",
+      tags$img(src = logoSrc, alt = logoAlt)
+    )
+  )
+}
+
+run_button <- function(inputId, label = "Simulate") {
+  actionButton(
+    inputId = inputId,
+    label = label,
+    icon = icon("play"),
+    class = "btn-primary"
+  )
+}
+
+note_box <- function(...) {
+  tags$div(class = "ct-note", ...)
+}
+
+description_box <- function(outputId) {
+  tags$div(
+    class = "ct-description",
+    h5(tags$b("Description:")),
+    textOutput(outputId)
+  )
+}
+
+simulation_layout <- function(title, sidebar, input_output, simulate_id, result_tabs) {
+  tags$div(
+    class = "ct-page",
+    h1(class = "ct-title", title),
+    bslib::layout_sidebar(
+      sidebar = bslib::sidebar(
+        class = "ct-sidebar",
+        width = 330,
+        sidebar,
+        sponsor_footer()
+      ),
+      bslib::card(
+        class = "ct-table-card",
+        bslib::card_header("Enter Inputs"),
+        input_output,
+        tags$div(class = "ct-action-row", run_button(simulate_id))
+      ),
+      result_tabs
+    )
+  )
+}
+
+horizontal_results_tabs <- function() {
+  bslib::navset_card_tab(
+    id = "inTabset",
+    bslib::nav_panel(
+      "Summary",
+      value = "respanel",
+      tableOutput("results"),
+      note_box(
+        tags$b("Note: "),
+        "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages. ",
+        "A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm. ",
+        "Numbers in parentheses denote harm and benefit as a percentage of post-merger revenues."
+      )
+    ),
+    bslib::nav_panel(
+      "Details",
+      value = "detpanel",
+      tableOutput("results_shareOut"),
+      tableOutput("results_detailed")
+    ),
+    bslib::nav_panel(
+      "Elasticities",
+      value = "elastpanel",
+      radioButtons("pre_elast", "", choices = c("Pre-Merger", "Post-Merger"), inline = TRUE),
+      tableOutput("results_mktelast"),
+      tableOutput("results_elast"),
+      conditionalPanel(
+        "input.supply != 'Cournot'",
+        checkboxInput("diversions", "Report diversion ratios", value = FALSE),
+        note_box(
+          tags$b("Note: "),
+          "Diagonal elements are own-price elasticities. Off-diagonal elements are cross-price elasticities of row with respect to column."
+        )
+      ),
+      conditionalPanel(
+        "input.supply == 'Cournot'",
+        note_box(tags$b("Note: "), "Above are own-price elasticities.")
+      )
+    ),
+    bslib::nav_panel(
+      "Diagnostics",
+      value = "diagpanel",
+      h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"),
+      tableOutput("results_diag_elast"),
+      tableOutput("results_diagnostics"),
+      htmlOutput("overIDText"),
+      h4("Parameters"),
+      verbatimTextOutput("parameters"),
+      helpText("See the", tags$a(href = "https://CRAN.R-project.org/package=antitrust", "antitrust"), "package vignette for more details about the parameters displayed here.")
+    ),
+    bslib::nav_panel("R Code", value = "codepanel", verbatimTextOutput("results_code")),
+    bslib::nav_panel(
+      "Messages",
+      value = "msgpanel",
+      h4("Warnings"),
+      span(class = "ct-message-warning", textOutput("warnings")),
+      h4("Errors"),
+      span(class = "ct-message-error", textOutput("errors"))
+    ),
+    title = "Results"
+  )
+}
+
+vertical_results_tabs <- function() {
+  bslib::navset_card_tab(
+    id = "inTabsetVertical",
+    bslib::nav_panel(
+      "Summary",
+      value = "respanelVertical",
+      tableOutput("resultsVertical"),
+      note_box(
+        tags$b("Note: "),
+        "All price changes as well as compensating marginal cost reduction are (post-merger) share-weighted averages. ",
+        "A negative Consumer Harm number denotes benefit, while a negative Producer Benefit number denotes harm."
+      )
+    ),
+    bslib::nav_panel(
+      "Details",
+      value = "detpanelVertical",
+      tableOutput("results_shareOutVertical"),
+      tableOutput("results_detailedVertical")
+    ),
+    bslib::nav_panel(
+      "Elasticities",
+      value = "elastpanelVertical",
+      radioButtons("pre_elastVertical", "", choices = c("Pre-Merger", "Post-Merger"), inline = TRUE),
+      tableOutput("results_mktelastVertical"),
+      tableOutput("results_elastVertical"),
+      conditionalPanel(
+        "input.supplyVertical != 'Cournot'",
+        checkboxInput("diversionsVertical", "Report diversion ratios", value = FALSE),
+        note_box(
+          tags$b("Note: "),
+          "Diagonal elements are own-price elasticities. Off-diagonal elements are cross-price elasticities of row with respect to column."
+        )
+      ),
+      conditionalPanel(
+        "input.supplyVertical == 'Cournot'",
+        note_box(tags$b("Note: "), "Above are own-price elasticities.")
+      )
+    ),
+    bslib::nav_panel(
+      "Diagnostics",
+      value = "diagpanelVertical",
+      h4("Percent Differences between Inputted and Fitted Values Relative to Inputs"),
+      tableOutput("results_diag_elastVertical"),
+      tableOutput("results_diagnosticsVertical"),
+      htmlOutput("overIDTextVertical"),
+      h4("Parameters"),
+      verbatimTextOutput("parametersVertical"),
+      helpText("See the", tags$a(href = "https://CRAN.R-project.org/package=antitrust", "antitrust"), "package vignette for more details about the parameters displayed here.")
+    ),
+    bslib::nav_panel("R Code", value = "codepanelVertical", verbatimTextOutput("results_codeVertical")),
+    bslib::nav_panel(
+      "Messages",
+      value = "msgpanelVertical",
+      h4("Warnings"),
+      span(class = "ct-message-warning", textOutput("warningsVertical")),
+      h4("Errors"),
+      span(class = "ct-message-error", textOutput("errorsVertical"))
+    ),
+    title = "Results"
+  )
+}
+
+trade_results_tabs <- function(type) {
+  is_tariff <- identical(type, "Tariffs")
+  suffix <- if (is_tariff) "Tariffs" else "Quota"
+  id <- if (is_tariff) "inTabsetTariffs" else "inTabsetQuota"
+  res <- if (is_tariff) "respanelTariffs" else "respanelQuota"
+  det <- if (is_tariff) "detpanelTariffs" else "detpanelQuota"
+  elast_panel <- if (is_tariff) "elastpanelTariffs" else "elastpanelQuota"
+  diag <- if (is_tariff) "diagpanelTariffs" else "diagpanelQuota"
+  code <- if (is_tariff) "codepanelTariffs" else "codepanelQuota"
+  msg <- if (is_tariff) "msgpanelTariffs" else "msgpanelQuota"
+  current_label <- if (is_tariff) "Current Tariff" else "Current Quota"
+  new_label <- if (is_tariff) "New Tariff" else "New Quota"
+  instrument <- if (is_tariff) "new tariff" else "new quota"
+  supply_input <- if (is_tariff) "input.supplyTariffs" else "input.supplyQuota"
+
+  bslib::navset_card_tab(
+    id = id,
+    bslib::nav_panel(
+      "Summary",
+      value = res,
+      tableOutput(paste0("results", suffix)),
+      note_box(
+        tags$b("Note: "),
+        "All price changes are (", instrument, ") share-weighted averages. Negative Consumer Harm or Net Harm numbers denote benefit."
+      )
+    ),
+    bslib::nav_panel(
+      "Details",
+      value = det,
+      tableOutput(paste0("results_shareOut", suffix)),
+      tableOutput(paste0("results_detailed", suffix))
+    ),
+    bslib::nav_panel(
+      "Elasticities",
+      value = elast_panel,
+      radioButtons(paste0("pre_elast", suffix), "", choices = c(current_label, new_label), inline = TRUE),
+      tableOutput(paste0("results_mktelast", suffix)),
+      tableOutput(paste0("results_elast", suffix)),
+      conditionalPanel(
+        paste0(supply_input, " !== 'Cournot'"),
+        checkboxInput(paste0("diversions", suffix), "Report diversion ratios", value = FALSE),
+        note_box(
+          tags$b("Note: "),
+          "Diagonal elements are own-price elasticities. Off-diagonal elements are cross-price elasticities of row with respect to column."
+        )
+      ),
+      conditionalPanel(
+        paste0(supply_input, " == 'Cournot'"),
+        note_box(tags$b("Note: "), "Above are own-price elasticities.")
+      )
+    ),
+    bslib::nav_panel(
+      "Diagnostics",
+      value = diag,
+      h4("Inputted vs. Fitted Values"),
+      tableOutput(paste0("results_diag_elast", suffix)),
+      tableOutput(paste0("results_diagnostics", suffix)),
+      htmlOutput(paste0("overIDText", suffix)),
+      h4("Parameters"),
+      verbatimTextOutput(paste0("parameters", suffix)),
+      helpText("See the", tags$a(href = "https://CRAN.R-project.org/package=antitrust", "antitrust"), "package vignette for more details about the parameters displayed here.")
+    ),
+    bslib::nav_panel("R Code", value = code, verbatimTextOutput(paste0("results_code", suffix))),
+    bslib::nav_panel(
+      "Messages",
+      value = msg,
+      h4("Warnings"),
+      verbatimTextOutput(paste0("warnings", suffix)),
+      h4("Errors"),
+      verbatimTextOutput(paste0("errors", suffix))
+    ),
+    title = "Results"
+  )
+}
+
+horizontal_merger_page <- function() {
+  simulation_layout(
+    "Simulate a Horizontal Merger",
+    tagList(
+      htmlOutput("urlText"),
+      hr(),
+      h5(tags$b("Directions:")),
+      helpText(tags$ul(
+        tags$li("Copy and paste or manually enter market data into the Inputs table."),
+        tags$li("Click Simulate to simulate a merger between 'Firm1' and 'Firm2'."),
+        tags$li("See the", tags$a(href = "https://CRAN.R-project.org/package=antitrust", "antitrust"), "package vignette for more details about the models used.")
+      )),
+      hr(),
+      radioButtons("calcElast", "Calibrate model parameters using:", choices = c("market elasticity and 1 or more margins", "2 or more margins")),
+      conditionalPanel(
+        condition = "input.calcElast.includes('elasticity') == true",
+        numericInput("enterElast", "Enter Market Elasticity:", value = -1, min = -Inf, max = 0, step = .1)
+      ),
+      hr(),
+      radioButtons("supply", "Competitive Interaction:", choices = c("Bertrand", "2nd Score Auction", "Cournot")),
+      conditionalPanel(
+        condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == true",
+        selectInput("demand1", "Demand Specification:", choices = c("logit", "ces", "aids"))
+      ),
+      conditionalPanel(
+        condition = "input.supply == 'Bertrand' & input.calcElast.includes('elasticity') == false",
+        selectInput("demand2", "Demand Specification:", choices = c("logit (unknown elasticity)", "ces (unknown elasticity)", "aids (unknown elasticity)"))
+      ),
+      conditionalPanel(
+        condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == true",
+        selectInput("demand3", "Demand Specification:", choices = "logit"),
+        helpText(tags$b("Note:"), "2nd Score Auction only requires a single price.")
+      ),
+      conditionalPanel(
+        condition = "input.supply == '2nd Score Auction' & input.calcElast.includes('elasticity') == false",
+        selectInput("demand4", "Demand Specification:", choices = "logit (unknown elasticity)"),
+        helpText(tags$b("Note:"), "2nd Score Auction does not require prices.")
+      ),
+      conditionalPanel(
+        condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == true",
+        selectInput("demand5", "Demand Specification:", choices = c("logit", "linear", "loglinear")),
+        helpText(tags$b("Note:"), "Linear and loglinear Cournot use only the first non-missing inputted price and product name.")
+      ),
+      conditionalPanel(
+        condition = "input.supply == 'Cournot' & input.calcElast.includes('elasticity') == false",
+        selectInput("demand6", "Demand Specification:", choices = c("logit (unknown elasticity)", "linear (unknown elasticity)", "loglinear (unknown elasticity)")),
+        helpText(tags$b("Note:"), "Linear and loglinear Cournot use only the first non-missing inputted price and product name.")
+      ),
+      conditionalPanel(
+        condition = "input.supply == 'Bertrand' & input.demand1.includes('aids') == true & input.calcElast.includes('elasticity') == true",
+        helpText(tags$b("Note:"), "'aids' does not require pricing information.")
+      ),
+      conditionalPanel(
+        condition = "input.supply == 'Bertrand' & input.demand2.includes('aids') == true & input.calcElast.includes('elasticity') == false",
+        helpText(tags$b("Note:"), "'aids' does not require pricing information.")
+      )
+    ),
+    rHandsontableOutput("hot"),
+    "simulate",
+    horizontal_results_tabs()
+  )
+}
+
+vertical_merger_page <- function() {
+  simulation_layout(
+    "Simulate a Merger in a Supply Chain",
+    tagList(
+      htmlOutput("urlTextVertical"),
+      hr(),
+      h5(tags$b("Directions:")),
+      helpText(tags$ul(
+        tags$li("Copy and paste or manually enter market data into the Inputs table."),
+        tags$li(htmlOutput("directionsVertical")),
+        tags$li("See the", tags$a(href = "https://CRAN.R-project.org/package=antitrust", "antitrust"), "package vignette for more details about the models used.")
+      )),
+      hr(),
+      sliderInput("addRowsVertical", "Add rows to Inputs table:", value = 10, min = 5, max = 50, step = 5),
+      selectInput("mergerTypeVertical", "Merger Type:", choices = c("Upstream", "Downstream", "Vertical")),
+      radioButtons("supplyVertical", "Competitive Interaction:", choices = c("Bertrand", "2nd Score Auction")),
+      conditionalPanel(
+        condition = "input.supplyVertical == 'Bertrand'",
+        selectInput("demandVertical1", "Downstream Demand Specification:", choices = c("logit")),
+        helpText(tags$b("Note:"), "Share of outside good implied by the sum of inside product shares. Price of outside good fixed at 0.")
+      ),
+      conditionalPanel(
+        condition = "input.supplyVertical == '2nd Score Auction'",
+        selectInput("demandVertical2", "Downstream Demand Specification:", choices = c("logit")),
+        helpText(tags$b("Note:"), "Share of outside good implied by the sum of inside product shares. Price of outside good fixed at 0.")
+      )
+    ),
+    rHandsontableOutput("hotVertical"),
+    "simulateVertical",
+    vertical_results_tabs()
+  )
+}
+
+tariffs_page <- function() {
+  simulation_layout(
+    "Simulate a Tariff",
+    tagList(
+      htmlOutput("urlTextTariffs"),
+      hr(),
+      h5(tags$b("Directions:")),
+      helpText(tags$ul(
+        tags$li("Copy and paste or manually enter market data into the Inputs table."),
+        tags$li("Click Simulate to simulate an", tags$em("ad valorem"), "tariff."),
+        tags$li("Default example simulates an increase in the ", tags$em("ad valorem"), "tariff from 5% to 25% on products produced by 'Firm1' and 'Firm2'."),
+        tags$li("Products without current or new tariffs are assumed to be produced domestically. Otherwise, products are assumed to be produced abroad.")
+      )),
+      hr(),
+      sliderInput("addRowsTariffs", "Add rows to Inputs table:", value = 10, min = 5, max = 50, step = 5),
+      radioButtons("calcElastTariffs", "Calibrate model parameters using:", choices = c("market elasticity AND 1 or more margins", "2 or more margins")),
+      conditionalPanel(
+        condition = "input.calcElastTariffs.includes('elasticity') == true ",
+        numericInput("enterElastTariffs", "Enter Market Elasticity:", value = -1, min = -Inf, max = 0, step = .1)
+      ),
+      hr(),
+      radioButtons("supplyTariffs", "Competitive Interaction:", choices = c("Bertrand", "Monopolistic Competition", "Cournot")),
+      conditionalPanel(
+        condition = "input.supplyTariffs == 'Bertrand' & input.calcElastTariffs.includes('elasticity') == true",
+        selectInput("demandTariffs1", "Demand Specification:", choices = c("logit", "ces", "aids"))
+      ),
+      conditionalPanel(
+        condition = "input.supplyTariffs == 'Bertrand' & input.calcElastTariffs.includes('elasticity') == false",
+        selectInput("demandTariffs2", "Demand Specification:", choices = c("logit (unknown elasticity)", "ces (unknown elasticity)", "aids (unknown elasticity)"))
+      ),
+      conditionalPanel(
+        condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == true",
+        selectInput("demandTariffs3", "Demand Specification:", choices = c("logit", "linear", "loglinear")),
+        helpText(tags$b("Note:"), "Linear and loglinear Cournot use only the first non-missing inputted price and product name.")
+      ),
+      conditionalPanel(
+        condition = "input.supplyTariffs == 'Cournot' & input.calcElastTariffs.includes('elasticity') == false",
+        selectInput("demandTariffs4", "Demand Specification:", choices = c("logit (unknown elasticity)", "linear (unknown elasticity)", "loglinear (unknown elasticity)")),
+        helpText(tags$b("Note:"), "Linear and loglinear Cournot use only the first non-missing inputted price and product name.")
+      ),
+      conditionalPanel(
+        condition = "input.supplyTariffs == 'Monopolistic Competition' & input.calcElastTariffs.includes('elasticity') == true",
+        selectInput("demandTariffs5", "Demand Specification:", choices = c("logit", "ces"))
+      ),
+      conditionalPanel(
+        condition = "input.supplyTariffs == 'Monopolistic Competition' & input.calcElastTariffs.includes('elasticity') == false",
+        selectInput("demandTariffs6", "Demand Specification:", choices = c("logit (unknown elasticity)", "ces (unknown elasticity)"))
+      ),
+      conditionalPanel(
+        condition = "input.supplyTariffs == 'Bertrand' && input.calcElastTariffs.includes('elasticity') == true && input.demandTariffs1 == 'aids'",
+        helpText(tags$b("Note:"), "aids does not require pricing information.")
+      ),
+      conditionalPanel(
+        condition = "input.supplyTariffs == 'Bertrand' && input.calcElastTariffs.includes('elasticity') == false && input.demandTariffs2 == 'aids (unknown elasticity)'",
+        helpText(tags$b("Note:"), "aids does not require pricing information.")
+      )
+    ),
+    rHandsontableOutput("hotTariffs"),
+    "simulateTariffs",
+    trade_results_tabs("Tariffs")
+  )
+}
+
+quotas_page <- function() {
+  simulation_layout(
+    "Simulate a Quota",
+    tagList(
+      htmlOutput("urlTextQuota"),
+      hr(),
+      h5(tags$b("Directions:")),
+      helpText(tags$ul(
+        tags$li("Copy and paste or manually enter market data into the Inputs table."),
+        tags$li("Click Simulate to simulate a quota."),
+        tags$li("Default example simulates an increase in the quota from 100% of current output to 75% of current output on products produced by 'Firm1' and 'Firm2'."),
+        tags$li("Products without current or new quotas are assumed to be produced domestically. Otherwise, products are assumed to be produced abroad.")
+      )),
+      hr(),
+      sliderInput("addRowsQuota", "Add rows to Inputs table:", value = 10, min = 5, max = 50, step = 5),
+      radioButtons("calcElastQuota", "Calibrate model parameters using:", choices = c("market elasticity and 1 or more margins", "2 or more margins"), selected = "market elasticity and 1 or more margins"),
+      conditionalPanel(
+        condition = "input.calcElastQuota.includes('elasticity') == true ",
+        numericInput("enterElastQuota", "Enter Market Elasticity:", value = -1, min = -Inf, max = 0, step = .1)
+      ),
+      hr(),
+      radioButtons("supplyQuota", "Competitive Interaction:", choices = c("Bertrand")),
+      conditionalPanel(
+        condition = "input.supplyQuota == 'Bertrand' & input.calcElastQuota.includes('elasticity') == true",
+        selectInput("demandQuota1", "Demand Specification:", choices = c("logit"))
+      ),
+      conditionalPanel(
+        condition = "input.supplyQuota == 'Bertrand' & input.calcElastQuota.includes('elasticity') == false",
+        selectInput("demandQuota2", "Demand Specification:", choices = c("logit (unknown elasticity)"))
+      )
+    ),
+    rHandsontableOutput("hotQuota"),
+    "simulateQuota",
+    trade_results_tabs("Quotas")
+  )
+}
+
+introduction_page <- function() {
+  tags$div(
+    class = "ct-page",
+    bslib::card(
+      h1(class = "ct-title", HTML("Welcome to the <em>competitiontoolbox</em> Shiny App")),
+      h3("Overview"),
+      p(
+        "The",
+        tags$a(href = "https://CRAN.R-project.org/package=competitiontoolbox", "competitiontoolbox", target = "_blank"),
+        "Shiny application is a browser-based user interface for functionality embedded in the",
+        tags$a(href = "https://CRAN.R-project.org/package=antitrust", "antitrust", target = "_blank"),
+        "and",
+        tags$a(href = "https://CRAN.R-project.org/package=trade", "trade", target = "_blank"),
+        "R packages."
+      ),
+      tags$ul(
+        tags$li("Simulate mergers, tariffs, and quotas under various specifications and market conditions."),
+        tags$li("Numerically simulate horizontal and vertical mergers."),
+        tags$li("Visualize estimated effects on prices, surplus, market structure, and related outcomes.")
+      ),
+      p("Users may input simulation parameters in the sidebars and edit market conditions in the input tables, including prices, margins, and shares."),
+      p(
+        "To better understand the types of predictions that these models make, users may also view the distribution of outcomes from numerical simulations. See",
+        tags$a(href = "https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)", target = "_blank"),
+        "and",
+        tags$a(href = "https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining", "Sheu and Taragin (2020)", target = "_blank"),
+        "for more details."
+      )
+    ),
+    bslib::layout_columns(
+      col_widths = c(6, 6),
+      bslib::card(
+        h3("Get Started"),
+        p("Use Mergers > Horizontal to simulate a horizontal merger."),
+        p("Use Mergers > Vertical to simulate a merger in a supply chain."),
+        p("Use Trade > Tariffs to simulate a tariff."),
+        p("Use Trade > Quotas to simulate a quota.")
+      ),
+      bslib::card(
+        h3("Output Tabs"),
+        tags$ul(
+          tags$li(tags$em("Summary"), ": summary statistics including HHI, surplus, and price changes."),
+          tags$li(tags$em("Details"), ": product-level prices, shares, and cost reductions."),
+          tags$li(tags$em("Elasticities"), ": elasticity and diversion matrices."),
+          tags$li(tags$em("Diagnostics"), ": fitted versus inputted values and model parameters."),
+          tags$li(tags$em("R Code"), ": reproducible R code for the selected simulation."),
+          tags$li(tags$em("Messages"), ": warnings and errors from the simulation.")
+        )
+      )
+    ),
+    sponsor_footer()
+  )
+}
+
+documentation_page <- function(package) {
+  tags$div(
+    class = "ct-page",
+    bslib::card(
+      h1(class = "ct-title", paste(package, "Documentation")),
+      p(
+        "Open the current CRAN reference material for the",
+        package,
+        "package."
+      ),
+      tags$a(
+        class = "btn btn-primary",
+        href = sprintf("https://cran.r-project.org/web/packages/%s/vignettes/Reference.html", package),
+        target = "_blank",
+        "Open Documentation"
+      )
+    )
+  )
+}
+
+numerical_sidebar <- function(..., output = NULL) {
+  tagList(
+    h5(tags$b("Overview:")),
+    helpText(tags$ul(...)),
+    output,
+    sponsor_footer()
+  )
+}
+
+horizontal_numerical_page <- function() {
+  tags$div(
+    class = "ct-page",
+    h1(class = "ct-title", "Horizontal Simulations"),
+    bslib::navset_card_tab(
+      bslib::nav_panel(
+        "Summary",
+        bslib::layout_sidebar(
+          sidebar = bslib::sidebar(
+            width = 330,
+            numerical_sidebar(
+              tags$li(htmlOutput("sumNumMergerATR")),
+              tags$li(helpText("See ", tags$a(href = "https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)"), "for further details.")),
+              output = tagList(
+                selectInput("outcomeSumATR", "Outcome to Report:", choices = c("Consumer Harm ($)", "Producer Benefit ($)", "Net Harm ($)", "Industry Price Change (%)", "Merging Party Price Change (%)")),
+                sliderInput("shareOutSumATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10)
+              )
+            )
+          ),
+          plotOutput("plotSumATR", height = "560px"),
+          description_box("capSumATR")
+        )
+      ),
+      bslib::nav_panel(
+        "Indices",
+        bslib::layout_sidebar(
+          sidebar = bslib::sidebar(
+            width = 330,
+            numerical_sidebar(
+              tags$li(htmlOutput("indicNumMergerATR")),
+              tags$li(helpText("See ", tags$a(href = "https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)"), "for further details.")),
+              output = tagList(
+                radioButtons("pooledIndATR", "Plot Display:", choices = c("Pooled", "By Demand Model"), selected = "Pooled"),
+                selectInput("indexIndATR", "Index:", choices = c("Firm Count", "HHI", "Delta HHI", "UPP", "CMCR", "Harm2nd")),
+                sliderInput("shareOutIndATR", "Restrict Market by Outside Share (%):", value = 30, min = 10, max = 60, step = 10)
+              )
+            )
+          ),
+          plotOutput("plotIndATR", height = "560px"),
+          description_box("capIndATR")
+        )
+      )
+    )
+  )
+}
+
+vertical_numerical_page <- function() {
+  vertical_panel <- function(title, outputId, captionId, input = NULL) {
+    bslib::nav_panel(
+      title,
+      bslib::layout_sidebar(
+        sidebar = bslib::sidebar(
+          width = 330,
+          numerical_sidebar(
+            tags$li(helpText("See ", tags$a(href = "https://www.researchgate.net/publication/330564874_Simulating_Mergers_in_a_Vertical_Supply_Chain_with_Bargaining", "Sheu and Taragin (2020)"), "for further details.")),
+            output = input
+          )
+        ),
+        imageOutput(outputId, width = "100%", height = "560px"),
+        description_box(captionId)
+      )
+    )
+  }
+
+  tags$div(
+    class = "ct-page",
+    h1(class = "ct-title", "Vertical Simulations"),
+    bslib::navset_card_tab(
+      vertical_panel("Summary", "figSummary", "capSummary"),
+      vertical_panel("Upstream", "figUpstream", "capUpstream", radioButtons("upstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter")),
+      vertical_panel("Downstream", "figDownstream", "capDownstream", radioButtons("downstreamPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter")),
+      vertical_panel("Vertical", "figVertical", "capVertical", radioButtons("verticalPlot", "Plot Display:", choices = c("By Bargaining Parameter", "By Number of Firms"), selected = "By Bargaining Parameter"))
+    )
+  )
+}
+
+tariff_numerical_page <- function() {
+  tags$div(
+    class = "ct-page",
+    h1(class = "ct-title", "Tariff Simulations"),
+    bslib::navset_card_tab(
+      bslib::nav_panel(
+        "Summary",
+        bslib::layout_sidebar(
+          sidebar = bslib::sidebar(
+            width = 330,
+            numerical_sidebar(
+              tags$li(htmlOutput("sumNumMergerTariffs")),
+              tags$li(helpText("See ", tags$a(href = "https://www.researchgate.net/publication/330564982_Using_measures_of_competitive_harm_for_optimal_screening_of_horizontal_mergers", "Taragin and Loudermilk (2019)"), "for further details.")),
+              output = tagList(
+                selectInput("outcomeSumTariffs", "Outcome to Report:", choices = c("Domestic Firm Benefit", "Domestic Firm Price Change", "Foreign Firm Harm", "Foreign Firm Price Change", "Industry Price Change", "Consumer Harm", "Net Domestic Harm", "Net Total Harm")),
+                sliderInput("tariffThreshSum", "Restrict Market by Tariff (%):", value = 20, min = 10, max = 30, step = 10)
+              )
+            )
+          ),
+          plotOutput("plotSumTariffs", height = "560px"),
+          description_box("capSumTariffs")
+        )
+      )
+    )
+  )
+}
+
+other_resources_page <- function() {
+  tags$div(
+    class = "ct-page",
+    bslib::card(
+      h1(class = "ct-title", "Additional Research"),
+      p(
+        "Luke Froeb and Steven Tschantz (Vanderbilt University) have developed a ",
+        tags$a(href = "https://daag.shinyapps.io/b1x2", "vertical merger simulator app", target = "_blank"),
+        " that allows users to compare simulated vertical merger effects across different bargaining models, including Nash-in-Nash two-part pricing and various models of derived demand."
+      ),
+      p(
+        "This vertical simulator accompanies ",
+        tags$a(href = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3760634", "Boshoff, Froeb, Minnie, and Tschantz (2020)", target = "_blank", .noWS = "outside"),
+        ", which provides theoretical frameworks for the included models."
+      )
+    ),
+    sponsor_footer()
+  )
+}
+
+bslib::page_navbar(
+  title = "competitiontoolbox",
+  id = "menu",
+  selected = "Introduction",
+  theme = app_theme,
+  window_title = "competitiontoolbox",
+  header = app_css,
+  bslib::nav_panel("Introduction", introduction_page()),
+  bslib::nav_menu(
+    "Mergers",
+    bslib::nav_panel("Horizontal", horizontal_merger_page()),
+    bslib::nav_panel("Vertical", vertical_merger_page()),
+    bslib::nav_panel("Documentation", documentation_page("antitrust"))
+  ),
+  bslib::nav_menu(
+    "Trade",
+    bslib::nav_panel("Tariffs", tariffs_page()),
+    bslib::nav_panel("Quotas", quotas_page()),
+    bslib::nav_panel("Documentation", documentation_page("trade"))
+  ),
+  bslib::nav_menu(
+    "Numerical Simulations",
+    bslib::nav_panel("Horizontal Mergers", horizontal_numerical_page()),
+    bslib::nav_panel("Vertical Mergers", vertical_numerical_page()),
+    bslib::nav_panel("Tariffs", tariff_numerical_page())
+  ),
+  bslib::nav_panel("Other Resources", other_resources_page())
+)

@@ -174,7 +174,7 @@ output$results_elastTariffs <- renderTable({
     res <- diversion(valuesTariffs[["sim"]], preMerger=preMerger)
   }
   else{  res <- elast(valuesTariffs[["sim"]], preMerger=preMerger)}
-  if(isCournot){colnames(res) <- "Elasticity"}
+  if(isCournot && ncol(res) == 1){colnames(res) <- "Elasticity"}
 
   res
 
@@ -194,7 +194,7 @@ output$results_elastQuota <- renderTable({
     res <- diversion(valuesQuota[["sim"]], preMerger=preMerger)
   }
   else{  res <- elast(valuesQuota[["sim"]], preMerger=preMerger)}
-  if(isCournot){colnames(res) <- "Elasticity"}
+  if(isCournot && ncol(res) == 1){colnames(res) <- "Elasticity"}
 
   res
 

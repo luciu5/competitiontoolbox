@@ -10,7 +10,7 @@ tradeInputs <- function(nrows, type = c("Tariffs", "Quotas")) {
     Owner  = c("Firm1","Firm2","Firm3","Firm3"),
     'Prices \n($/unit)'    = rep(10,4),
     'Quantities'   =c(0.4,.3,.2,.1)*100,
-    'Margins\n(p-c)/p' =c(0.25,NA,NA,NA),
+    'Margins\n(p-c)/p' = c(0.25, 0.25, NA, NA),
     stringsAsFactors = FALSE,
     check.names=FALSE
   )

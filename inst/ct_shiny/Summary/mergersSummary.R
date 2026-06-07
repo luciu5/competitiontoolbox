@@ -16,10 +16,16 @@ mergersSummary <- function(res){
   if(isCournot){
 
     capture.output(s <- summary(res, market = FALSE))
-    theseshares <- drop(res@quantities/sum(res@quantities))
-    # Fixed HHI share calculations for Cournot results
-    totQuantPost <- sum(s$quantityPost,na.rm=TRUE)
-    s$sharesPost <- s$quantityPost/totQuantPost*100
+
+    if ("quantities" %in% slotNames(res)) {
+      theseshares <- drop(res@quantities / sum(res@quantities))
+      # Fixed HHI share calculations for Cournot results
+      totQuantPost <- sum(s$quantityPost, na.rm = TRUE)
+      s$sharesPost <- s$quantityPost / totQuantPost * 100
+    } else {
+      theseshares <- calcShares(res, preMerger = TRUE)
+      theseshares <- theseshares / sum(theseshares)
+    }
 
   }
 

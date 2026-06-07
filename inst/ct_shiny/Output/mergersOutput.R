@@ -99,7 +99,7 @@ output$results_shareOutVertical <- renderTable({
 
   if(input$inTabsetVertical != "detpanelVertical" || input$simulateVertical == 0  || is.null(valuesVertical[["sim"]])){return()}
 
-  mergersNoPurch(valuesVertical[["sim"]])  # Returns an error; need to code calcRevenues() in -antitrust-
+  mergersNoPurch(valuesVertical[["sim"]])
 
 }, rownames = TRUE, digits = 1, align = "c")
 
@@ -111,7 +111,7 @@ output$results_detailed <- renderTable({
 
   if(input$inTabset != "detpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
-  if(input$supply == "Cournot"){
+  if(input$supply == "Cournot" && "quantities" %in% slotNames(values[["sim"]])){
 
     res <- NULL
     capture.output(try(res <- summary(values[["sim"]], revenue= FALSE,market=FALSE),silent=TRUE))
@@ -193,7 +193,7 @@ output$results_mktelastVertical <- renderTable({
   if(input$pre_elastVertical == "Pre-Merger"){preMerger = TRUE}
   else{preMerger = FALSE}
 
-  res <- as.matrix(elast(valuesVertical[["sim"]], preMerger = preMerger, market = TRUE))  # Returns an error; need to code elast() in -antitrust-
+  res <- as.matrix(elast(valuesVertical[["sim"]], preMerger = preMerger, market = TRUE))
   colnames(res) <- "Market"
   res
 
@@ -216,7 +216,7 @@ output$results_elast <- renderTable({
     res <- diversion(values[["sim"]], preMerger = preMerger)
   }
   else{res <- elast(values[["sim"]], preMerger = preMerger)}
-  if(isCournot){colnames(res) <- "Elasticity"}
+  if(isCournot && ncol(res) == 1){colnames(res) <- "Elasticity"}
 
   res
 
@@ -236,7 +236,7 @@ output$results_elastVertical <- renderTable({
     res <- diversion(valuesVertical[["sim"]], preMerger = preMerger)
   }
   else{res <- elast(valuesVertical[["sim"]], preMerger = preMerger)}
-  if(isCournot){colnames(res) <- "Elasticity"}
+  if(isCournot && ncol(res) == 1){colnames(res) <- "Elasticity"}
 
   res
 

@@ -58,14 +58,20 @@ tradeTemplateCode <- function(type){
       )
 
       if(input$supplyTariffs == "Cournot"){
-        atrfun <- "cournot_tariff"
-        argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
-        argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
-        argvalues[grep("margins", argvalues)] <- paste0("margins = as.matrix(simdata$`",grep("Margin",cnames,value = TRUE),"`)")
-        argvalues[grep("tariffPre", argvalues)] <- paste0("tariffPre = as.matrix(simdata$`",grep("Current Tariff",cnames,value = TRUE),"`)")
-        argvalues[grep("tariffPost", argvalues)] <- paste0("tariffPost = as.matrix(simdata$`",grep("New Tariff",cnames,value = TRUE),"`)")
-        argvalues[grep("labels", argvalues)] <- sprintf("labels = list(as.character(simdata$Name),as.character(simdata$Name[%d]))",firstPrice)
-        argvalues <- argvalues[grep("insideSize", argvalues, invert = TRUE)]
+        if(grepl("logit", demand(), ignore.case = TRUE)){
+          atrfun <- "logit_cournot_tariff"
+          argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
+        } else {
+          atrfun <- "cournot_tariff"
+          if(thisdemand == "loglinear"){argvalues[grep("^demand\\s*=", argvalues)] <- "demand = 'log'"}
+          argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
+          argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
+          argvalues[grep("margins", argvalues)] <- paste0("margins = as.matrix(simdata$`",grep("Margin",cnames,value = TRUE),"`)")
+          argvalues[grep("tariffPre", argvalues)] <- paste0("tariffPre = as.matrix(simdata$`",grep("Current Tariff",cnames,value = TRUE),"`)")
+          argvalues[grep("tariffPost", argvalues)] <- paste0("tariffPost = as.matrix(simdata$`",grep("New Tariff",cnames,value = TRUE),"`)")
+          argvalues[grep("labels", argvalues)] <- sprintf("labels = list(as.character(simdata$Name),as.character(simdata$Name[%d]))",firstPrice)
+          argvalues <- argvalues[grep("insideSize", argvalues, invert = TRUE)]
+        }
       }
       else if( input$supplyTariffs =="Bertrand"){atrfun <- "bertrand_tariff"}
       else if( input$supplyTariffs =="Monopolistic Competition"){

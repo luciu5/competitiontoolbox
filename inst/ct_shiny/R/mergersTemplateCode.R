@@ -55,15 +55,48 @@ mergersTemplateCode <- function(type){
 
 
       if(supply() == "Cournot"){
-        atrfun <- "cournot"
-        argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
-        argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
-        argvalues[grep("margins", argvalues)] <- paste0("margins = as.matrix(simdata$`",grep("Margin",cnames,value = TRUE),"`)")
+        if(grepl("logit", demand(), ignore.case = TRUE)){
+          atrfun <- "logit.cournot.alm"
+          argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
+          argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum(simdata$`Quantities`)"
+        } else {
+          atrfun <- "cournot"
+          if(thisdemand == "loglinear"){argvalues[grep("^demand\\s*=", argvalues)] <- "demand = 'log'"}
+          argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
+          argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
+          argvalues[grep("margins", argvalues)] <- paste0("margins = as.matrix(simdata$`",grep("Margin",cnames,value = TRUE),"`)")
 
-        argvalues[grep("labels", argvalues)] <- sprintf("labels = list(as.character(simdata$Name),as.character(simdata$Name[%d]))",firstPrice)
-        #argvalues[grep("insideSize", argvalues)] <- NULL
+          argvalues[grep("labels", argvalues)] <- sprintf("labels = list(as.character(simdata$Name),as.character(simdata$Name[%d]))",firstPrice)
+          #argvalues[grep("insideSize", argvalues)] <- NULL
+        }
       }
-      else if(supply() =="Bertrand"){atrfun <- "bertrand.alm"}
+      else if(supply() =="Bertrand"){
+        if(grepl("logit", demand(), ignore.case = TRUE)){
+          atrfun <- "logit.alm"
+          argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
+          argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum(simdata$`Quantities`)"
+        } else if(grepl("ces", demand(), ignore.case = TRUE)){
+          atrfun <- "ces.alm"
+          argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
+          argvalues[grep("quantities", argvalues)] <- paste0(
+            "shares = simdata$`", grep("price", cnames, ignore.case = TRUE, value = TRUE),
+            "` * simdata$`Quantities` / sum(simdata$`",
+            grep("price", cnames, ignore.case = TRUE, value = TRUE),
+            "` * simdata$`Quantities`)"
+          )
+        } else if(grepl("aids", demand(), ignore.case = TRUE)){
+          atrfun <- "aids"
+          argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
+          argvalues[grep("quantities", argvalues)] <- paste0(
+            "shares = simdata$`", grep("price", cnames, ignore.case = TRUE, value = TRUE),
+            "` * simdata$`Quantities` / sum(simdata$`",
+            grep("price", cnames, ignore.case = TRUE, value = TRUE),
+            "` * simdata$`Quantities`)"
+          )
+        } else {
+          atrfun <- "bertrand.alm"
+        }
+      }
 
       else{atrfun <- "auction2nd.logit.alm"
       argvalues <- argvalues[-1]
