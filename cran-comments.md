@@ -1,4 +1,4 @@
-## Submission Summary (v0.7.3)
+## Submission Summary (v0.7.4)
 This is a patch release updating submission metadata and dependencies (`antitrust >= 0.99.33`, `trade >= 0.8.6`).
 
 ## Test Environments
