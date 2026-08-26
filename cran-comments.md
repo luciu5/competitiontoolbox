@@ -1,5 +1,5 @@
-## Submission Summary (v0.7.2)
-This is a patch release updating submission metadata and dependencies (`antitrust >= 0.99.32`, `trade >= 0.8.4`).
+## Submission Summary (v0.7.3)
+This is a patch release updating submission metadata and dependencies (`antitrust >= 0.99.33`, `trade >= 0.8.6`).
 
 ## Test Environments
 * Local Ubuntu 22.04.5 LTS, R 4.6.1
