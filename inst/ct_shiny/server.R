@@ -87,7 +87,7 @@ shinyServer(function(input, output, session) {
 
     ## Summary Tables
     source(paste0(getwd(), "/Summary/mergersSummary.R"), local = TRUE)
-    source(paste0(getwd(), "/Summary/tradeSummary.R"), local = TRUE)
+    source(paste0(getwd(), "/Summary/tradeMarketReport.R"), local = TRUE)
 
     ## No-purchase Shares
     source(paste0(getwd(), "/Details/mergersNoPurch.R"), local = TRUE)
@@ -191,17 +191,6 @@ shinyServer(function(input, output, session) {
       if (input$menu == "Vertical") {
         indata <- indata[!is.na(indata[, "sharesDown"]), ]
       }
-
-      if (input$menu == "Tariffs") {
-        tariffPost <- indata[,grep('New.*\\n(Tariff)',colnames(indata), perl=TRUE), drop = TRUE]
-        tariffPost[is.na(tariffPost)] <- 0
-
-        tariffPre <- indata[,grep('Cur.*\\n(Tariff)',colnames(indata), perl = TRUE), drop= TRUE]
-        tariffPre[is.na(tariffPre)] <- 0
-        indata$mcDelta <- (tariffPost - tariffPre)
-        indata$mcDelta <- indata$mcDelta/(1 - tariffPost)
-      }
-
 
       ##### Run simulations based on input$menu:
       if (req(input$menu) == "Tariffs") {

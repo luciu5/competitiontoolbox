@@ -1,174 +1,168 @@
-
 tradeTemplateCode <- function(type){
+  type <- match.arg(type, c("Tariffs", "Quotas"))
+  indata <- if (type == "Tariffs") {
+    valuesTariffs[["inputData"]]
+  } else {
+    valuesQuota[["inputData"]]
+  }
+  indata <- indata[!is.na(indata$Name) & indata$Name != '', , drop = FALSE]
 
-  if (type == "Tariffs") {
-    indata <- valuesTariffs[["inputData"]]
-  } else if (type == "Quotas") {
-    indata <- valuesQuota[["inputData"]]
+  ## Emit a clean, standalone data object. dput() keeps NA/Inf values and
+  ## product/owner labels valid even when labels contain punctuation.
+  column <- function(pattern, required = TRUE) {
+    hit <- grep(pattern, colnames(indata), ignore.case = TRUE, perl = TRUE)
+    if (!length(hit) && required) stop("trade template input is missing ", pattern)
+    if (length(hit)) indata[[hit[1L]]] else NULL
+  }
+  literal <- function(value) {
+    value <- if (is.factor(value)) as.character(value) else value
+    paste(capture.output(dput(value)), collapse = '')
   }
 
-  indata <- indata[!is.na(indata$Name) & indata$Name != '',]
-
-  cnames <- colnames(indata)
-  cnames <- gsub("\n","",cnames)
-
-  firstPrice <- which(!is.na(indata[,grep("price",cnames, ignore.case = TRUE)]))[1]
-
-  argnames <- c("demand",
-                "owner",
-                "prices",
-                "quantities",
-                "margins",
-                "tariffPre",
-                "tariffPost"
+  values <- list(
+    Name = column('^Name$'),
+    Owner = column('^Owner$'),
+    Prices = column('price'),
+    Output = column('Quantities|Revenues'),
+    Margins = column('Margin'),
+    policyPre = column('^Current'),
+    policyPost = column('^New')
+  )
+  data_code <- paste0(
+    'simdata <- data.frame(\n',
+    paste(vapply(names(values), function(name) {
+      paste0('  ', name, ' = ', literal(values[[name]]))
+    }, character(1L)), collapse = ',\n'),
+    ',\n  check.names = FALSE, stringsAsFactors = FALSE\n)'
   )
 
-  argvalues   <- paste0(argnames," = simdata$`",cnames,"`")
-  summary_code <- "summary(simres, levels = FALSE, market=FALSE)"
+  spec <- model_spec(
+    type,
+    if (type == "Tariffs") supply() else supply(),
+    demand()
+  )
+  known_elast <- identical(spec$calibration, "known")
+  mkt_input <- if (type == "Tariffs") input$enterElastTariffs else input$enterElastQuota
+  mkt_code <- if (known_elast) literal(mkt_input) else NULL
+  policy <- if (type == "Tariffs") "tariff" else "quota"
+  post_arg <- if (type == "Tariffs") "tariffPost" else "quotaPost"
+  pre_arg <- if (type == "Tariffs") "tariffPre" else "quotaPre"
 
-  if(!is.null(demand()) & !is.null(supply())){
-
-    spec <- model_spec(type, supply(), demand())
-
-    if (type == "Tariffs"){
-      thisElast <- ifelse(grepl("elast",input$calcElastTariffs),
-                          input$enterElastTariffs,
-                          "NA_real_"
-      )
-
-      if(grepl("logit", demand(), ignore.case = TRUE)){
-        thisSize <- "sum(simdata$`Quantities`)"
-      }
-      else if(all(is.na(indata[,grepl("price",cnames, ignore.case = TRUE)]))){
-
-        thisSize <-   "sum(simdata$`Revenues`)"
-      }
-
-      else{
-
-        thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
-      }
-
-      thisdemand <- spec$demand_id
-
-      argvalues[1] <- paste(c("demand = ", shQuote(thisdemand)), collapse = "")
-
-      argvalues <- c(argvalues,
-                     paste0("mktElast = ", thisElast,collapse = ""),
-                     #paste0("insideSize = ",thisSize, collapse=""),
-                     "labels = simdata$Name"
-      )
-
-      if(spec$supply == "Cournot"){
-        if(spec$demand_id == "logit"){
-          atrfun <- spec$simulation_fn
-          argvalues <- argvalues[grep("^demand\\s*=", argvalues, invert = TRUE)]
-        } else {
-          atrfun <- spec$simulation_fn
-          if(thisdemand == "loglinear"){argvalues[grep("^demand\\s*=", argvalues)] <- "demand = 'log'"}
-          argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
-          argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
-          argvalues[grep("margins", argvalues)] <- paste0("margins = as.matrix(simdata$`",grep("Margin",cnames,value = TRUE),"`)")
-          argvalues[grep("tariffPre", argvalues)] <- paste0("tariffPre = as.matrix(simdata$`",grep("Current Tariff",cnames,value = TRUE),"`)")
-          argvalues[grep("tariffPost", argvalues)] <- paste0("tariffPost = as.matrix(simdata$`",grep("New Tariff",cnames,value = TRUE),"`)")
-          argvalues[grep("labels", argvalues)] <- sprintf("labels = list(as.character(simdata$Name),as.character(simdata$Name[%d]))",firstPrice)
-          argvalues <- argvalues[grep("insideSize", argvalues, invert = TRUE)]
-        }
-      }
-      else if(spec$supply =="Bertrand"){atrfun <- spec$simulation_fn}
-      else if(spec$supply =="Monopolistic Competition"){
-        atrfun <- spec$simulation_fn
-
-        argvalues <- argvalues[grep("owner", argvalues, invert = TRUE)]
-
-        summary_code <- "summary(simres, levels = FALSE, market=FALSE)"
-        }
-      else{atrfun <- "auction2nd.logit.alm"
-      argvalues <- argvalues[-1]
-      argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum( simdata$`Quantities` ) "
-      argvalues[grep("margins", argvalues)] <- paste0("margins = simdata$`",
-                                                      grep("Margin",cnames,value = TRUE),
-                                                      "` * ", "simdata$`", grep("Price", cnames, value=TRUE),"`")
-      }
-    } else {
-
-      thisElast <- ifelse(grepl("elast",input$calcElastQuota),
-                          input$enterElastQuota,
-                          "NA_real_"
-      )
-
-      if(grepl("logit", demand(), ignore.case =TRUE)){
-        thisSize <- "sum(simdata$`Quantities`)"
-      }
-      else if(all(is.na(indata[,grepl("price",cnames, ignore.case = TRUE)]))){
-        thisSize <- "sum(simdata$`Revenues`)"
-      }
-
-      else{
-        thisSize <- paste0("sum(simdata$`",grep("price",cnames, ignore.case = TRUE, value=TRUE),"`*simdata$`Quantities`)")
-      }
-
-      thisdemand <- spec$demand_id
-
-      argvalues[1] <- paste(c("demand = ", shQuote(thisdemand)), collapse = "")
-
-      argvalues <- c(argvalues,
-                     paste0("mktElast = ", thisElast,collapse = ""),
-                     #paste0("insideSize = ",thisSize, collapse=""),
-                     "labels = simdata$Name"
-      )
-
-      if(spec$supply == "Cournot"){
-        atrfun <- spec$simulation_fn
-        argvalues[grep("prices", argvalues)] <- paste0(argvalues[grep("prices", argvalues)],"[",firstPrice,"]")
-        argvalues[grep("quantities", argvalues)] <- "quantities = as.matrix(simdata$`Quantities`)"
-        argvalues[grep("margins", argvalues)] <- paste0("margins = as.matrix(simdata$`",grep("Margin",cnames,value = TRUE),"`)")
-        argvalues[grep("tariffPre", argvalues)] <- paste0("tariffPre = as.matrix(simdata$`",grep("Current Tariff",cnames,value = TRUE),"`)")
-        argvalues[grep("tariffPost", argvalues)] <- paste0("tariffPost = as.matrix(simdata$`",grep("New Tariff",cnames,value = TRUE),"`)")
-        argvalues[grep("labels", argvalues)] <- sprintf("labels = list(as.character(simdata$Name),as.character(simdata$Name[%d]))",firstPrice)
-        argvalues <- argvalues[grep("insideSize", argvalues, invert = TRUE)]
-      }
-      else if(spec$supply =="Bertrand"){atrfun <- spec$simulation_fn}
-      else{atrfun <- "auction2nd.logit.alm"
-      argvalues <- argvalues[-1]
-      argvalues[grep("quantities", argvalues)] <- "shares = simdata$`Quantities` / sum( simdata$`Quantities` ) "
-      argvalues[grep("margins", argvalues)] <- paste0("margins = simdata$`",
-                                                      grep("Margin",cnames,value = TRUE),
-                                                      "` * ", "simdata$`", grep("Price", cnames, value=TRUE),"`")
-      }
-    }
-
-    atrfun <- paste0("simres <- ",atrfun,"(\n\t",paste0(argvalues,collapse = ",\n\t"),")",collapse = "\n")
-
-    indata_code <- sapply(1:ncol(indata),
-                          function(x){d <- indata[,x];
-                          if(is.character(d)){d <- sprintf("'%s'", indata[,x])};
-                          paste0('`',cnames[x],'`',"= c(",paste(d,collapse=","),")")}
+  is_cournot_matrix <- identical(spec$conduct, "cournot") &&
+    !identical(spec$demand_id, "logit")
+  if (is_cournot_matrix) {
+    calibration_code <- paste0(
+      'first_price <- which(!is.na(simdata$Prices))[1L]\n',
+      'calibration_args <- list(\n',
+      '  prices = simdata$Prices[first_price],\n',
+      '  quantities = as.matrix(simdata$Output),\n',
+      '  margins = as.matrix(simdata$Margins),\n',
+      '  owner = as.character(simdata$Owner),\n',
+      '  ', pre_arg, ' = as.matrix(simdata$policyPre),\n',
+      '  labels = list(as.character(simdata$Name), as.character(simdata$Name[first_price]))\n',
+      ')'
     )
-    indata_code <- paste0("simdata <- data.frame(\n\t", paste0(indata_code,collapse=",\n\t"),",\n check.names = FALSE,\n stringsAsFactors = FALSE\n)")
-
-    if(type =="Quotas"){
-      atrfun <- gsub("tariff","quota",atrfun)
-      indata_code <- gsub("Tariff","Quota",indata_code)
-    }
-
-    thiscode <- c(
-      "library(trade)",
-      "\n\n ## Load Data:\n",
-      indata_code,
-      "\n\n ## Run Simulation: \n",
-      atrfun,
-      "\n\n ## Summary Tab Results:\n",
-      gsub("market\\s*=\\s*FALSE","market=TRUE",summary_code,perl=TRUE),
-      "\n\n ## Details Tab Results:\n",
-      summary_code,
-      "\n\n",
-      "\n ## Elasticities Tab Results  (Pre-tariff Only):\n",
-      "elast(simres, preMerger = TRUE, market=TRUE)\n elast(simres, preMerger = TRUE, market=FALSE)",
-      "\n\n ## Diagnostics Tab Results:\n",
-      "calcDiagnostics(simres)\n\n"
+    post_code <- paste0('as.matrix(simdata$policyPost)')
+  } else {
+    calibration_code <- paste0(
+      'calibration_args <- list(\n',
+      '  prices = simdata$Prices,\n',
+      '  quantities = simdata$Output,\n',
+      '  margins = simdata$Margins,\n',
+      '  ', pre_arg, ' = simdata$policyPre,\n',
+      '  labels = as.character(simdata$Name)\n',
+      ')'
     )
-
-    return(thiscode)
+    if (!identical(spec$conduct, "moncom")) {
+      calibration_code <- paste0(
+        calibration_code,
+        '\ncalibration_args$owner <- as.character(simdata$Owner)'
+      )
+    }
+    post_code <- 'simdata$policyPost'
   }
+  if (known_elast) {
+    calibration_code <- paste0(
+      calibration_code,
+      '\ncalibration_args$mktElast <- ', mkt_code
+    )
+  }
+
+  simulation_code <- paste0(
+    'simres <- trade::simulate(fit, ', post_arg, ' = ', post_code, ')\n'
+  )
+  if (identical(spec$demand_id, "aids")) {
+    simulation_code <- paste0(
+      '## Compatibility path for TariffAIDS priceDelta in the frozen upstream lifecycle.\n',
+      'legacy_args <- calibration_args\n',
+      'legacy_args$tariffPost <- simdata$policyPost\n',
+      'simres <- do.call(trade::bertrand_tariff, c(list(demand = "aids"), legacy_args))\n'
+    )
+  }
+
+  model_code <- paste0(
+    'trade_spec <- trade::model_spec(\n',
+    '  demand = ', shQuote(spec$demand_id), ',\n',
+    '  conduct = ', shQuote(spec$conduct), ',\n',
+    '  variant = ', shQuote(spec$variant), ',\n',
+    '  policy = ', shQuote(policy), '\n',
+    ')\n',
+    calibration_code, '\n',
+    'fit <- do.call(trade::calibrate, c(list(demand = trade_spec), calibration_args))\n',
+    simulation_code
+  )
+
+  revenue_code <- if (spec$demand_id %in% c("ces", "aids")) {
+    "anyNA(simdata$Prices)"
+  } else {
+    "FALSE"
+  }
+  market_summary_code <- if (identical(spec$demand_id, "aids")) {
+    c(
+      "if (anyNA(simdata$Prices)) {",
+      "  details <- NULL",
+      "  capture.output(details <- trade::summary(simres, revenue = TRUE, levels = FALSE, market = FALSE))",
+      "  is_foreign <- trimws(as.character(details$isForeign)) == \"*\"",
+      "  weighted_change <- function(select) {",
+      "    if (!any(select)) return(NA_real_)",
+      "    stats::weighted.mean(details$priceDelta[select], details$sharesPost[select], na.rm = TRUE)",
+      "  }",
+      "  market_summary <- data.frame(",
+      "    `Domestic Firm Price Change (%)` = weighted_change(!is_foreign),",
+      "    `Foreign Firm Price Change (%)` = weighted_change(is_foreign),",
+      "    `Industry Price Change (%)` = weighted_change(rep(TRUE, nrow(details))),",
+      "    check.names = FALSE",
+      "  )",
+      "  print(market_summary, row.names = FALSE)",
+      "} else {",
+      "  trade::summary(simres, levels = FALSE, market = TRUE)",
+      "}"
+    )
+  } else {
+    "trade::summary(simres, levels = FALSE, market = TRUE)"
+  }
+
+  c(
+    'library(trade)',
+    '',
+    '## Load Data:',
+    data_code,
+    '',
+    '## Calibrate baseline and run one counterfactual:',
+    model_code,
+    '## Summary Tab Results:',
+    market_summary_code,
+    '',
+    '## Details Tab Results:',
+    paste0('trade::summary(simres, revenue = ', revenue_code,
+           ', levels = FALSE, market = FALSE)'),
+    '',
+    '## Elasticities Tab Results (Pre-policy Only):',
+    'trade::elast(simres, preMerger = TRUE, market = TRUE)',
+    'trade::elast(simres, preMerger = TRUE, market = FALSE)',
+    '',
+    '## Diagnostics Tab Results:',
+    'trade::calcDiagnostics(simres)',
+    ''
+  )
 }

@@ -77,7 +77,7 @@ output$resultsVertical <-
     if(input$inTabsetVertical != "respanelVertical" || input$simulateVertical == 0 || is.null(valuesVertical[["sim"]])){return()}
 
     #inputData <- valuesVertical[["inputData"]]
-    capture.output(result <- summary(valuesVertical[["sim"]], market = TRUE))
+    capture.output(result <- vertical::summary(valuesVertical[["sim"]], market = TRUE))
     result <- as.data.frame(result)
 
   }, na = "", digits = 1)
@@ -111,10 +111,11 @@ output$results_detailed <- renderTable({
 
   if(input$inTabset != "detpanel" || input$simulate == 0 || is.null(values[["sim"]])){return()}
 
-  if(model_is_cournot(values[["sim"]]) && model_has_quantities(values[["sim"]])){
+  if(model_is_cournot(values[["sim"]]) &&
+     model_result_spec(values[["sim"]])$demand_id %in% c("linear", "loglin")){
 
     res <- NULL
-    capture.output(try(res <- summary(values[["sim"]], revenue= FALSE,market=FALSE),silent=TRUE))
+    capture.output(try(res <- antitrust::summary(values[["sim"]], revenue= FALSE,market=FALSE),silent=TRUE))
     res$product <- res$mcDelta <- NULL
 
     try(colnames(res) <- c("Merging Party","Name","Pre-Merger Price","Post-Merger Price", "Price Change (%)","Pre-Merger Quantity","Post-Merger Quantity", "Output Change (%)"),silent=TRUE)
@@ -124,16 +125,15 @@ output$results_detailed <- renderTable({
     isAuction <- model_is_auction(values[["sim"]])
     isRevDemand <- model_uses_revenue_shares(values[["sim"]])
     inLevels <- FALSE
-    #isAIDS <- grepl("aids",class(values[["sim"]]),ignore.case = TRUE)
-    missPrice <- any(is.na(values[["sim"]]@prices))
+    missPrice <- anyNA(model_result_inputs(values[["sim"]])$Prices)
     if(isAuction && missPrice){inLevels = TRUE}
 
-    capture.output(res <- summary(values[["sim"]], revenue=isRevDemand & missPrice, insideOnly=TRUE, levels=inLevels))
+    capture.output(res <- antitrust::summary(values[["sim"]], revenue=isRevDemand & missPrice, insideOnly=TRUE, levels=inLevels))
     res$Name <- rownames(res)
     res$mcDelta <- NULL
     res <- res[,c(1, ncol(res), 2 : (ncol(res)  - 1))]
     res$cmcr <- NA
-    try(res$cmcr[res$isParty=="*"] <- cmcr(values[["sim"]]))
+    try(res$cmcr[res$isParty=="*"] <- antitrust::cmcr(values[["sim"]]))
 
     thesenames <-  c("Merging Party","Name","Pre-Merger Price","Post-Merger Price", "Price Change (%)","Pre-Merger Share (%)","Post-Merger Share (%)", "Share Change (%)",'Compensating Marginal Cost Reduction (%)')
 
@@ -160,7 +160,7 @@ output$results_detailedVertical <- renderTable({
   ## ASK CHARLES if the complicated logic for results_detailed in -Horizontal- needs to be replicated here...
   ##
 
-  capture.output(result <- summary(valuesVertical[["sim"]]))
+  capture.output(result <- vertical::summary(valuesVertical[["sim"]]))
   result <- as.data.frame(result)
 
   result$Name <- rownames(result)
@@ -179,7 +179,7 @@ output$results_mktelast <- renderTable({
   if(input$pre_elast == "Pre-Merger"){ preMerger = TRUE}
   else{preMerger = FALSE}
 
-  res <- as.matrix(elast(values[["sim"]], preMerger=preMerger, market = TRUE))
+  res <- as.matrix(antitrust::elast(values[["sim"]], preMerger=preMerger, market = TRUE))
   colnames(res) <- "Market"
   res
 
@@ -193,7 +193,7 @@ output$results_mktelastVertical <- renderTable({
   if(input$pre_elastVertical == "Pre-Merger"){preMerger = TRUE}
   else{preMerger = FALSE}
 
-  res <- as.matrix(elast(valuesVertical[["sim"]], preMerger = preMerger, market = TRUE))
+  res <- as.matrix(vertical::elast(valuesVertical[["sim"]], preMerger = preMerger, market = TRUE))
   colnames(res) <- "Market"
   res
 
@@ -211,9 +211,9 @@ output$results_elast <- renderTable({
   else{preMerger = FALSE}
 
   if(model_supports_diversion(values[["sim"]]) && input$diversions){
-    res <- diversion(values[["sim"]], preMerger = preMerger)
+    res <- antitrust::diversion(values[["sim"]], preMerger = preMerger)
   }
-  else{res <- elast(values[["sim"]], preMerger = preMerger)}
+  else{res <- antitrust::elast(values[["sim"]], preMerger = preMerger)}
   res <- format_elasticity_table(res, values[["sim"]])
 
   res
@@ -229,9 +229,9 @@ output$results_elastVertical <- renderTable({
   else{preMerger = FALSE}
 
   if(model_supports_diversion(valuesVertical[["sim"]]) && input$diversionsVertical){
-    res <- diversion(valuesVertical[["sim"]], preMerger = preMerger)
+    res <- vertical::diversion(valuesVertical[["sim"]], preMerger = preMerger)
   }
-  else{res <- elast(valuesVertical[["sim"]], preMerger = preMerger)}
+  else{res <- vertical::elast(valuesVertical[["sim"]], preMerger = preMerger)}
   res <- format_elasticity_table(res, valuesVertical[["sim"]])
 
   res
@@ -290,7 +290,6 @@ output$results_diagnosticsVertical <- renderTable({
   ##
 
   res <- mergersDiag(valuesVertical[["sim"]])
-  #res <- calcDiagnostics(thisSim$value)  # Why does this looks different than the -horizontal- merger sim Diagnostic table?
   res
 
 }, digits = 2, rownames = FALSE, align = "c")
@@ -327,7 +326,7 @@ output$parameters <- renderPrint({
 
   if(input$inTabset != "diagpanel" || input$simulate == 0  || is.null(values[["sim"]])){return()}
 
-  print(getParms(values[["sim"]], digits = 2))
+  print(antitrust::getParms(values[["sim"]], digits = 2))
 })
 
 # Vertical
@@ -335,7 +334,7 @@ output$parametersVertical <- renderPrint({
 
   if(input$inTabsetVertical != "diagpanelVertical" || input$simulateVertical == 0  || is.null(valuesVertical[["sim"]])){return()}
 
-  print(getParms(valuesVertical[["sim"]], digits = 2))
+  print(vertical::getParms(valuesVertical[["sim"]], digits = 2))
 })
 
 

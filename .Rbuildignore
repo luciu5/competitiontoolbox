@@ -7,3 +7,5 @@
 ^CRAN-SUBMISSION$
 ^competitiontoolbox_.*[.]tar[.]gz$
 ^\.Rcheck$
+^\.github$
+^\.ci$

@@ -36,11 +36,11 @@ model_registry <- function() {
     ),
     demand_id = c(
       "logit", "ces", "aids", "logit", "ces", "aids",
-      "logit", "linear", "loglinear", "logit", "linear", "loglinear",
+      "logit", "linear", "loglin", "logit", "linear", "loglin",
       "logit", "logit",
       "logit", "logit",
       "logit", "ces", "aids", "logit", "ces", "aids",
-      "logit", "linear", "loglinear", "logit", "linear", "loglinear",
+      "logit", "linear", "loglin", "logit", "linear", "loglin",
       "logit", "ces", "logit", "ces",
       "logit", "logit"
     ),
@@ -54,69 +54,88 @@ model_registry <- function() {
       rep(known, 2), rep(unknown, 2),
       known, unknown
     ),
-    simulation_fn = c(
-      "logit.alm", "ces.alm", "aids", "logit.alm", "ces.alm", "aids",
-      "logit.cournot.alm", "cournot", "cournot", "logit.cournot.alm", "cournot", "cournot",
-      "auction2nd.logit.alm", "auction2nd.logit.alm",
-      "vertical.barg", "vertical.barg",
-      "bertrand_tariff", "bertrand_tariff", "bertrand_tariff",
-      "bertrand_tariff", "bertrand_tariff", "bertrand_tariff",
-      "logit_cournot_tariff", "cournot_tariff", "cournot_tariff",
-      "logit_cournot_tariff", "cournot_tariff", "cournot_tariff",
-      "monopolistic_competition_tariff", "monopolistic_competition_tariff",
-      "monopolistic_competition_tariff", "monopolistic_competition_tariff",
-      "bertrand_quota", "bertrand_quota"
+    upstream_package = c(
+      rep("antitrust", 14),
+      rep("vertical", 2),
+      rep("trade", 18)
     ),
-    output_shape = c(
-      rep("shares", 6),
-      "full_elasticity_matrix", "quantity_table", "quantity_table",
-      "full_elasticity_matrix", "quantity_table", "quantity_table",
-      rep("shares", 2),
-      rep("shares", 2),
-      rep("shares", 6),
-      "full_elasticity_matrix", "quantity_table", "quantity_table",
-      "full_elasticity_matrix", "quantity_table", "quantity_table",
-      rep("shares", 4),
-      rep("shares", 2)
+    conduct = c(
+      rep("bertrand", 6),
+      rep("cournot", 6),
+      rep("auction2nd", 2),
+      rep("vertical_bargaining", 2),
+      rep("bertrand", 6),
+      rep("cournot", 6),
+      rep("moncom", 4),
+      rep("bertrand", 2)
+    ),
+    variant = c(
+      "alm", "alm", "standard", "alm", "alm", "standard",
+      "alm", "standard", "standard", "alm", "standard", "standard",
+      "alm", "alm",
+      "standard", "auction2nd",
+      rep("standard", 6), "alm", rep("standard", 11)
+    ),
+    policy = c(
+      rep(NA_character_, 16),
+      rep("tariff", 16),
+      rep("quota", 2)
     ),
     stringsAsFactors = FALSE
   )
 }
 
 model_demand_id <- function(demand_label) {
-  gsub("\\s*\\(.*", "", demand_label, perl = TRUE)
+  demand_id <- gsub("\\s*\\(.*", "", demand_label, perl = TRUE)
+  if (identical(demand_id, "loglinear")) "loglin" else demand_id
 }
 
 model_has_known_elasticity <- function(calc_elast) {
   grepl("elasticity", calc_elast, ignore.case = TRUE)
 }
 
+upstream_model_spec <- function(spec) {
+  switch(
+    spec$upstream_package,
+    antitrust = antitrust::model_spec(
+      demand = spec$demand_id,
+      conduct = spec$conduct,
+      variant = spec$variant
+    ),
+    trade = trade::model_spec(
+      demand = spec$demand_id,
+      conduct = spec$conduct,
+      variant = spec$variant,
+      policy = spec$policy
+    ),
+    vertical = vertical::model_spec(
+      demand = spec$demand_id,
+      conduct = spec$conduct,
+      variant = spec$variant
+    ),
+    stop("Unsupported upstream package: ", spec$upstream_package, call. = FALSE)
+  )
+}
+
 model_spec <- function(page, supply, demand) {
   registry <- model_registry()
-  demand_id <- model_demand_id(demand)
   matches <- registry[
     registry$page == page &
       registry$supply == supply &
-      registry$demand_id == demand_id &
-      registry$calibration == ifelse(grepl("unknown elasticity", demand, ignore.case = TRUE), "unknown", registry$calibration),
+      registry$demand_label == demand,
+    , drop = FALSE
   ]
 
-  if (nrow(matches) != 1) {
-    matches <- registry[
-      registry$page == page &
-        registry$supply == supply &
-        registry$demand_label == demand,
-    ]
-  }
-
-  if (nrow(matches) != 1) {
+  if (nrow(matches) != 1L) {
     stop(
       sprintf("Unsupported model combination: page=%s, supply=%s, demand=%s", page, supply, demand),
       call. = FALSE
     )
   }
 
-  as.list(matches[1, ])
+  spec <- as.list(matches[1, , drop = FALSE])
+  spec$upstream_spec <- upstream_model_spec(spec)
+  spec
 }
 
 model_demand_choices <- function(page, supply, known_elasticity = TRUE) {
@@ -130,36 +149,37 @@ model_demand_choices <- function(page, supply, known_elasticity = TRUE) {
   unique(choices)
 }
 
-model_is_cournot <- function(sim) {
-  spec <- attr(sim, "ct_model_spec")
-  if (!is.null(spec)) {
-    return(identical(spec$supply, "Cournot"))
+model_result_spec <- function(sim) {
+  spec <- attr(sim, "ct_model_spec", exact = TRUE)
+  if (is.null(spec)) {
+    stop("Result was not created by a competitiontoolbox model route.", call. = FALSE)
   }
-  grepl("Cournot", class(sim), ignore.case = TRUE)
+  spec
+}
+
+model_result_inputs <- function(sim) {
+  inputs <- attr(sim, "ct_model_inputs", exact = TRUE)
+  if (is.null(inputs)) {
+    stop("Result does not retain competitiontoolbox input metadata.", call. = FALSE)
+  }
+  inputs
+}
+
+model_is_cournot <- function(sim) {
+  identical(model_result_spec(sim)$conduct, "cournot")
 }
 
 model_is_auction <- function(sim) {
-  spec <- attr(sim, "ct_model_spec")
-  if (!is.null(spec)) {
-    return(identical(spec$supply, "2nd Score Auction"))
-  }
-  grepl("Auction", class(sim), ignore.case = TRUE)
+  spec <- model_result_spec(sim)
+  identical(spec$conduct, "auction2nd") || identical(spec$variant, "auction2nd")
 }
 
 model_is_vertical <- function(sim) {
-  spec <- attr(sim, "ct_model_spec")
-  if (!is.null(spec)) {
-    return(identical(spec$page, "Vertical"))
-  }
-  grepl("Vert", class(sim), ignore.case = TRUE)
+  identical(model_result_spec(sim)$page, "Vertical")
 }
 
 model_uses_revenue_shares <- function(sim) {
-  spec <- attr(sim, "ct_model_spec")
-  if (!is.null(spec)) {
-    return(spec$demand_id %in% c("ces", "aids"))
-  }
-  grepl("ces|aids", class(sim), ignore.case = TRUE)
+  model_result_spec(sim)$demand_id %in% c("ces", "aids")
 }
 
 model_supports_no_purchase_share <- function(sim) {
@@ -170,13 +190,9 @@ model_supports_diversion <- function(sim) {
   !model_is_cournot(sim)
 }
 
-model_has_quantities <- function(sim) {
-  "quantities" %in% slotNames(sim)
-}
-
 format_elasticity_table <- function(res, sim) {
   res <- as.matrix(res)
-  if (model_is_cournot(sim) && ncol(res) == 1) {
+  if (model_is_cournot(sim) && ncol(res) == 1L) {
     colnames(res) <- "Elasticity"
   }
   res
@@ -193,25 +209,29 @@ normalize_model_inputs <- function(page, indata) {
     cnames[grepl("^Margins", cnames, ignore.case = TRUE)] <- "Margins"
     cnames[grepl("Quantities|Revenues", cnames, ignore.case = TRUE)] <- "Output"
     cnames[grepl("Cost Changes", cnames, ignore.case = TRUE)] <- "mcDeltaInput"
-    cnames[grepl("^Current.*(Tariff|Quota)", cnames, ignore.case = TRUE)] <- "tariffPre"
-    cnames[grepl("^New.*(Tariff|Quota)", cnames, ignore.case = TRUE)] <- "tariffPost"
+    cnames[grepl("^Current.*(Tariff|Quota)", cnames, ignore.case = TRUE)] <- "policyPre"
+    cnames[grepl("^New.*(Tariff|Quota)", cnames, ignore.case = TRUE)] <- "policyPost"
     colnames(indata) <- cnames
   }
 
   if (page %in% c("Horizontal", "Tariffs", "Quotas")) {
     indata <- indata[!is.na(indata$Output), , drop = FALSE]
-    if (!"mcDelta" %in% colnames(indata)) {
-      indata$mcDelta <- 0
-    }
   }
 
   if (page == "Horizontal") {
+    indata$mcDelta <- 0
     if ("mcDeltaInput" %in% colnames(indata)) {
       indata$mcDelta <- indata$mcDeltaInput
       indata$mcDelta[is.na(indata$mcDelta)] <- 0
     }
-    indata$`Pre-merger\n Owner` <- factor(indata$`Pre-merger\n Owner`, levels = unique(indata$`Pre-merger\n Owner`))
-    indata$`Post-merger\n Owner` <- factor(indata$`Post-merger\n Owner`, levels = unique(indata$`Post-merger\n Owner`))
+    indata$`Pre-merger\n Owner` <- factor(
+      indata$`Pre-merger\n Owner`,
+      levels = unique(indata$`Pre-merger\n Owner`)
+    )
+    indata$`Post-merger\n Owner` <- factor(
+      indata$`Post-merger\n Owner`,
+      levels = unique(indata$`Post-merger\n Owner`)
+    )
   }
 
   if (page == "Vertical") {
@@ -223,167 +243,42 @@ normalize_model_inputs <- function(page, indata) {
   }
 
   if (page == "Tariffs") {
-    indata$tariffPre[is.na(indata$tariffPre)] <- 0
-    indata$tariffPost[is.na(indata$tariffPost)] <- 0
-    indata$mcDelta <- (indata$tariffPost - indata$tariffPre) / (1 - indata$tariffPost)
+    indata$policyPre[is.na(indata$policyPre)] <- 0
+    indata$policyPost[is.na(indata$policyPost)] <- 0
   }
 
   if (page == "Quotas") {
-    indata$tariffPre[is.na(indata$tariffPre)] <- Inf
-    indata$tariffPost[is.na(indata$tariffPost)] <- Inf
+    indata$policyPre[is.na(indata$policyPre)] <- Inf
+    indata$policyPost[is.na(indata$policyPost)] <- Inf
   }
 
   indata
 }
 
 run_model <- function(spec, data, params = list()) {
-  page <- spec$page
-  data <- normalize_model_inputs(page, data)
-  fn <- get(spec$simulation_fn)
-  mktElast <- params$mktElast
-  known_elast <- identical(spec$calibration, "known")
-
-  result <- switch(
-    page,
-    Horizontal = run_horizontal_model(fn, spec, data, mktElast, known_elast),
-    Vertical = run_vertical_model(fn, spec, data),
-    Tariffs = run_tariff_model(fn, spec, data, mktElast, known_elast),
-    Quotas = run_quota_model(fn, spec, data, mktElast, known_elast),
-    stop(sprintf("Unsupported page: %s", page), call. = FALSE)
+  data <- normalize_model_inputs(spec$page, data)
+  execution <- switch(
+    spec$page,
+    Horizontal = run_horizontal_model(spec, data, params),
+    Vertical = run_vertical_model(spec, data, params),
+    Tariffs = run_tariff_model(spec, data, params),
+    Quotas = run_quota_model(spec, data, params),
+    stop(sprintf("Unsupported page: %s", spec$page), call. = FALSE)
   )
 
+  if (!is.list(execution) || is.null(execution$fit) || is.null(execution$result) ||
+      length(execution$simulation_api) != 1L ||
+      !nzchar(execution$simulation_api)) {
+    stop(
+      "A model route must return a fitted baseline, simulated result, and public execution API.",
+      call. = FALSE
+    )
+  }
+
+  result <- execution$result
   attr(result, "ct_model_spec") <- spec
+  attr(result, "ct_model_inputs") <- data
+  attr(result, "ct_fit") <- execution$fit
+  attr(result, "ct_simulation_api") <- execution$simulation_api
   result
-}
-
-run_horizontal_model <- function(fn, spec, indata, mktElast, known_elast) {
-  prices <- indata$Prices
-  margins <- indata$Margins
-  missPrices <- any(is.na(prices))
-  shares_quantity <- shares_revenue <- indata$Output / sum(indata$Output, na.rm = TRUE)
-  insideSize <- sum(indata$Output, na.rm = TRUE)
-
-  if (!missPrices) {
-    if (spec$demand_id %in% c("ces", "aids")) {
-      insideSize <- sum(prices * indata$Output, na.rm = TRUE)
-    }
-    shares_revenue <- prices * shares_revenue / sum(prices * shares_revenue)
-    if (identical(spec$supply, "2nd Score Auction")) {
-      margins <- margins * prices
-    }
-  }
-
-  ownerPre <- tcrossprod(model.matrix(~ -1 + indata$`Pre-merger\n Owner`))
-  if (nlevels(indata$`Post-merger\n Owner`) > 1) {
-    ownerPost <- tcrossprod(model.matrix(~ -1 + indata$`Post-merger\n Owner`))
-  } else {
-    ownerPost <- matrix(1, ncol = length(indata$Output), nrow = length(indata$Output))
-  }
-
-  if (identical(spec$supply, "Cournot") && spec$demand_id != "logit") {
-    args <- list(
-      prices = na.omit(prices)[1],
-      demand = ifelse(spec$demand_id == "loglinear", "log", "linear"),
-      quantities = as.matrix(indata$Output),
-      margins = as.matrix(margins),
-      ownerPre = ownerPre,
-      ownerPost = ownerPost,
-      mktElast = ifelse(known_elast, mktElast, NA_real_),
-      mcDelta = indata$mcDelta,
-      labels = list(indata$Name, indata$Name[1])
-    )
-    return(do.call(fn, args))
-  }
-
-  shares <- if (spec$demand_id %in% c("ces", "aids")) shares_revenue else shares_quantity
-  args <- list(
-    prices = prices,
-    shares = shares,
-    margins = margins,
-    ownerPre = ownerPre,
-    ownerPost = ownerPost,
-    insideSize = insideSize,
-    mcDelta = indata$mcDelta,
-    labels = indata$Name
-  )
-  if (known_elast || identical(spec$supply, "Cournot")) {
-    args$mktElast <- ifelse(known_elast, mktElast, NA_real_)
-  }
-
-  do.call(fn, args)
-}
-
-run_vertical_model <- function(fn, spec, indata) {
-  supplyDown <- ifelse(identical(spec$supply, "Bertrand"), "bertrand", "2nd")
-  do.call(fn, list(
-    supplyDown = supplyDown,
-    sharesDown = indata$sharesDown,
-    pricesDown = indata$pricesDown,
-    marginsDown = indata$marginsDown,
-    ownerPreDown = indata$ownerPreDown,
-    ownerPostDown = indata$ownerPostDown,
-    pricesUp = indata$pricesUp,
-    marginsUp = indata$marginsUp,
-    ownerPreUp = indata$ownerPreUp,
-    ownerPostUp = indata$ownerPostUp,
-    priceOutside = 0,
-    labels = indata$Name
-  ))
-}
-
-run_tariff_model <- function(fn, spec, indata, mktElast, known_elast) {
-  if (identical(spec$supply, "Cournot") && spec$demand_id != "logit") {
-    args <- list(
-      prices = na.omit(indata$Prices)[1],
-      demand = ifelse(spec$demand_id == "loglinear", "log", "linear"),
-      quantities = as.matrix(indata$Output),
-      margins = as.matrix(indata$Margins),
-      owner = indata$Owner,
-      tariffPre = as.matrix(indata$tariffPre),
-      tariffPost = as.matrix(indata$tariffPost),
-      labels = list(indata$Name, indata$Name[1])
-    )
-    if (known_elast) {
-      args$mktElast <- mktElast
-    }
-    return(do.call(fn, args))
-  }
-
-  args <- list(
-    prices = indata$Prices,
-    quantities = indata$Output,
-    margins = indata$Margins,
-    tariffPre = indata$tariffPre,
-    tariffPost = indata$tariffPost,
-    labels = indata$Name
-  )
-
-  if (!identical(spec$supply, "Monopolistic Competition")) {
-    args$owner <- indata$Owner
-  }
-  if (!identical(spec$supply, "Cournot") || spec$demand_id != "logit") {
-    args$demand <- spec$demand_id
-  }
-  if (known_elast || identical(spec$supply, "Cournot")) {
-    args$mktElast <- ifelse(known_elast, mktElast, NA_real_)
-  }
-
-  do.call(fn, args)
-}
-
-run_quota_model <- function(fn, spec, indata, mktElast, known_elast) {
-  args <- list(
-    demand = spec$demand_id,
-    prices = indata$Prices,
-    quantities = indata$Output,
-    margins = indata$Margins,
-    owner = indata$Owner,
-    quotaPre = indata$tariffPre,
-    quotaPost = indata$tariffPost,
-    labels = indata$Name
-  )
-  if (known_elast) {
-    args$mktElast <- mktElast
-  }
-  do.call(fn, args)
 }

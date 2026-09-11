@@ -1,0 +1,347 @@
+name: Dependency stack QA
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - refactor
+  pull_request:
+  schedule:
+    # The scheduled run is the fullest regression tier.  All source refs
+    # still come from the immutable defaults below.
+    - cron: '17 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      antitrust_ref:
+        description: 'antitrust git ref (SHA, tag, or branch)'
+        required: true
+        type: string
+        default: '103c2491607d7f164f5e4e00fc21d6ea79331138'
+      trade_ref:
+        description: 'trade git ref (SHA, tag, or branch)'
+        required: true
+        type: string
+        default: '7700776ef488fbbd29ff05f8e8d382b7958a11c7'
+      vertical_ref:
+        description: 'vertical git ref (SHA, tag, or branch)'
+        required: true
+        type: string
+        default: 'c28c9e56086b2a5b6713323672036cd0330e25a5'
+      test_tier:
+        description: 'Regression depth'
+        required: true
+        type: choice
+        options:
+          - FAST
+          - EXTENDED
+          - NIGHTLY
+        default: FAST
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-stack:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    env:
+      # These expressions are empty on push, pull_request, and schedule
+      # events, so those events always use the immutable SHA defaults.  A
+      # mutable branch is used only when a workflow_dispatch caller supplies
+      # one explicitly.
+      ANTITRUST_REF: ${{ inputs.antitrust_ref || '103c2491607d7f164f5e4e00fc21d6ea79331138' }}
+      TRADE_REF: ${{ inputs.trade_ref || '7700776ef488fbbd29ff05f8e8d382b7958a11c7' }}
+      VERTICAL_REF: ${{ inputs.vertical_ref || 'c28c9e56086b2a5b6713323672036cd0330e25a5' }}
+      TEST_TIER: ${{ github.event_name == 'schedule' && 'NIGHTLY' || inputs.test_tier || 'FAST' }}
+      R_LIBS_USER: ${{ github.workspace }}/.ci/R-lib
+      SOURCE_ROOT: ${{ github.workspace }}/.ci/src
+      BUILD_ROOT: ${{ github.workspace }}/.ci/build
+      LOG_ROOT: ${{ github.workspace }}/.ci/logs
+      PROVENANCE_FILE: ${{ github.workspace }}/.ci/provenance.txt
+
+    steps:
+      # actions/checkout v4.2.2, pinned to its release commit.
+      - name: Checkout competitiontoolbox
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      # setup-r v2 is the stable major of r-lib/actions.  Dependency
+      # installation is deliberately done below so the three source packages
+      # are installed before the toolbox dependencies can resolve them.
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+
+      - name: Initialize isolated library and provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$R_LIBS_USER" "$SOURCE_ROOT" "$BUILD_ROOT" "$LOG_ROOT"
+          {
+            echo "event=${CI_EVENT_NAME:-${{ github.event_name }}}"
+            echo "workflow_run_id=${{ github.run_id }}"
+            echo "workflow_attempt=${{ github.run_attempt }}"
+            echo "requested_antitrust_ref=$ANTITRUST_REF"
+            echo "requested_trade_ref=$TRADE_REF"
+            echo "requested_vertical_ref=$VERTICAL_REF"
+            echo "competitiontoolbox_sha=$(git rev-parse HEAD)"
+            echo "r_version=$(Rscript -e 'cat(R.version.string)')"
+            echo "test_tier=$TEST_TIER"
+          } | tee "$PROVENANCE_FILE"
+
+      - name: Resolve dependency source refs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "$TEST_TIER" in
+            FAST|EXTENDED|NIGHTLY) ;;
+            *)
+              echo "Unsupported test tier: $TEST_TIER" >&2
+              exit 2
+              ;;
+          esac
+          echo "COMPETITIONTOOLBOX_TEST_TIER=$TEST_TIER" >> "$GITHUB_ENV"
+
+          # Clone without a checkout, resolve the requested ref to a commit,
+          # then detach at that commit.  The defaults are full SHAs; explicit
+          # dispatch inputs may be tags/branches, but their resolved SHA is
+          # always recorded for auditability.
+          clone_at_ref() {
+            local repository="$1"
+            local requested_ref="$2"
+            local destination="$3"
+            local commit=""
+            local candidate=""
+
+            git clone --quiet --no-checkout --filter=blob:none \
+              "https://github.com/${repository}.git" "$destination"
+
+            # A no-checkout clone stores branches under origin/*, while a
+            # commit or tag may resolve directly.  Try each supported form.
+            for candidate in \
+              "$requested_ref" \
+              "refs/remotes/origin/${requested_ref#refs/heads/}" \
+              "refs/tags/${requested_ref#refs/tags/}"; do
+              if commit="$(git -C "$destination" rev-parse --verify \
+                  --end-of-options "${candidate}^{commit}" 2>/dev/null)"; then
+                break
+              fi
+              commit=""
+            done
+
+            if [[ -z "$commit" ]]; then
+              echo "Cannot resolve $repository ref '$requested_ref'" >&2
+              exit 1
+            fi
+
+            git -C "$destination" checkout --quiet --detach "$commit"
+            local resolved_sha
+            resolved_sha="$(git -C "$destination" rev-parse --verify HEAD)"
+            test "$resolved_sha" = "$commit"
+            printf '%s' "$resolved_sha"
+          }
+
+          ANTITRUST_SHA="$(clone_at_ref luciu5/antitrust "$ANTITRUST_REF" "$SOURCE_ROOT/antitrust")"
+          TRADE_SHA="$(clone_at_ref luciu5/trade "$TRADE_REF" "$SOURCE_ROOT/trade")"
+          VERTICAL_SHA="$(clone_at_ref luciu5/vertical "$VERTICAL_REF" "$SOURCE_ROOT/vertical")"
+
+          {
+            echo "resolved_antitrust_sha=$ANTITRUST_SHA"
+            echo "resolved_trade_sha=$TRADE_SHA"
+            echo "resolved_vertical_sha=$VERTICAL_SHA"
+          } | tee -a "$PROVENANCE_FILE"
+
+          {
+            echo "ANTITRUST_SHA=$ANTITRUST_SHA"
+            echo "TRADE_SHA=$TRADE_SHA"
+            echo "VERTICAL_SHA=$VERTICAL_SHA"
+            echo "ANTITRUST_SRC=$SOURCE_ROOT/antitrust"
+            echo "TRADE_SRC=$SOURCE_ROOT/trade"
+            echo "VERTICAL_SRC=$SOURCE_ROOT/vertical"
+          } >> "$GITHUB_ENV"
+
+      - name: Install dependency stack in order
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          install_deps() {
+            local source_path="$1"
+            Rscript - "$source_path" <<'RSCRIPT' 2>&1 | tee -a "$LOG_ROOT/install-dependencies.log"
+          args <- commandArgs(trailingOnly = TRUE)
+          stopifnot(length(args) == 1L)
+          options(repos = c(CRAN = "https://cloud.r-project.org"))
+          remotes::install_deps(
+            args[[1L]],
+            # Keep optional test/documentation dependencies out of the
+            # upstream source-install pass.  In particular, some upstream
+            # Suggests metadata points back at competitiontoolbox.
+            dependencies = c("Depends", "Imports", "LinkingTo"),
+            upgrade = "never",
+            lib = Sys.getenv("R_LIBS_USER"),
+            quiet = FALSE
+          )
+          RSCRIPT
+          }
+
+          install_source() {
+            local package_name="$1"
+            local source_path="$2"
+            echo "Installing $package_name from $source_path"
+            install_deps "$source_path"
+            R CMD INSTALL --clean --no-multiarch \
+              --library="$R_LIBS_USER" "$source_path" \
+              2>&1 | tee -a "$LOG_ROOT/install-${package_name}.log"
+          }
+
+          options_file="$LOG_ROOT/bootstrap-remotes.R"
+          cat > "$options_file" <<'RSCRIPT'
+          options(repos = c(CRAN = "https://cloud.r-project.org"))
+          install.packages(
+            c(
+              "remotes", "testthat", "MASS", "ggplot2", "knitr", "rmarkdown",
+              "bookdown", "shiny", "rhandsontable", "bslib"
+            ),
+            lib = Sys.getenv("R_LIBS_USER"),
+            dependencies = TRUE,
+            quiet = FALSE
+          )
+          RSCRIPT
+          Rscript "$options_file" 2>&1 | tee "$LOG_ROOT/bootstrap-remotes.log"
+
+          # Keep this order: trade/vertical can resolve their antitrust
+          # dependency from the exact source package already installed.
+          install_source antitrust "$ANTITRUST_SRC"
+          install_source trade "$TRADE_SRC"
+          install_source vertical "$VERTICAL_SRC"
+
+          # Resolve all toolbox dependencies only after the source stack is
+          # present, then install the checked-out toolbox itself.
+          install_deps "$GITHUB_WORKSPACE"
+          R CMD INSTALL --clean --no-multiarch \
+            --library="$R_LIBS_USER" "$GITHUB_WORKSPACE" \
+            2>&1 | tee -a "$LOG_ROOT/install-competitiontoolbox.log"
+
+          {
+            echo "installed_antitrust_version=$(Rscript -e 'cat(as.character(packageVersion("antitrust")))')"
+            echo "installed_trade_version=$(Rscript -e 'cat(as.character(packageVersion("trade")))')"
+            echo "installed_vertical_version=$(Rscript -e 'cat(as.character(packageVersion("vertical")))')"
+            echo "installed_competitiontoolbox_version=$(Rscript -e 'cat(as.character(packageVersion("competitiontoolbox")))')"
+          } | tee -a "$PROVENANCE_FILE"
+
+      - name: Build and run toolbox FAST checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$BUILD_ROOT/toolbox" "$BUILD_ROOT/check"
+
+          build_options=(--keep-empty-dirs --no-manual --no-build-vignettes)
+          (
+            cd "$BUILD_ROOT/toolbox"
+            R CMD build "${build_options[@]}" "$GITHUB_WORKSPACE"
+          ) 2>&1 | tee "$LOG_ROOT/competitiontoolbox-build.log"
+
+          toolbox_tarball="$(find "$BUILD_ROOT/toolbox" -maxdepth 1 -type f \
+            -name 'competitiontoolbox_*.tar.gz' -print -quit)"
+          test -n "$toolbox_tarball"
+          echo "TOOLBOX_TARBALL=$toolbox_tarball" >> "$GITHUB_ENV"
+
+          # R CMD check runs the ordinary unit and high-value integration
+          # tests in tests/testthat as part of its standard test phase.
+          R CMD check \
+            --library="$R_LIBS_USER" \
+            --output="$BUILD_ROOT/check" \
+            --no-manual --no-vignettes --no-build-vignettes \
+            "$toolbox_tarball" \
+            2>&1 | tee "$LOG_ROOT/competitiontoolbox-check-fast.log"
+
+          # Run the same route/parity suite directly against the source tree
+          # so failures retain testthat context in the CI log.
+          Rscript -e 'testthat::test_dir("tests/testthat", reporter = "summary", stop_on_failure = TRUE)' \
+            2>&1 | tee "$LOG_ROOT/competitiontoolbox-testthat-fast.log"
+
+      - name: Run EXTENDED parity and upstream regression checks
+        if: env.TEST_TIER == 'EXTENDED' || env.TEST_TIER == 'NIGHTLY'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$BUILD_ROOT/upstream" "$BUILD_ROOT/upstream-check"
+
+          check_upstream() {
+            local package_name="$1"
+            local source_path="$2"
+            local package_build="$BUILD_ROOT/upstream/$package_name"
+            local package_check="$BUILD_ROOT/upstream-check/$package_name"
+            mkdir -p "$package_build" "$package_check"
+
+            local build_options=(--keep-empty-dirs)
+            local check_options=(--library="$R_LIBS_USER" --output="$package_check")
+            if [[ "$TEST_TIER" == EXTENDED ]]; then
+              # Extended runs donttest sections and rebuilds vignettes, while
+              # avoiding manual generation that is not a solver/runtime test.
+              build_options+=(--no-manual)
+              check_options+=(--no-manual --run-donttest --timings)
+            else
+              # Nightly is the fullest meaningful package regression setting.
+              check_options+=(--as-cran --run-donttest --timings)
+            fi
+
+            (
+              cd "$package_build"
+              R CMD build "${build_options[@]}" "$source_path"
+            ) 2>&1 | tee "$LOG_ROOT/${package_name}-build.log"
+            local package_tarball
+            package_tarball="$(find "$package_build" -maxdepth 1 -type f \
+              -name "${package_name}_*.tar.gz" -print -quit)"
+            test -n "$package_tarball"
+            R CMD check "${check_options[@]}" "$package_tarball" \
+              2>&1 | tee "$LOG_ROOT/${package_name}-check-${TEST_TIER,,}.log"
+          }
+
+          # These checks exercise upstream unit tests, examples, donttest
+          # solver cases, and (where present) vignettes against the exact
+          # source stack used by the toolbox.
+          check_upstream antitrust "$ANTITRUST_SRC"
+          check_upstream trade "$TRADE_SRC"
+          check_upstream vertical "$VERTICAL_SRC"
+
+          # The toolbox parity suite is mandatory in both non-FAST tiers.
+          Rscript -e 'testthat::test_dir("tests/testthat", reporter = "summary", stop_on_failure = TRUE)' \
+            2>&1 | tee "$LOG_ROOT/competitiontoolbox-testthat-${TEST_TIER,,}.log"
+
+      - name: Run NIGHTLY full toolbox check
+        if: env.TEST_TIER == 'NIGHTLY'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$BUILD_ROOT/nightly-check"
+          R CMD check \
+            --library="$R_LIBS_USER" \
+            --output="$BUILD_ROOT/nightly-check" \
+            --as-cran --run-donttest --timings \
+            "$TOOLBOX_TARBALL" \
+            2>&1 | tee "$LOG_ROOT/competitiontoolbox-check-nightly.log"
+
+      - name: Show provenance
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat "$PROVENANCE_FILE"
+
+      # actions/upload-artifact v4.6.2, pinned to its release commit.
+      - name: Upload provenance and CI logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dependency-stack-provenance-${{ github.run_id }}
+          path: |
+            .ci/provenance.txt
+            .ci/logs
+          if-no-files-found: error
+          retention-days: 30

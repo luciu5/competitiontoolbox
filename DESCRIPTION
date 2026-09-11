@@ -1,8 +1,8 @@
 Package: competitiontoolbox
 Type: Package
 Title: A Graphical User Interface for Antitrust and Trade Practitioners
-Version: 0.7.4
-Date: 2026-08-25
+Version: 0.8.0
+Date: 2026-09-11
 Authors@R: c(person("Charles", "Taragin", email = "ctaragin+competitiontoolbox@gmail.com",
                   role = c("aut", "cre")),
              person("Kenneth", "Rios", email = "krios@econicpartners.com",
@@ -12,11 +12,11 @@ Authors@R: c(person("Charles", "Taragin", email = "ctaragin+competitiontoolbox@g
                   )
 Author: Charles Taragin [aut, cre], Kenneth Rios [aut], Paulette Wolak [aut]
 Maintainer: Charles Taragin <ctaragin+competitiontoolbox@gmail.com>
-Depends: R (>= 2.10), antitrust (>= 0.99.33), trade (>= 0.8.6), shiny, rhandsontable
-Imports: bslib, ggplot2
-Description: A graphical user interface for simulating the effects of mergers, tariffs, and quotas under an
-             assortment of different economic models. The interface is powered by the 'Shiny' web application framework from 
-             'RStudio'.
+Depends: R (>= 4.1.0), shiny, rhandsontable
+Imports: antitrust (>= 0.99.39), bslib, ggplot2, trade (>= 0.8.6), vertical (>= 0.1.0)
+Description: A graphical user interface for simulating the effects of horizontal and vertical mergers, tariffs, and quotas under an
+             assortment of different economic models. The interface is powered by the 'Shiny' web application framework from
+             'RStudio'. Vertical merger simulations are provided by the 'vertical' package.
 URL: https://github.com/luciu5/competitiontoolbox
 Suggests: testthat
 License: CC0

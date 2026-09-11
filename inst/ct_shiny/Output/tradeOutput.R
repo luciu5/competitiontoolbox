@@ -53,7 +53,7 @@ output$hotQuota <- renderRHandsontable({
 })
 
 
-## Display summary results from tradeSummary
+## Display summary results
 # Tariffs
 output$resultsTariffs <-
 
@@ -61,10 +61,7 @@ output$resultsTariffs <-
 
     if(input$inTabsetTariffs != "respanelTariffs" || input$simulateTariffs == 0|| is.null(valuesTariffs[["sim"]])){return()}
 
-    # isolate(inputData <- valuesTariffs[["inputData"]])
-    # tradeSummary(valuesTariffs[["sim"]], inputData, type = "Tariffs")
-    capture.output(result <- summary(valuesTariffs[["sim"]], levels = FALSE, market = TRUE))
-    result <- as.data.frame(result)
+    tradeMarketReport(valuesTariffs[["sim"]])
 
   })
 
@@ -75,10 +72,7 @@ output$resultsQuota <-
 
     if(input$inTabsetQuota != "respanelQuota" || input$simulateQuota == 0|| is.null(valuesQuota[["sim"]])){return()}
 
-    # isolate(inputData <- valuesQuota[["inputData"]])
-    # tradeSummary(valuesQuota[["sim"]], inputData, type = "Quotas")
-    capture.output(result <- summary(valuesQuota[["sim"]], levels = FALSE, market = TRUE))
-    result <- as.data.frame(result)
+    tradeMarketReport(valuesQuota[["sim"]])
 
   })
 
@@ -109,9 +103,12 @@ output$results_detailedTariffs <- renderTable({
 
   if(input$inTabsetTariffs != "detpanelTariffs" || input$simulateTariffs == 0  || is.null(valuesTariffs[["sim"]])){return()}
 
-  # isolate(inputData <- valuesTariffs[["inputData"]])
-  # tradeSummary(valuesTariffs[["sim"]], inputData, type = "Tariffs")
-  capture.output(result <- summary(valuesTariffs[["sim"]], levels = FALSE, market = FALSE))
+  isRevenue <- model_uses_revenue_shares(valuesTariffs[["sim"]]) &&
+    anyNA(model_result_inputs(valuesTariffs[["sim"]])$Prices)
+  capture.output(result <- trade::summary(
+    valuesTariffs[["sim"]], revenue = isRevenue,
+    levels = FALSE, market = FALSE
+  ))
   result <- as.data.frame(result)
 
 })
@@ -121,9 +118,12 @@ output$results_detailedQuota <- renderTable({
 
   if(input$inTabsetQuota != "detpanelQuota" || input$simulateQuota == 0  || is.null(valuesQuota[["sim"]])){return()}
 
-  # isolate(inputData <- valuesTariffs[["inputData"]])
-  # tradeSummary(valuesTariffs[["sim"]], inputData, type = "Tariffs")
-  capture.output(result <- summary(valuesQuota[["sim"]], levels = FALSE, market = FALSE))
+  isRevenue <- model_uses_revenue_shares(valuesQuota[["sim"]]) &&
+    anyNA(model_result_inputs(valuesQuota[["sim"]])$Prices)
+  capture.output(result <- trade::summary(
+    valuesQuota[["sim"]], revenue = isRevenue,
+    levels = FALSE, market = FALSE
+  ))
   result <- as.data.frame(result)
 
 })
@@ -138,7 +138,7 @@ output$results_mktelastTariffs <- renderTable({
   if(input$pre_elast == "Current Tariff"){preTariff = TRUE}
   else{preTariff = FALSE}
 
-  res <- as.matrix(elast(valuesTariffs[["sim"]], preMerger=preTariff, market = TRUE))
+  res <- as.matrix(trade::elast(valuesTariffs[["sim"]], preMerger=preTariff, market = TRUE))
   colnames(res)= "Market"
   res
 
@@ -152,7 +152,7 @@ output$results_mktelastQuota <- renderTable({
   if(input$pre_elast == "Current Quota"){ preQuota = TRUE}
   else{preQuota = FALSE}
 
-  res <- as.matrix(elast(valuesQuota[["sim"]], preMerger=preQuota, market = TRUE))
+  res <- as.matrix(trade::elast(valuesQuota[["sim"]], preMerger=preQuota, market = TRUE))
   colnames(res)= "Market"
   res
 
@@ -169,9 +169,9 @@ output$results_elastTariffs <- renderTable({
   else{preMerger = FALSE}
 
   if(model_supports_diversion(valuesTariffs[["sim"]]) && input$diversionsTariffs){
-    res <- diversion(valuesTariffs[["sim"]], preMerger=preMerger)
+    res <- trade::diversion(valuesTariffs[["sim"]], preMerger=preMerger)
   }
-  else{  res <- elast(valuesTariffs[["sim"]], preMerger=preMerger)}
+  else{  res <- trade::elast(valuesTariffs[["sim"]], preMerger=preMerger)}
   res <- format_elasticity_table(res, valuesTariffs[["sim"]])
 
   res
@@ -187,9 +187,9 @@ output$results_elastQuota <- renderTable({
   else{preMerger =FALSE}
 
   if(model_supports_diversion(valuesQuota[["sim"]]) && input$diversionsQuota){
-    res <- diversion(valuesQuota[["sim"]], preMerger=preMerger)
+    res <- trade::diversion(valuesQuota[["sim"]], preMerger=preMerger)
   }
-  else{  res <- elast(valuesQuota[["sim"]], preMerger=preMerger)}
+  else{  res <- trade::elast(valuesQuota[["sim"]], preMerger=preMerger)}
   res <- format_elasticity_table(res, valuesQuota[["sim"]])
 
   res
@@ -265,7 +265,7 @@ output$parametersTariffs <- renderPrint({
 
   if(input$inTabsetTariffs!= "diagpanelTariffs" || input$simulateTariffs == 0  || is.null(valuesTariffs[["sim"]])){return()}
 
-  print(getParms(valuesTariffs[["sim"]],digits=2))
+  print(antitrust::getParms(valuesTariffs[["sim"]],digits=2))
 
 })
 
@@ -274,7 +274,7 @@ output$parametersQuota <- renderPrint({
 
   if(input$inTabsetQuota!= "diagpanelQuota" || input$simulateQuota == 0  || is.null(valuesQuota[["sim"]])){return()}
 
-  print(getParms(valuesQuota[["sim"]], digits = 2))
+  print(antitrust::getParms(valuesQuota[["sim"]], digits = 2))
 
 })
 

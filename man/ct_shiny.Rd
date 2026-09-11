@@ -2,7 +2,7 @@
 % Please edit documentation in R/ct_shiny.R
 \name{ct_shiny}
 \alias{ct_shiny}
-\title{A Shiny Interface to the trade and antitrust Packages}
+\title{A Shiny Interface to the antitrust, trade, and vertical Packages}
 \usage{
 ct_shiny()
 }
@@ -10,11 +10,14 @@ ct_shiny()
 Launch a shiny interface to simulate the effects of tariffs and mergers
 }
 \details{
-\code{ct_shiny} launches a shiny interface for the \code{antitrust} and \code{trade} packages.
+\code{ct_shiny} launches a shiny interface for the \code{antitrust}, \code{trade}, and
+\code{vertical} packages.
 The shiny interface provides users with the ability to calibrate model parameters and simulate
-tariff effects using many of the supply and demand models included in the \code{trade} package. It
-also provides users with the ability to calibrate different consumer demand systems and simulate the
-effects of mergers under different competitive regimes included in the \code{antitrust} package.
+tariff and quota effects using many of the supply and demand models included in the \code{trade}
+package. It also provides users with the ability to calibrate different consumer demand systems
+and simulate the effects of horizontal mergers under different competitive regimes included in the
+\code{antitrust} package. The \code{vertical} package owns the vertical merger workflow, including
+its model calibration and simulation.
 }
 \examples{
 if(interactive()){ct_shiny()}

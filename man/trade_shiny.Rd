@@ -2,7 +2,7 @@
 % Please edit documentation in R/ct_shiny.R
 \name{trade_shiny}
 \alias{trade_shiny}
-\title{A Link to the Shiny Interface to the trade and antitrust Packages}
+\title{A Link to the Shiny Interface to the antitrust, trade, and vertical Packages}
 \usage{
 trade_shiny()
 }
@@ -10,6 +10,6 @@ trade_shiny()
 Launch a shiny interface to simulate the effects of tariffs and mergers
 }
 \details{
-\code{trade_shiny} calls \code{ct_shiny}, which is a shiny interface for the \code{antitrust}
-and \code{trade} package. See \code{\link{ct_shiny}} for further details.
+\code{trade_shiny} calls \code{ct_shiny}, which is a shiny interface for the \code{antitrust},
+\code{trade}, and \code{vertical} packages. See \code{\link{ct_shiny}} for further details.
 }
