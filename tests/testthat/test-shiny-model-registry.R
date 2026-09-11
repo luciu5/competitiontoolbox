@@ -115,8 +115,6 @@ test_that("every UI row runs with defaults and tab computations remain callable"
       "antitrust::simulate"
     } else if (row$upstream_package == "vertical") {
       "vertical::simulate"
-    } else if (row$demand_id == "aids") {
-      "trade::bertrand_tariff (TariffAIDS compatibility)"
     } else {
       "trade::simulate"
     }
@@ -409,6 +407,9 @@ test_that("AIDS and known Logit-Cournot tariff rows retain legacy outcomes", {
   expect_equal(ct_numeric(trade::calcPrices(aids, preMerger = FALSE)),
                ct_numeric(trade::calcPrices(aids_direct, preMerger = FALSE)),
                tolerance = 1e-8)
+  expect_identical(attr(aids, "ct_simulation_api", exact = TRUE),
+                   "trade::simulate")
+  expect_s4_class(attr(aids, "ct_fit", exact = TRUE), "TradeFit")
 
   registry <- ct_app_env$model_registry()
   row <- registry[registry$page == "Tariffs" &

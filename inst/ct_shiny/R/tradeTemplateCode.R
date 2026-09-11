@@ -91,14 +91,6 @@ tradeTemplateCode <- function(type){
   simulation_code <- paste0(
     'simres <- trade::simulate(fit, ', post_arg, ' = ', post_code, ')\n'
   )
-  if (identical(spec$demand_id, "aids")) {
-    simulation_code <- paste0(
-      '## Compatibility path for TariffAIDS priceDelta in the frozen upstream lifecycle.\n',
-      'legacy_args <- calibration_args\n',
-      'legacy_args$tariffPost <- simdata$policyPost\n',
-      'simres <- do.call(trade::bertrand_tariff, c(list(demand = "aids"), legacy_args))\n'
-    )
-  }
 
   model_code <- paste0(
     'trade_spec <- trade::model_spec(\n',

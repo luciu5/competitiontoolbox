@@ -2,3 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Local deployment metadata and unused app artwork; keep tracked app assets
+# and the tracked paulette2 deployment record visible to Git.
+/inst/ct_shiny/rsconnect/shinyapps.io/daag/
+/inst/ct_shiny/www/vandy.png

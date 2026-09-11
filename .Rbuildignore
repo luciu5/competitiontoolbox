@@ -9,3 +9,5 @@
 ^\.Rcheck$
 ^\.github$
 ^\.ci$
+^inst/ct_shiny/rsconnect/shinyapps[.]io/daag$
+^inst/ct_shiny/www/vandy[.]png$

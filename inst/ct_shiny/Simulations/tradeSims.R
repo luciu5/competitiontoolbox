@@ -53,32 +53,16 @@ run_tariff_model <- function(spec, indata, params = list()) {
     trade::calibrate,
     c(list(demand = spec$upstream_spec), calibration_args)
   )
-  ## The frozen upstream lifecycle currently leaves the TariffAIDS priceDelta at
-  ## its calibration value: its simulate() path recalculates marginal costs
-  ## but does not call the public calcPriceDelta() method before calcPrices().
-  ## Keep the lifecycle fit, then use the public legacy constructor for this
-  ## one affected counterfactual so the established AIDS economics remain
-  ## unchanged.  No private helpers or slots are accessed here.
-  if (identical(spec$demand_id, "aids")) {
-    legacy_args <- calibration_args
-    legacy_args$tariffPost <- indata$policyPost
-    result <- do.call(
-      trade::bertrand_tariff,
-      c(list(demand = "aids"), legacy_args)
-    )
-    simulation_api <- "trade::bertrand_tariff (TariffAIDS compatibility)"
-  } else if (is_cournot_matrix) {
+  if (is_cournot_matrix) {
     result <- trade::simulate(fit, tariffPost = as.matrix(indata$policyPost))
-    simulation_api <- "trade::simulate"
   } else {
     result <- trade::simulate(fit, tariffPost = indata$policyPost)
-    simulation_api <- "trade::simulate"
   }
 
   ## mktElast is a model primitive rather than a row-level input.  Retain it
   ## for the diagnostics tab without reading the trade S4 object's slots.
   attr(result, "ct_mktElast") <- if (known_elast) mkt_elast else NA_real_
-  list(fit = fit, result = result, simulation_api = simulation_api)
+  list(fit = fit, result = result, simulation_api = "trade::simulate")
 }
 
 run_quota_model <- function(spec, indata, params = list()) {

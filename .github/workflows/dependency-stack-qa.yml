@@ -22,12 +22,12 @@ on:
         description: 'trade git ref (SHA, tag, or branch)'
         required: true
         type: string
-        default: '7700776ef488fbbd29ff05f8e8d382b7958a11c7'
+        default: '374a463bca0486373653b81807840f21319dae62'
       vertical_ref:
         description: 'vertical git ref (SHA, tag, or branch)'
         required: true
         type: string
-        default: 'c28c9e56086b2a5b6713323672036cd0330e25a5'
+        default: '9bb259e96a025c204afd53b44432890f2b2a04ec'
       test_tier:
         description: 'Regression depth'
         required: true
@@ -51,8 +51,8 @@ jobs:
       # mutable branch is used only when a workflow_dispatch caller supplies
       # one explicitly.
       ANTITRUST_REF: ${{ inputs.antitrust_ref || '103c2491607d7f164f5e4e00fc21d6ea79331138' }}
-      TRADE_REF: ${{ inputs.trade_ref || '7700776ef488fbbd29ff05f8e8d382b7958a11c7' }}
-      VERTICAL_REF: ${{ inputs.vertical_ref || 'c28c9e56086b2a5b6713323672036cd0330e25a5' }}
+      TRADE_REF: ${{ inputs.trade_ref || '374a463bca0486373653b81807840f21319dae62' }}
+      VERTICAL_REF: ${{ inputs.vertical_ref || '9bb259e96a025c204afd53b44432890f2b2a04ec' }}
       TEST_TIER: ${{ github.event_name == 'schedule' && 'NIGHTLY' || inputs.test_tier || 'FAST' }}
       R_LIBS_USER: ${{ github.workspace }}/.ci/R-lib
       SOURCE_ROOT: ${{ github.workspace }}/.ci/src
