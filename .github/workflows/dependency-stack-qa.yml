@@ -22,7 +22,7 @@ on:
         description: 'trade git ref (SHA, tag, or branch)'
         required: true
         type: string
-        default: '374a463bca0486373653b81807840f21319dae62'
+        default: '584f16adff705ae34c0f1d046f045f108c71fbec'
       vertical_ref:
         description: 'vertical git ref (SHA, tag, or branch)'
         required: true
@@ -51,7 +51,7 @@ jobs:
       # mutable branch is used only when a workflow_dispatch caller supplies
       # one explicitly.
       ANTITRUST_REF: ${{ inputs.antitrust_ref || '103c2491607d7f164f5e4e00fc21d6ea79331138' }}
-      TRADE_REF: ${{ inputs.trade_ref || '374a463bca0486373653b81807840f21319dae62' }}
+      TRADE_REF: ${{ inputs.trade_ref || '584f16adff705ae34c0f1d046f045f108c71fbec' }}
       VERTICAL_REF: ${{ inputs.vertical_ref || '9bb259e96a025c204afd53b44432890f2b2a04ec' }}
       TEST_TIER: ${{ github.event_name == 'schedule' && 'NIGHTLY' || inputs.test_tier || 'FAST' }}
       R_LIBS_USER: ${{ github.workspace }}/.ci/R-lib
