@@ -1,5 +1,5 @@
-## Submission Summary (v0.7.4)
-This is a patch release updating submission metadata and dependencies (`antitrust >= 0.99.33`, `trade >= 0.8.6`).
+## Submission Summary (v0.8.0)
+This release migrates the application to the public structural lifecycle APIs and updates its dependency requirements (`antitrust >= 0.99.39`, `trade >= 0.8.7`, `vertical >= 0.1.0`).
 
 ## Test Environments
 * Local Ubuntu 22.04.5 LTS, R 4.6.1

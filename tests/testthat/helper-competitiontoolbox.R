@@ -44,8 +44,8 @@ ct_require_stack <- function() {
     if (pkg == "antitrust" && utils::packageVersion(pkg) < "0.99.39") {
       testthat::skip("antitrust >= 0.99.39 is required for lifecycle tests")
     }
-    if (pkg == "trade" && utils::packageVersion(pkg) < "0.8.6") {
-      testthat::skip("trade >= 0.8.6 is required for lifecycle tests")
+    if (pkg == "trade" && utils::packageVersion(pkg) < "0.8.7") {
+      testthat::skip("trade >= 0.8.7 is required for lifecycle tests")
     }
     if (pkg == "vertical" && utils::packageVersion(pkg) < "0.1.0") {
       testthat::skip("vertical >= 0.1.0 is required for lifecycle tests")

@@ -31,7 +31,7 @@ This will open the `competitiontoolbox` web interface and the user will be greet
 
 ## Dependencies
 `antitrust` (>= 0.99.39)<br>
-`trade` (>= 0.8.6)<br>
+`trade` (>= 0.8.7)<br>
 `vertical` (>= 0.1.0)<br>
 `bslib`<br>
 `ggplot2`<br>
