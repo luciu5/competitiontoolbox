@@ -22,7 +22,7 @@ on:
         description: 'antitrust development bootstrap ref (ignored for certification)'
         required: false
         type: string
-        default: 'refactor'
+        default: 'master'
       antitrust_release_sha:
         description: 'Full 40-character antitrust candidate SHA'
         required: false
@@ -40,7 +40,7 @@ on:
         description: 'trade development bootstrap ref (ignored for certification)'
         required: false
         type: string
-        default: 'refactor'
+        default: 'master'
       trade_release_sha:
         description: 'Full 40-character trade candidate SHA'
         required: false
@@ -75,9 +75,9 @@ jobs:
       # Bootstrap runs use moving refs and record the resolved commits.
       # Certification accepts the separately named full-SHA inputs only.
       RELEASE_CERTIFICATION: ${{ inputs.release_certification && 'true' || 'false' }}
-      ANTITRUST_REF: ${{ inputs.release_certification && inputs.antitrust_release_sha || inputs.antitrust_ref || 'refactor' }}
+      ANTITRUST_REF: ${{ inputs.release_certification && inputs.antitrust_release_sha || inputs.antitrust_ref || 'master' }}
       COORDINATION_REF: ${{ inputs.release_certification && inputs.coordination_release_sha || inputs.coordination_ref || 'main' }}
-      TRADE_REF: ${{ inputs.release_certification && inputs.trade_release_sha || inputs.trade_ref || 'refactor' }}
+      TRADE_REF: ${{ inputs.release_certification && inputs.trade_release_sha || inputs.trade_ref || 'master' }}
       VERTICAL_REF: ${{ inputs.release_certification && inputs.vertical_release_sha || inputs.vertical_ref || 'main' }}
       TEST_TIER: ${{ github.event_name == 'schedule' && 'NIGHTLY' || inputs.test_tier || 'FAST' }}
       R_LIBS_USER: ${{ github.workspace }}/.ci/R-lib

@@ -39,8 +39,9 @@ This will open the `competitiontoolbox` web interface and the user will be greet
 `shiny`<br>
 `rhandsontable`
 
-The dependency-stack workflow keeps moving development refs as its ordinary
-bootstrap and records the resolved commit for each package. Select release
-certification and provide full 40-character SHAs for antitrust, coordination,
-trade, and vertical to validate a fixed candidate stack. It also checks the
-toolbox `Remotes` entries and the public Stackelberg helpers required by trade.
+The dependency-stack workflow bootstraps from antitrust and trade `master` and
+coordination and vertical `main`, and records the resolved commit for each
+package. Select release certification and provide full 40-character SHAs for
+antitrust, coordination, trade, and vertical to validate a fixed candidate
+stack. It also checks the toolbox `Remotes` entries and the public Stackelberg
+helpers required by trade.
