@@ -1,5 +1,5 @@
 name: Dependency stack QA
-run-name: ${{ github.event_name == 'workflow_dispatch' && format('certification-{0}-{1}-{2}-{3}-{4}-{5}', inputs.release_certification, inputs.antitrust_release_sha, inputs.coordination_release_sha, inputs.trade_release_sha, inputs.vertical_release_sha, inputs.test_tier) || github.event_name }}
+run-name: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/') && format('release-certification-{0}', github.sha) || github.event_name == 'workflow_dispatch' && format('certification-{0}-{1}-{2}-{3}-{4}-{5}', inputs.release_certification, inputs.antitrust_release_sha, inputs.coordination_release_sha, inputs.trade_release_sha, inputs.vertical_release_sha, inputs.test_tier) || github.event_name }}
 
 on:
   push:
@@ -85,7 +85,7 @@ jobs:
       COORDINATION_RELEASE_SHA: ${{ inputs.coordination_release_sha || '' }}
       TRADE_RELEASE_SHA: ${{ inputs.trade_release_sha || '' }}
       VERTICAL_RELEASE_SHA: ${{ inputs.vertical_release_sha || '' }}
-      TEST_TIER: ${{ github.event_name == 'schedule' && 'NIGHTLY' || inputs.test_tier || 'FAST' }}
+      TEST_TIER: ${{ (github.event_name == 'schedule' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))) && 'NIGHTLY' || inputs.test_tier || 'FAST' }}
 
     steps:
       # actions/checkout v4.2.2, pinned to its release commit.
