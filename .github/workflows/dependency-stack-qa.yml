@@ -1,4 +1,5 @@
 name: Dependency stack QA
+run-name: ${{ github.event_name == 'workflow_dispatch' && format('certification-{0}-{1}-{2}-{3}-{4}-{5}', inputs.release_certification, inputs.antitrust_release_sha, inputs.coordination_release_sha, inputs.trade_release_sha, inputs.vertical_release_sha, inputs.test_tier) || github.event_name }}
 
 on:
   push:
@@ -6,6 +7,7 @@ on:
       - main
       - master
       - refactor
+      - 'release/**'
   pull_request:
   schedule:
     # The scheduled run is the fullest regression tier.  All source refs
@@ -75,16 +77,15 @@ jobs:
       # Bootstrap runs use moving refs and record the resolved commits.
       # Certification accepts the separately named full-SHA inputs only.
       RELEASE_CERTIFICATION: ${{ inputs.release_certification && 'true' || 'false' }}
-      ANTITRUST_REF: ${{ inputs.release_certification && inputs.antitrust_release_sha || inputs.antitrust_ref || 'master' }}
-      COORDINATION_REF: ${{ inputs.release_certification && inputs.coordination_release_sha || inputs.coordination_ref || 'main' }}
-      TRADE_REF: ${{ inputs.release_certification && inputs.trade_release_sha || inputs.trade_ref || 'master' }}
-      VERTICAL_REF: ${{ inputs.release_certification && inputs.vertical_release_sha || inputs.vertical_ref || 'main' }}
+      ANTITRUST_REF: ${{ inputs.antitrust_ref || 'master' }}
+      COORDINATION_REF: ${{ inputs.coordination_ref || 'main' }}
+      TRADE_REF: ${{ inputs.trade_ref || 'master' }}
+      VERTICAL_REF: ${{ inputs.vertical_ref || 'main' }}
+      ANTITRUST_RELEASE_SHA: ${{ inputs.antitrust_release_sha || '' }}
+      COORDINATION_RELEASE_SHA: ${{ inputs.coordination_release_sha || '' }}
+      TRADE_RELEASE_SHA: ${{ inputs.trade_release_sha || '' }}
+      VERTICAL_RELEASE_SHA: ${{ inputs.vertical_release_sha || '' }}
       TEST_TIER: ${{ github.event_name == 'schedule' && 'NIGHTLY' || inputs.test_tier || 'FAST' }}
-      R_LIBS_USER: ${{ github.workspace }}/.ci/R-lib
-      SOURCE_ROOT: ${{ github.workspace }}/.ci/src
-      BUILD_ROOT: ${{ github.workspace }}/.ci/build
-      LOG_ROOT: ${{ github.workspace }}/.ci/logs
-      PROVENANCE_FILE: ${{ github.workspace }}/.ci/provenance.txt
 
     steps:
       # actions/checkout v4.2.2, pinned to its release commit.
@@ -108,23 +109,75 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "$RELEASE_CERTIFICATION" == true ]]; then
-            for item in "antitrust:$ANTITRUST_REF" "coordination:$COORDINATION_REF" "trade:$TRADE_REF" "vertical:$VERTICAL_REF"; do
+            for item in "antitrust:$ANTITRUST_RELEASE_SHA" "coordination:$COORDINATION_RELEASE_SHA" "trade:$TRADE_RELEASE_SHA" "vertical:$VERTICAL_RELEASE_SHA"; do
               name="${item%%:*}"
               sha="${item#*:}"
               if [[ ! "$sha" =~ ^[[:xdigit:]]{40}$ ]]; then
-                echo "Release certification requires an explicit full 40-character ${name} SHA; mutable refs such as main/refactor are rejected." >&2
+                echo "Release certification requires an explicit full 40-character ${name} SHA; development refs are not accepted." >&2
                 exit 1
               fi
             done
+            {
+              echo "ANTITRUST_REF=$ANTITRUST_RELEASE_SHA"
+              echo "COORDINATION_REF=$COORDINATION_RELEASE_SHA"
+              echo "TRADE_REF=$TRADE_RELEASE_SHA"
+              echo "VERTICAL_REF=$VERTICAL_RELEASE_SHA"
+            } >> "$GITHUB_ENV"
           fi
 
       - name: Initialize isolated library and provenance
         shell: bash
         run: |
           set -euo pipefail
+          ci_root="$RUNNER_TEMP/competitiontoolbox-ci"
+          R_LIBS_USER="$ci_root/R-lib"
+          SOURCE_ROOT="$ci_root/src"
+          BUILD_ROOT="$ci_root/build"
+          LOG_ROOT="$ci_root/logs"
+          PROVENANCE_FILE="$ci_root/provenance.txt"
+
+          if [[ ( "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" == refs/heads/release/* ) || ( "$GITHUB_EVENT_NAME" == pull_request && ( "${GITHUB_HEAD_REF:-}" == release/* || "${GITHUB_BASE_REF:-}" == release/* ) ) ]]; then
+            mapfile -t release_refs < <(Rscript --vanilla - <<'RSCRIPT'
+          desc <- read.dcf("DESCRIPTION")[1L, ]
+          entries <- trimws(strsplit(desc[["Remotes"]], ",", fixed = TRUE)[[1L]])
+          expected <- c("antitrust", "coordination", "trade", "vertical")
+          parsed <- lapply(entries, function(entry) {
+            match <- regexec("^luciu5/([^/@]+)@([[:xdigit:]]{40})$", entry, perl = TRUE)
+            parts <- regmatches(entry, match)[[1L]]
+            if (length(parts) != 3L) stop("Malformed or mutable DESCRIPTION Remote: ", entry)
+            setNames(tolower(parts[3L]), parts[2L])
+          })
+          actual <- unlist(parsed, use.names = TRUE)
+          if (length(actual) != length(expected) || !setequal(names(actual), expected) ||
+              anyDuplicated(names(actual))) {
+            stop("competitiontoolbox DESCRIPTION must pin exactly antitrust, coordination, trade, and vertical")
+          }
+          cat(paste(actual[expected], collapse = "\n"), "\n", sep = "")
+          RSCRIPT
+            )
+            if [[ "${#release_refs[@]}" -ne 4 ]]; then
+              echo "Could not resolve exact release dependency pins from DESCRIPTION" >&2
+              exit 1
+            fi
+            ANTITRUST_REF="${release_refs[0]}"
+            COORDINATION_REF="${release_refs[1]}"
+            TRADE_REF="${release_refs[2]}"
+            VERTICAL_REF="${release_refs[3]}"
+          fi
           mkdir -p "$R_LIBS_USER" "$SOURCE_ROOT" "$BUILD_ROOT" "$LOG_ROOT"
           {
-            echo "event=${CI_EVENT_NAME:-${{ github.event_name }}}"
+            echo "R_LIBS_USER=$R_LIBS_USER"
+            echo "SOURCE_ROOT=$SOURCE_ROOT"
+            echo "BUILD_ROOT=$BUILD_ROOT"
+            echo "LOG_ROOT=$LOG_ROOT"
+            echo "PROVENANCE_FILE=$PROVENANCE_FILE"
+            echo "ANTITRUST_REF=$ANTITRUST_REF"
+            echo "COORDINATION_REF=$COORDINATION_REF"
+            echo "TRADE_REF=$TRADE_REF"
+            echo "VERTICAL_REF=$VERTICAL_REF"
+          } >> "$GITHUB_ENV"
+          {
+            echo "event=$GITHUB_EVENT_NAME"
             echo "workflow_run_id=${{ github.run_id }}"
             echo "workflow_attempt=${{ github.run_attempt }}"
             echo "requested_antitrust_ref=$ANTITRUST_REF"
@@ -488,7 +541,7 @@ jobs:
         with:
           name: dependency-stack-provenance-${{ github.run_id }}
           path: |
-            .ci/provenance.txt
-            .ci/logs
+            ${{ runner.temp }}/competitiontoolbox-ci/provenance.txt
+            ${{ runner.temp }}/competitiontoolbox-ci/logs
           if-no-files-found: error
           retention-days: 30

@@ -14,10 +14,10 @@ Author: Charles Taragin [aut, cre], Kenneth Rios [aut], Paulette Wolak [aut]
 Maintainer: Charles Taragin <ctaragin+competitiontoolbox@gmail.com>
 Depends: R (>= 4.1.0), shiny, rhandsontable
 Imports: antitrust (>= 0.99.43), bslib, ggplot2, trade (>= 0.9.0), vertical (>= 0.3.0)
-Remotes: luciu5/antitrust@abc8f9457cc9cbb2e3f252c6b82fe5b87da3dd79,
-    luciu5/coordination@761cb49fbae87744de99b2dce4eb597e81feb7a1,
-    luciu5/trade@c99a6ac6d7505b63e6c369246b0ef650d9af2421,
-    luciu5/vertical@eaf12d4505f77b1802071574145874a8c415cec3
+Remotes: luciu5/antitrust@4bafd47d099c95ff6521038fb64c3a03d17ae84e,
+    luciu5/coordination@1e7dbbf7680e4a2073c47ca73313999bf766c2e3,
+    luciu5/trade@aa72664931e277608bd5fe0b989ea0896d0e988e,
+    luciu5/vertical@e6e85154e5b40914cf4edd184885067e2f196a4d
 Description: A graphical user interface for simulating the effects of horizontal and vertical mergers, tariffs, and quotas under an
              assortment of different economic models. The interface is powered by the 'Shiny' web application framework from
              'RStudio'. Vertical merger simulations are provided by the 'vertical' package.
