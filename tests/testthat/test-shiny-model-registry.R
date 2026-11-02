@@ -384,7 +384,7 @@ test_that("trade tariff and quota routes preserve public legacy outcomes", {
   }
 })
 
-test_that("AIDS and known Logit-Cournot tariff rows retain legacy outcomes", {
+test_that("AIDS benchmark and Logit-Cournot tariff route satisfy economics", {
   ct_load_core()
   data <- ct_complete_data(ct_default_inputs("Tariffs"))
   normalized <- ct_app_env$normalize_model_inputs("Tariffs", data)
@@ -433,13 +433,38 @@ test_that("AIDS and known Logit-Cournot tariff rows retain legacy outcomes", {
       labels = normalized$Name
     )
   ) })
-  expect_equal(ct_numeric(trade::calcPrices(cournot, preMerger = FALSE)),
-               c(10.0732129685849, 10.1916010896528, 10, 10),
+  ## Migration parity: A (permanent).
+  ## This catches a unique economic failure: treating a tariff as an
+  ## effective-cost change instead of retained revenue in a multiproduct
+  ## Cournot firm's physical-profit FOCs.
+  alpha <- cournot@slopes$alpha
+  share_pre <- cournot@shares * cournot@shareInside
+  outside_pre <- 1 - sum(share_pre)
+  mean_utility <- log(share_pre / outside_pre) - alpha * cournot@prices
+
+  share_post <- ct_numeric(trade::calcShares(cournot, preMerger = FALSE))
+  outside_post <- 1 - sum(share_post)
+  price_inverse <- (log(share_post / outside_post) - mean_utility) / alpha
+  expect_equal(price_inverse,
+               ct_numeric(trade::calcPrices(cournot, preMerger = FALSE)),
                tolerance = 1e-8)
-  expect_equal(ct_numeric(trade::calcShares(cournot, preMerger = FALSE)),
-               c(.332295786034588, .0633477015057421,
-                 .387580690110965, .193790345055482),
-               tolerance = 1e-8)
+
+  market_size <- cournot@insideSize / cournot@shareInside
+  quantity_post <- market_size * share_post
+  outside_quantity <- market_size * outside_post
+  retention_pre <- 1 - cournot@tariffPre
+  retention_post <- 1 - cournot@tariffPost
+  physical_cost <- retention_pre * cournot@mcPre
+  owner <- as.character(normalized$Owner)
+  physical_profit_foc <- vapply(seq_along(price_inverse), function(product) {
+    same_firm <- owner == owner[[product]]
+    retention_post[[product]] * price_inverse[[product]] -
+      physical_cost[[product]] + retention_post[[product]] / alpha +
+      sum(retention_post[same_firm] * quantity_post[same_firm]) /
+        (alpha * outside_quantity)
+  }, numeric(1))
+  expect_equal(physical_profit_foc, rep(0, length(physical_profit_foc)),
+               tolerance = 1e-5)
   expect_equal(ct_numeric(trade::calcPrices(cournot, preMerger = FALSE)),
                ct_numeric(trade::calcPrices(cournot_direct, preMerger = FALSE)),
                tolerance = 1e-8)

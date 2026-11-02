@@ -41,14 +41,14 @@ ct_require_stack <- function() {
   ## older user library may contain the legacy packages but not the lifecycle
   ## release required by this package's DESCRIPTION.
   for (pkg in c("antitrust", "trade", "vertical")) {
-    if (pkg == "antitrust" && utils::packageVersion(pkg) < "0.99.39") {
-      testthat::skip("antitrust >= 0.99.39 is required for lifecycle tests")
+    if (pkg == "antitrust" && utils::packageVersion(pkg) < "0.99.42") {
+      testthat::skip("antitrust >= 0.99.42 is required for lifecycle tests")
     }
-    if (pkg == "trade" && utils::packageVersion(pkg) < "0.8.7") {
-      testthat::skip("trade >= 0.8.7 is required for lifecycle tests")
+    if (pkg == "trade" && utils::packageVersion(pkg) < "0.8.9.9002") {
+      testthat::skip("trade >= 0.8.9.9002 is required for lifecycle tests")
     }
-    if (pkg == "vertical" && utils::packageVersion(pkg) < "0.1.0") {
-      testthat::skip("vertical >= 0.1.0 is required for lifecycle tests")
+    if (pkg == "vertical" && utils::packageVersion(pkg) < "0.2.0") {
+      testthat::skip("vertical >= 0.2.0 is required for lifecycle tests")
     }
   }
 

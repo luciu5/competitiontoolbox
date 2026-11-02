@@ -30,10 +30,17 @@ ct_shiny()
 This will open the `competitiontoolbox` web interface and the user will be greeted by the **Introduction** tab. Users may proceed to the **Mergers**, **Trade**, **Numerical Simulations**, or **Other Resources** tabs. All tabs are self-contained and provide directions on how to proceed.
 
 ## Dependencies
-`antitrust` (>= 0.99.39)<br>
-`trade` (>= 0.8.7)<br>
-`vertical` (>= 0.1.0)<br>
+`antitrust` (>= 0.99.43)<br>
+`coordination` (>= 0.1.0, through `trade`)<br>
+`trade` (>= 0.9.0)<br>
+`vertical` (>= 0.3.0)<br>
 `bslib`<br>
 `ggplot2`<br>
 `shiny`<br>
 `rhandsontable`
+
+The dependency-stack workflow keeps moving development refs as its ordinary
+bootstrap and records the resolved commit for each package. Select release
+certification and provide full 40-character SHAs for antitrust, coordination,
+trade, and vertical to validate a fixed candidate stack. It also checks the
+toolbox `Remotes` entries and the public Stackelberg helpers required by trade.

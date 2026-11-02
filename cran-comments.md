@@ -1,15 +1,10 @@
-## Submission Summary (v0.8.0)
-This release migrates the application to the public structural lifecycle APIs and updates its dependency requirements (`antitrust >= 0.99.39`, `trade >= 0.8.7`, `vertical >= 0.1.0`).
+## Submission preparation: competitiontoolbox 0.9.0
 
-## Test Environments
-* Local Ubuntu 22.04.5 LTS, R 4.6.1
-* Local R-devel (`R Under development (unstable) 2026-06-06 r90114`)
+The application uses the public structural lifecycle APIs and requires
+antitrust >= 0.99.43, trade >= 0.9.0, and vertical >= 0.3.0.
 
-## R CMD check Results
-There were 0 ERRORS and 0 WARNINGS.
-
-There was 1 NOTE:
-* Standard local environment note regarding missing system 'tidy' utility.
-
-## Downstream Dependencies
-None affected.
+Local validation uses R 4.6.1 and the exact coordinated candidate stack.
+The release manifest and validation record identify source revisions and
+executed package checks. Historical development checks are not reported as
+new R-devel or CRAN results. Remote incoming checks and submission have not
+been performed. The live browser smoke remains an environment-dependent gate.
