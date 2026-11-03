@@ -74,8 +74,9 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 180
     env:
-      # Bootstrap runs use moving refs and record the resolved commits.
-      # Certification accepts the separately named full-SHA inputs only.
+      # Development bootstrap runs use moving refs and record resolved commits.
+      # Release/master/scheduled runs resolve exact DESCRIPTION pins; certification
+      # accepts the separately named full-SHA inputs only.
       RELEASE_CERTIFICATION: ${{ inputs.release_certification && 'true' || 'false' }}
       ANTITRUST_REF: ${{ inputs.antitrust_ref || 'master' }}
       COORDINATION_REF: ${{ inputs.coordination_ref || 'main' }}
@@ -137,7 +138,11 @@ jobs:
           PRIVATE_LOG_ROOT="$ci_root/private-logs"
           PROVENANCE_FILE="$ci_root/provenance.txt"
 
-          if [[ ( "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF" == refs/heads/release/* ) || ( "$GITHUB_EVENT_NAME" == pull_request && ( "${GITHUB_HEAD_REF:-}" == release/* || "${GITHUB_BASE_REF:-}" == release/* ) ) ]]; then
+          # Release branches, master pushes and master-targeted PRs, and scheduled runs
+          # read exact dependency pins from DESCRIPTION.
+          if [[ "$GITHUB_EVENT_NAME" == schedule ||
+                ( "$GITHUB_EVENT_NAME" == push && ( "$GITHUB_REF" == refs/heads/release/* || "$GITHUB_REF" == refs/heads/master ) ) ||
+                ( "$GITHUB_EVENT_NAME" == pull_request && ( "${GITHUB_HEAD_REF:-}" == release/* || "${GITHUB_BASE_REF:-}" == release/* || "${GITHUB_BASE_REF:-}" == master ) ) ]]; then
             mapfile -t release_refs < <(Rscript --vanilla - <<'RSCRIPT'
           desc <- read.dcf("DESCRIPTION")[1L, ]
           entries <- trimws(strsplit(desc[["Remotes"]], ",", fixed = TRUE)[[1L]])
