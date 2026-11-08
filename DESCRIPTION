@@ -14,7 +14,7 @@ Author: Charles Taragin [aut, cre], Kenneth Rios [aut], Paulette Wolak [aut]
 Maintainer: Charles Taragin <ctaragin+competitiontoolbox@gmail.com>
 Depends: R (>= 4.1.0), shiny, rhandsontable
 Imports: antitrust (>= 0.99.43), bslib, ggplot2, trade (>= 0.9.0), vertical (>= 0.3.0)
-Remotes: luciu5/antitrust@a941cf145353c1941e906e173d82b05bc199a6bb,
+Remotes: luciu5/antitrust@31c39b2707b532dff4a77c09f51aef0b0d7edfc3,
     luciu5/coordination@fbb5343042a5b1564927fbe9839e3696e0c5d651,
     luciu5/trade@e39914a59b9b2abbf4100558d89117a9909b7dc6,
     luciu5/vertical@4f9c00820d08c68a85f48e44b599c1058cac1023
