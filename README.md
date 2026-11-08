@@ -45,3 +45,7 @@ package. Select release certification and provide full 40-character SHAs for
 antitrust, coordination, trade, and vertical to validate a fixed candidate
 stack. It also checks the toolbox `Remotes` entries and the public Stackelberg
 helpers required by trade.
+
+See [application and release verification](.ci/READINESS.md) for local server
+and standalone R-code checks, the required browser interactions, and the
+distinction between a hosted CI waiver and a passing certification.

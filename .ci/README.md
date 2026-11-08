@@ -1,5 +1,9 @@
 # Dependency stack CI setup
 
+For local application verification and the remaining browser gate, see
+[release readiness](READINESS.md). Server tests and checkout fixtures do not
+replace a real browser run or an actual hosted dependency-stack certification.
+
 The dependency stack workflow checks out `luciu5/vertical`, which is a private
 repository. Configure a repository Actions secret named `VERTICAL_READ_TOKEN`
 with a fine-grained personal access token limited to the `luciu5/vertical`

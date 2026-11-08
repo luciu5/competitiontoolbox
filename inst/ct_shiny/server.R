@@ -1,18 +1,22 @@
 
-get_vignette_link <- function(...) {
-    x <- vignette(...)
-    if (nzchar(out <- x$PDF)) {
-        ext <- tools::file_ext(out)
-        port <- if (tolower(ext) == "html")
-            tools::startDynamicHelp(NA)
-        else 0L
-        if (port > 0L) {
-            out <- sprintf("http://127.0.0.1:%d/library/%s/doc/%s",
-                           port, basename(x$Dir), out)
-            return(out)
-        }
+get_vignette_link <- function(topic, package) {
+    path <- system.file("doc", paste0(topic, ".html"), package = package)
+    if (!nzchar(path) || !file.exists(path)) return(NULL)
+    # Serve documentation through this app. A localhost dynamic-help URL
+    # points at the visitor's computer when Shiny runs on a remote server.
+    prefix <- paste0("ct-doc-", package)
+    shiny::addResourcePath(prefix, dirname(path))
+    paste0(prefix, "/", basename(path))
+}
+
+reference_panel <- function(topic, package, id) {
+    link <- get_vignette_link(topic, package = package)
+    if (is.null(link)) {
+        return(helpText(paste("The", topic, "vignette is not included in the installed",
+                              package, "package. Install a package build with vignettes to view it here.")))
     }
-    stop("no html help found")
+    tags$iframe(id = id, src = link, width = "100%", height = 768,
+                frameborder = 0, marginheight = 0)
 }
 
 
@@ -313,25 +317,13 @@ shinyServer(function(input, output, session) {
     # antitrust
     output$referenceATR <-
       renderUI({
-        tags$iframe(id = "referenceATR",
-                    src = get_vignette_link("Reference", package = "antitrust"),
-                    width = "100%",
-                    height = 768,
-                    frameborder = 0,
-                    marginheight = 0
-        )
+        reference_panel("Workflow", "antitrust", "referenceATR")
       })
 
     # trade
     output$referenceTrade <-
         renderUI({
-            tags$iframe(id = "referenceTrade",
-                        src = get_vignette_link("Reference", package = "trade"),
-                        width = "100%",
-                        height = 768,
-                        frameborder = 0,
-                        marginheight = 0
-            )
+            reference_panel("Reference", "trade", "referenceTrade")
         })
 
 })
