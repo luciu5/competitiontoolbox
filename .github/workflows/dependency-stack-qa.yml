@@ -298,6 +298,15 @@ jobs:
             echo "VERTICAL_SRC=$SOURCE_ROOT/vertical"
           } >> "$GITHUB_ENV"
 
+      - name: Install system dependency for fs
+        shell: bash
+        run: |
+          set -euo pipefail
+          # fs uses system libuv; this workflow installs CRAN source packages
+          # directly rather than relying on a dependency action's sysreqs.
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libuv1-dev
+
       - name: Provision explicit third-party CRAN dependencies
         shell: bash
         run: |
