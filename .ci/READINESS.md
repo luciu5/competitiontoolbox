@@ -7,7 +7,7 @@ R_LIBS=/path/to/compatible/library \
   Rscript --vanilla -e 'testthat::test_local(filter="app-interactions", reporter="summary")'
 COMPETITIONTOOLBOX_TEST_TIER=FAST R_LIBS=/path/to/compatible/library \
   Rscript --vanilla -e 'testthat::test_local(reporter="summary")'
-bash .ci/test-private-vertical-checkout.sh
+bash .ci/test-public-dependency-checkout.sh
 ```
 
 The application-interaction tests run the actual Shiny server, exercise all
@@ -40,9 +40,10 @@ The export feature is copied R code; a “download smoke” is inapplicable unti
 such a feature exists. Do not add a new download feature merely to clear a
 historical checklist item.
 
-The existing November 3 hosted private-vertical dependency CI waiver remains
-separate from passing checks. A real hosted certification requires the exact
-frozen dependency commits and the dedicated read-only private checkout described
-in [the setup instructions](README.md). Local fixture/server tests do not turn
-the waiver into a hosted pass. Keep workflow guards, repository visibility and
-publication holds unchanged.
+The former private-vertical token guard has been removed because vertical is
+public. Hosted checks now exercise the full public dependency stack, including
+vertical, without repository secrets. Historical waived failures remain
+historical evidence; only a completed successful run certifies its recorded
+source commits. See [the setup instructions](README.md) for provenance and exact
+commit checks. Repository visibility and public package publication remain
+separate decisions.

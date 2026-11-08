@@ -135,7 +135,6 @@ jobs:
           SOURCE_ROOT="$ci_root/src"
           BUILD_ROOT="$ci_root/build"
           LOG_ROOT="$ci_root/logs"
-          PRIVATE_LOG_ROOT="$ci_root/private-logs"
           PROVENANCE_FILE="$ci_root/provenance.txt"
 
           # Release branches, master pushes and master-targeted PRs, and scheduled runs
@@ -170,13 +169,12 @@ jobs:
             TRADE_REF="${release_refs[2]}"
             VERTICAL_REF="${release_refs[3]}"
           fi
-          mkdir -p "$R_LIBS_USER" "$SOURCE_ROOT" "$BUILD_ROOT" "$LOG_ROOT" "$PRIVATE_LOG_ROOT"
+          mkdir -p "$R_LIBS_USER" "$SOURCE_ROOT" "$BUILD_ROOT" "$LOG_ROOT"
           {
             echo "R_LIBS_USER=$R_LIBS_USER"
             echo "SOURCE_ROOT=$SOURCE_ROOT"
             echo "BUILD_ROOT=$BUILD_ROOT"
             echo "LOG_ROOT=$LOG_ROOT"
-            echo "PRIVATE_LOG_ROOT=$PRIVATE_LOG_ROOT"
             echo "PROVENANCE_FILE=$PROVENANCE_FILE"
             echo "ANTITRUST_REF=$ANTITRUST_REF"
             echo "COORDINATION_REF=$COORDINATION_REF"
@@ -197,39 +195,9 @@ jobs:
             echo "test_tier=$TEST_TIER"
           } | tee "$PROVENANCE_FILE"
 
-      - name: Check private vertical checkout workflow fixtures
+      - name: Check public dependency checkout fixtures
         shell: bash
-        run: bash .ci/test-private-vertical-checkout.sh
-
-      - name: Require private vertical read token
-        shell: bash
-        env:
-          VERTICAL_READ_TOKEN: ${{ secrets.VERTICAL_READ_TOKEN }}
-        run: bash .ci/require-vertical-read-token.sh
-
-      # The repository is private. Keep this credential scoped to this checkout
-      # action and do not persist it in the repository's Git configuration.
-      - name: Checkout selected vertical source
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with:
-          repository: luciu5/vertical
-          ref: ${{ env.VERTICAL_REF }}
-          token: ${{ secrets.VERTICAL_READ_TOKEN }}
-          path: .vertical-private-checkout
-          persist-credentials: false
-          fetch-depth: 1
-
-      - name: Move and verify vertical source checkout
-        shell: bash
-        run: |
-          set -euo pipefail
-          checkout_path="$GITHUB_WORKSPACE/.vertical-private-checkout"
-          test -d "$checkout_path/.git"
-          test ! -e "$SOURCE_ROOT/vertical"
-          mv "$checkout_path" "$SOURCE_ROOT/vertical"
-          VERTICAL_SHA="$(bash .ci/resolve-private-vertical-checkout.sh \
-            "$VERTICAL_REF" "$SOURCE_ROOT/vertical")"
-          echo "VERTICAL_SHA=$VERTICAL_SHA" >> "$GITHUB_ENV"
+        run: bash .ci/test-public-dependency-checkout.sh
 
       - name: Resolve dependency source refs
         shell: bash
@@ -286,6 +254,7 @@ jobs:
           ANTITRUST_SHA="$(clone_at_ref luciu5/antitrust "$ANTITRUST_REF" "$SOURCE_ROOT/antitrust")"
           COORDINATION_SHA="$(clone_at_ref luciu5/coordination "$COORDINATION_REF" "$SOURCE_ROOT/coordination")"
           TRADE_SHA="$(clone_at_ref luciu5/trade "$TRADE_REF" "$SOURCE_ROOT/trade")"
+          VERTICAL_SHA="$(clone_at_ref luciu5/vertical "$VERTICAL_REF" "$SOURCE_ROOT/vertical")"
           if [[ "$RELEASE_CERTIFICATION" == true ]]; then
             if [[ "$ANTITRUST_SHA" != "${ANTITRUST_REF,,}" || "$COORDINATION_SHA" != "${COORDINATION_REF,,}" || "$TRADE_SHA" != "${TRADE_REF,,}" || "$VERTICAL_SHA" != "${VERTICAL_REF,,}" ]]; then
               echo "A checked-out dependency SHA differs from its explicit release candidate input" >&2
@@ -441,10 +410,7 @@ jobs:
           install_source coordination "$COORDINATION_SRC"
           Rscript -e 'required <- c("stackelberg_logit_h", "stackelberg_ces_multipliers"); missing <- setdiff(required, getNamespaceExports("coordination")); if (length(missing)) stop(sprintf("coordination ref %s resolved to %s and does not export %s; for release certification set coordination_ref to the full SHA that includes these public helpers", Sys.getenv("COORDINATION_REF"), Sys.getenv("COORDINATION_SHA"), paste(missing, collapse = ", ")), call. = FALSE)'
           install_source trade "$TRADE_SRC"
-          bash "$GITHUB_WORKSPACE/.ci/run-private-vertical-command.sh" \
-            "$VERTICAL_SHA" "$PRIVATE_LOG_ROOT/install-vertical.log" "installation" -- \
-            R CMD INSTALL --clean --no-multiarch \
-              --library="$R_LIBS_USER" "$VERTICAL_SRC"
+          install_source vertical "$VERTICAL_SRC"
 
           # Install the toolbox itself last from the checked-out candidate.
           R CMD INSTALL --clean --no-multiarch \
@@ -540,29 +506,16 @@ jobs:
               check_options+=(--as-cran --run-donttest --timings)
             fi
 
-            if [[ "$package_name" == vertical ]]; then
-              bash "$GITHUB_WORKSPACE/.ci/run-private-vertical-command.sh" \
-                "$VERTICAL_SHA" "$PRIVATE_LOG_ROOT/vertical-build.log" "source build" -- \
-                bash -c 'cd "$1"; shift; R CMD build "$@"' _ \
-                "$package_build" "${build_options[@]}" "$source_path"
-            else
-              (
-                cd "$package_build"
-                R CMD build "${build_options[@]}" "$source_path"
-              ) 2>&1 | tee "$LOG_ROOT/${package_name}-build.log"
-            fi
+            (
+              cd "$package_build"
+              R CMD build "${build_options[@]}" "$source_path"
+            ) 2>&1 | tee "$LOG_ROOT/${package_name}-build.log"
             local package_tarball
             package_tarball="$(find "$package_build" -maxdepth 1 -type f \
               -name "${package_name}_*.tar.gz" -print -quit)"
             test -n "$package_tarball"
-            if [[ "$package_name" == vertical ]]; then
-              bash "$GITHUB_WORKSPACE/.ci/run-private-vertical-command.sh" \
-                "$VERTICAL_SHA" "$PRIVATE_LOG_ROOT/vertical-check-${TEST_TIER,,}.log" "R CMD check" -- \
-                R CMD check "${check_options[@]}" "$package_tarball"
-            else
-              R CMD check "${check_options[@]}" "$package_tarball" \
-                2>&1 | tee "$LOG_ROOT/${package_name}-check-${TEST_TIER,,}.log"
-            fi
+            R CMD check "${check_options[@]}" "$package_tarball" \
+              2>&1 | tee "$LOG_ROOT/${package_name}-check-${TEST_TIER,,}.log"
           }
 
           # These checks exercise upstream unit tests, examples, donttest

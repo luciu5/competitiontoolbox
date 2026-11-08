@@ -1,33 +1,26 @@
 # Dependency stack CI setup
 
 For local application verification and the remaining browser gate, see
-[release readiness](READINESS.md). Server tests and checkout fixtures do not
-replace a real browser run or an actual hosted dependency-stack certification.
+[release readiness](READINESS.md). Local checkout fixtures do not replace a
+hosted dependency-stack check or a real browser run.
 
-The dependency stack workflow checks out `luciu5/vertical`, which is a private
-repository. Configure a repository Actions secret named `VERTICAL_READ_TOKEN`
-with a fine-grained personal access token limited to the `luciu5/vertical`
-repository and read-only **Contents** access. The workflow uses that secret
-only for its missing-secret guard and the dedicated checkout action; checkout
-credentials are not persisted in Git configuration.
+All four upstream repositories, including `luciu5/vertical`, are public. The
+workflow clones them over public HTTPS. No personal access token or repository
+Actions secret is required, including for fork `pull_request` events. An old
+`VERTICAL_READ_TOKEN` secret can be removed; the workflow does not read it.
 
-Create the token in GitHub with only that repository selected, then enter it at
-the GitHub CLI's interactive prompt:
+Each selected ref is resolved to a commit and checked out at that exact SHA
+under the runner temporary directory. The resolved commits, installed versions
+and test tier are recorded in provenance. Release certification still requires
+four explicit full candidate SHAs matching the DESCRIPTION pins; public access
+does not weaken commit verification or skip vertical integration tests.
+
+Vertical installation, build and check diagnostics use the same public logs as
+the other dependencies. Uploaded artifacts contain provenance and logs only,
+not dependency source trees, libraries or package builds.
+
+Run the checkout regression fixtures without network access:
 
 ```sh
-gh secret set VERTICAL_READ_TOKEN --repo github.com/luciu5/competitiontoolbox
+bash .ci/test-public-dependency-checkout.sh
 ```
-
-The value belongs in the CLI prompt, not in a shell argument or a chat message.
-
-GitHub does not provide repository secrets to workflows triggered by fork
-`pull_request` events. Those runs fail closed with an explanatory message. A
-maintainer can run the workflow from a trusted branch or use workflow dispatch
-after reviewing the proposed change. Manual dispatch requires the workflow on
-the default branch; until then, use a trusted release-branch push. The workflow never switches to
-`pull_request_target` to obtain the secret.
-
-The private checkout is pinned to `VERTICAL_REF`, verified against that ref
-when it is a full SHA, moved under the runner temporary directory, and recorded
-in the same provenance file as the three public source resolutions. Public
-artifacts contain provenance and logs only.
