@@ -469,12 +469,22 @@ jobs:
 
           # R CMD check runs the ordinary unit and high-value integration
           # tests in tests/testthat as part of its standard test phase.
+          check_status=0
           R CMD check \
             --library="$R_LIBS_USER" \
             --output="$BUILD_ROOT/check" \
             --no-manual --no-vignettes --no-build-vignettes \
             "$toolbox_tarball" \
-            2>&1 | tee "$LOG_ROOT/competitiontoolbox-check-fast.log"
+            2>&1 | tee "$LOG_ROOT/competitiontoolbox-check-fast.log" || check_status=$?
+          # R CMD check only prints the final few test lines. Retain complete
+          # test failures so an initial route error is visible before cascades.
+          while IFS= read -r -d '' failure_log; do
+            cp "$failure_log" "$LOG_ROOT/$(basename "$failure_log")"
+            cat "$failure_log"
+          done < <(find "$BUILD_ROOT/check" -type f -name '*.Rout.fail' -print0)
+          if [[ "$check_status" -ne 0 ]]; then
+            exit "$check_status"
+          fi
 
           # Run the same route/parity suite directly against the source tree
           # so failures retain testthat context in the CI log.
