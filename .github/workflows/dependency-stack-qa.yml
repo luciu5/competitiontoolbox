@@ -488,7 +488,7 @@ jobs:
 
           # Run the same route/parity suite directly against the source tree
           # so failures retain testthat context in the CI log.
-          Rscript -e 'testthat::test_dir("tests/testthat", reporter = "summary", stop_on_failure = TRUE)' \
+          Rscript -e 'library(competitiontoolbox); testthat::test_dir("tests/testthat", reporter = "summary", stop_on_failure = TRUE)' \
             2>&1 | tee "$LOG_ROOT/competitiontoolbox-testthat-fast.log"
 
       - name: Set up Pandoc for R Markdown vignettes
@@ -546,7 +546,7 @@ jobs:
           check_upstream vertical "$VERTICAL_SRC"
 
           # The toolbox parity suite is mandatory in both non-FAST tiers.
-          Rscript -e 'testthat::test_dir("tests/testthat", reporter = "summary", stop_on_failure = TRUE)' \
+          Rscript -e 'library(competitiontoolbox); testthat::test_dir("tests/testthat", reporter = "summary", stop_on_failure = TRUE)' \
             2>&1 | tee "$LOG_ROOT/competitiontoolbox-testthat-${TEST_TIER,,}.log"
 
       - name: Run NIGHTLY full toolbox check
