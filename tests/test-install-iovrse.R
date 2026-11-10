@@ -16,6 +16,9 @@ local({
   stopifnot(nzchar(script), file.exists(script))
   original <- new.env(parent = globalenv()); source(script, local = original)
   fixture <- tempfile('iovrse-installer-'); dir.create(fixture)
+  # Match the installer's canonical paths, including Windows separators and
+  # macOS /var -> /private/var aliases, before indexing mock libraries.
+  fixture <- normalizePath(fixture, winslash = '/', mustWork = TRUE)
   on.exit(unlink(fixture, recursive = TRUE), add = TRUE)
   target <- file.path(fixture, 'target'); dir.create(target)
   visible <- file.path(fixture, 'visible'); dir.create(visible)
