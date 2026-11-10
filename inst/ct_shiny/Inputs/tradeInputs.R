@@ -19,8 +19,8 @@ tradeInputs <- function(nrows, type = c("Tariffs", "Quotas")) {
   rownames(exampleData) <- NULL
 
   if(type == "Tariffs"){
-    fx <- data.frame('Current \nTariff \n(proportion)' = c(.05,.05,0,0),
-                     'New \nTariff \n(proportion)' = c(.25,.25,0,0),
+    fx <- data.frame('Current \nTariff \n(consumer-price fraction)' = c(.05,.05,0,0),
+                     'New \nTariff \n(consumer-price fraction)' = c(.25,.25,0,0),
                      stringsAsFactors = FALSE,
                      check.names=FALSE)
   }

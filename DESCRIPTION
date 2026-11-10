@@ -22,7 +22,8 @@ Description: A graphical user interface for simulating the effects of horizontal
              assortment of different economic models. The interface is powered by the 'Shiny' web application framework from
              'RStudio'. Vertical merger simulations are provided by the 'vertical' package.
 URL: https://github.com/luciu5/competitiontoolbox
-Suggests: testthat
+Suggests: testthat, knitr, rmarkdown, remotes
+VignetteBuilder: knitr
 License: CC0
 Encoding: UTF-8
 LazyData: true

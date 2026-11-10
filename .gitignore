@@ -7,3 +7,4 @@
 # and the tracked paulette2 deployment record visible to Git.
 /inst/ct_shiny/rsconnect/shinyapps.io/daag/
 /inst/ct_shiny/www/vandy.png
+.scratch/

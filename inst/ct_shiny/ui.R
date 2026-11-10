@@ -446,8 +446,9 @@ tariffs_page <- function() {
       h5(tags$b("Directions:")),
       helpText(tags$ul(
         tags$li("Copy and paste or manually enter market data into the Inputs table."),
-        tags$li("Click Simulate to simulate an", tags$em("ad valorem"), "tariff."),
-        tags$li("Default example simulates an increase in the ", tags$em("ad valorem"), "tariff from 5% to 25% on products produced by 'Firm1' and 'Firm2'."),
+        tags$li("Enter tariffs as fractions of consumer price, then click Simulate."),
+        tags$li("For a statutory tariff t measured against producer value, enter t / (1 + t): a 25% statutory tariff is 0.20 here."),
+        tags$li("The default example raises the consumer-price tariff fraction from 0.05 to 0.25 on products produced by 'Firm1' and 'Firm2'."),
         tags$li("Products without current or new tariffs are assumed to be produced domestically. Otherwise, products are assumed to be produced abroad.")
       )),
       hr(),
@@ -591,22 +592,13 @@ introduction_page <- function() {
   )
 }
 
-documentation_page <- function(package) {
+documentation_page <- function(package, output_id) {
   tags$div(
     class = "ct-page",
     bslib::card(
       h1(class = "ct-title", paste(package, "Documentation")),
-      p(
-        "Open the current CRAN reference material for the",
-        package,
-        "package."
-      ),
-      tags$a(
-        class = "btn btn-primary",
-        href = sprintf("https://cran.r-project.org/web/packages/%s/vignettes/Reference.html", package),
-        target = "_blank",
-        "Open Documentation"
-      )
+      p("Read the installed documentation or open the current online guide."),
+      shiny::uiOutput(output_id)
     )
   )
 }
@@ -755,13 +747,13 @@ bslib::page_navbar(
     "Mergers",
     bslib::nav_panel("Horizontal", horizontal_merger_page()),
     bslib::nav_panel("Vertical", vertical_merger_page()),
-    bslib::nav_panel("Documentation", documentation_page("antitrust"))
+    bslib::nav_panel("Documentation", documentation_page("antitrust", "referenceATR"))
   ),
   bslib::nav_menu(
     "Trade",
     bslib::nav_panel("Tariffs", tariffs_page()),
     bslib::nav_panel("Quotas", quotas_page()),
-    bslib::nav_panel("Documentation", documentation_page("trade"))
+    bslib::nav_panel("Documentation", documentation_page("trade", "referenceTrade"))
   ),
   bslib::nav_menu(
     "Numerical Simulations",

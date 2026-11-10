@@ -1,0 +1,70 @@
+name: Ordinary installation and examples
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ordinary-use:
+    name: ${{ matrix.os }} / R release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      R_LIBS_USER: ${{ runner.temp }}/iovrse-library
+    defaults:
+      run:
+        working-directory: competitiontoolbox
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: competitiontoolbox
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/antitrust
+          ref: master
+          path: antitrust
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/coordination
+          ref: main
+          path: coordination
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/trade
+          ref: master
+          path: trade
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/vertical
+          ref: main
+          path: vertical
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/financial
+          ref: main
+          path: financial
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/antitrustBayes
+          ref: main
+          path: antitrustBayes
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - name: Check installer dependency and no-downgrade behavior
+        run: Rscript --vanilla tests/test-install-iovrse.R
+      - name: Install the complete source cohort in a clean library
+        shell: Rscript {0}
+        run: |
+          source("tools/install_iovrse.R")
+          install_iovrse(source_root = normalizePath(".."), lib = Sys.getenv("R_LIBS_USER"))
+      - name: Run documented ordinary features without CmdStan or a Git working directory
+        run: Rscript --vanilla .ci/smoke_iovrse.R ..

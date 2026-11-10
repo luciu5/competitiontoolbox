@@ -8,7 +8,7 @@ Diagnostics - isOverID.R outputs a note which indicates whether the merger simul
 or tariff/quota run is just- or over-identified based on the inputs. mergersDiag.R
 calculates percent differences in inputted and fitted simulation values for prices,
 margins, shares, and market elasticity. Several parameters are also outputted, including
-the bargaining parameter for supply chain simulations. tradeDiag.R is analagous for 
+the bargaining parameter for supply chain simulations. tradeDiag.R is analagous for
 tariffs/quotas. These figures are all displayed in the Diagnostic tabs.
 
 Inputs - reactiveInputs.R creates reactive values for supply, demand, and market
@@ -29,10 +29,11 @@ is displayed in the R Code tab.
 rsconnect/shinyapps.io/paulette2 - files that assist in generating the RShiny app
 
 Simulations - mergersSims.R is where the code that actually runs the horizontal
-and vertical merger simulations is stored. It contains extensive conditional logic 
+and vertical merger simulations is stored. It contains extensive conditional logic
 based on the various competitive environments and demand systems that users can select.
-The functions that run the merger simulation on the back end are called from the
-antitrust package. tradeSims.R is analagous for tariffs/quotas.
+Horizontal calculations use antitrust; linked vertical calculations use the
+vertical package. tradeSims.R routes tariffs and quotas through trade.
+For the current user workflow see vignettes/gui-to-r-merger.Rmd.
 
 Summary - Generates the formatted summary tables that displays summary() calls on
 merger simulation objects. Displayed in the Summary tab.

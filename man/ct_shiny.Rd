@@ -18,6 +18,10 @@ package. It also provides users with the ability to calibrate different consumer
 and simulate the effects of horizontal mergers under different competitive regimes included in the
 \code{antitrust} package. The \code{vertical} package owns the vertical merger workflow, including
 its model calibration and simulation.
+
+Copy the R Code tab to a local script to reproduce a scenario outside the app.
+See \code{vignette("gui-to-r-merger", package = "competitiontoolbox")}
+for a complete walkthrough.
 }
 \examples{
 if(interactive()){ct_shiny()}

@@ -1,0 +1,78 @@
+name: Documentation review artifacts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      R_LIBS_USER: ${{ runner.temp }}/iovrse-doc-library
+      _R_CHECK_FORCE_SUGGESTS_: false
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+    defaults:
+      run:
+        working-directory: competitiontoolbox
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: competitiontoolbox
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/antitrust
+          ref: master
+          path: antitrust
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/coordination
+          ref: main
+          path: coordination
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/trade
+          ref: master
+          path: trade
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/vertical
+          ref: main
+          path: vertical
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/financial
+          ref: main
+          path: financial
+      - uses: actions/checkout@v4
+        with:
+          repository: luciu5/antitrustBayes
+          ref: main
+          path: antitrustBayes
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-pandoc@v2
+      - name: Install documentation tools and current source cohort once
+        shell: Rscript {0}
+        run: |
+          lib <- Sys.getenv("R_LIBS_USER")
+          dir.create(lib, recursive = TRUE, showWarnings = FALSE)
+          install.packages(c("pkgdown", "knitr", "rmarkdown"), lib = lib)
+          source("tools/install_iovrse.R")
+          install_iovrse(source_root = normalizePath(".."), lib = lib)
+      - name: Render sites and check vignette bundles
+        run: Rscript --vanilla .ci/build_documentation.R .. --check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iovrse-documentation-review
+          include-hidden-files: true
+          path: |
+            */.scratch/pkgdown
+            competitiontoolbox/.scratch/documentation
+          if-no-files-found: error

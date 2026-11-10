@@ -11,12 +11,23 @@ get_vignette_link <- function(topic, package) {
 
 reference_panel <- function(topic, package, id) {
     link <- get_vignette_link(topic, package = package)
+    online <- switch(package,
+        antitrust = "https://github.com/luciu5/antitrust/blob/master/vignettes/Workflow.Rmd",
+        trade = "https://github.com/luciu5/trade/blob/master/vignettes/Reference.Rmd",
+        paste0("https://CRAN.R-project.org/package=", package))
+    online_link <- shiny::tags$a(href = online, target = "_blank",
+                                rel = "noopener noreferrer",
+                                paste("Read", topic, "online"))
     if (is.null(link)) {
-        return(helpText(paste("The", topic, "vignette is not included in the installed",
-                              package, "package. Install a package build with vignettes to view it here.")))
+        return(shiny::tagList(
+            shiny::helpText(paste("The", topic,
+                "vignette is not included in the installed package. Read the online guide below.")),
+            online_link))
     }
-    tags$iframe(id = id, src = link, width = "100%", height = 768,
-                frameborder = 0, marginheight = 0)
+    shiny::tagList(
+        shiny::tags$iframe(id = id, src = link, width = "100%", height = 768,
+                           frameborder = 0, marginheight = 0),
+        online_link)
 }
 
 

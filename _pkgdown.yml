@@ -1,0 +1,12 @@
+destination: .scratch/pkgdown
+template:
+  bootstrap: 5
+home:
+  links:
+  - text: Get started
+    href: articles/gui-to-r-merger.html
+articles:
+- title: Use the app
+  navbar: ~
+  contents:
+  - gui-to-r-merger

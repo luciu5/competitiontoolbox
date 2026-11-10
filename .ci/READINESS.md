@@ -21,7 +21,9 @@ provide the separate numerical/economic checks.
 Reference panels use antitrust's current `Workflow` vignette and trade's
 `Reference`. Installed HTML is served through the application's resource path,
 so a remote visitor does not receive a server-local dynamic-help address.
-Development installs without vignettes show an explicit unavailable message.
+Development installs without vignettes show an explicit unavailable message and
+a link to the current public online guide; reading help does not require building
+vignettes locally. The navbar mounts these server panels.
 
 A socket-enabled browser run remains required before a public release:
 
@@ -47,3 +49,15 @@ historical evidence; only a completed successful run certifies its recorded
 source commits. See [the setup instructions](README.md) for provenance and exact
 commit checks. Repository visibility and public package publication remain
 separate decisions.
+
+## Documentation walkthrough acceptance
+
+The guide `vignettes/gui-to-r-merger.Rmd` uses the four-row default horizontal
+Logit/Bertrand market. For manual browser acceptance, record package versions,
+run its explicit controls, inspect Messages/Diagnostics/Details, make the -.04
+Prod1 cost edit, and copy the complete R Code into a fresh-session script. Compare
+unrounded prices/shares with the app and retain any errors and two readable
+screenshots. Also check invalid-price error recovery and the stored-results
+captions. Headless script/link tests do not certify this browser step.
+
+Maintainer-only rendering and build evidence: [.ci/DOCUMENTATION.md](DOCUMENTATION.md).

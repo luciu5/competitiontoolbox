@@ -1,6 +1,6 @@
 # Working in competitiontoolbox
 
-Use `master`, the repository default branch, for routine work. The `refactor` migration is integrated; do not recreate that branch. Start any necessary isolated task branch from `master`.
+Routine implementation may be performed directly on `master`, the maintained default branch. The `refactor` migration is integrated; do not recreate that branch. Start any necessary isolated task branch from `master`.
 
 Preserve uncommitted local changes and unrelated branches or worktrees.
 

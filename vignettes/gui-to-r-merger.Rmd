@@ -1,0 +1,200 @@
+---
+title: "From a merger question to reproducible R code"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{From a merger question to reproducible R code}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+This guide takes you from a four-product horizontal merger in the app to a
+saved R script that reproduces it. You need basic R and the current
+`competitiontoolbox` package; this example uses `antitrust` 0.99.43 or later.
+No Bayesian estimation is involved.
+
+## Open the app and choose the question
+
+If needed, follow the [installation instructions](https://github.com/luciu5/competitiontoolbox#installation)
+in a fresh R session. Launch the app locally:
+
+```{r launch, eval=FALSE}
+library(competitiontoolbox)
+ct_shiny()
+```
+
+This opens a browser interface. Stop the app with the R console's Stop button
+or Escape when finished. Ordinary use does not require Pandoc, TeX or CmdStan.
+The optional hosted app may run a different version from your installed copy.
+
+From **Introduction**, choose **Mergers > Horizontal**. Set these controls
+explicitly, since a browser may retain earlier choices:
+
+| Control | Choice |
+|:--|:--|
+| Calibration | market elasticity and 1 or more margins |
+| Market elasticity | -1 |
+| Competitive interaction | Bertrand |
+| Demand | logit |
+
+The question is: what happens when Firm1 acquires Firm2, leaving Firm3's
+existing two-product portfolio intact?
+
+## Understand the input rows
+
+Enter or verify the following rows under **Enter Inputs**. Prices and quantities
+use consistent arbitrary units. Margins are proportions of price: .25 means
+25%, not 25 currency units.
+
+```{r inputs}
+simdata <- data.frame(
+  product = paste0("Prod", 1:4),
+  price = rep(10, 4), quantity = c(40, 30, 20, 10),
+  margin = rep(.25, 4),
+  owner_pre = c("Firm1", "Firm2", "Firm3", "Firm3"),
+  owner_post = c("Firm1", "Firm1", "Firm3", "Firm3"),
+  cost_change = rep(0, 4)
+)
+knitr::kable(simdata)
+```
+
+The default post-merger owners already describe the acquisition. Firm3 owns both
+Prod3 and Prod4 before and after it. Treating those products as separate firms
+would answer a different economic question. Quantities become conditional
+inside-market shares in this Logit example; changing to a revenue-based model
+requires checking its input definitions again.
+
+Click **Simulate**. Inspect **Messages**, then **Diagnostics**, before reading
+**Summary** or **Details**. Calibration fits a common demand system, so the
+fitted margins need not reproduce every supplied margin exactly. Compare the
+input-versus-fit discrepancies before using the result in advice or a report.
+Finite output alone does not certify a good empirical fit.
+
+## Reproduce the same market with public R functions
+
+The following is a compact equivalent of this app scenario. The app's **R Code**
+tab includes its own serialized input table and extraction commands; copy that
+whole script for your actual analysis rather than trying to reuse browser state.
+
+```{r simulate}
+library(antitrust)
+upstream_spec <- antitrust::model_spec(
+  demand = "logit", conduct = "bertrand", variant = "alm"
+)
+fit <- antitrust::calibrate(
+  demand = upstream_spec,
+  prices = simdata$price,
+  shares = simdata$quantity / sum(simdata$quantity),
+  margins = simdata$margin,
+  ownerPre = 1 * outer(simdata$owner_pre, simdata$owner_pre, "=="),
+  mktElast = -1,
+  insideSize = sum(simdata$quantity), labels = simdata$product
+)
+simres <- antitrust::simulate(
+  fit,
+  ownerPost = 1 * outer(simdata$owner_post, simdata$owner_post, "=="),
+  mcDelta = simdata$cost_change
+)
+```
+
+```{r results}
+result <- data.frame(
+  product = simdata$product,
+  price_pre = as.numeric(antitrust::calcPrices(simres, preMerger = TRUE)),
+  price_post = as.numeric(antitrust::calcPrices(simres, preMerger = FALSE)),
+  share_post = as.numeric(antitrust::calcShares(simres, preMerger = FALSE))
+)
+result$price_change_pct <- 100 * (result$price_post / result$price_pre - 1)
+result$inside_share_post_pct <- 100 * result$share_post / sum(result$share_post)
+knitr::kable(result, digits = 3)
+```
+
+`price_change_pct` compares each product with its own pre-merger price. Shares
+are fractions of the modeled market including the outside option, so they need
+not sum to one across the four displayed products. The supplied input quantities
+were normalized within the inside market; the fitted outside share changes that
+denominator. `inside_share_post_pct` rescales the four displayed products to
+100% and matches the app's **Details** quantity-share convention. For example,
+raw share .28627 becomes about 37.589% within the inside market.
+The app's industry price-change summary sums product percentage
+changes times the **raw full-market post-merger shares** (`share_post`),
+without rescaling them to sum to one.
+It is not the percentage change of an unweighted average price, nor a draw-wise
+uncertainty interval.
+
+```{r weighted-change}
+c(app_industry_price_change_pct = sum(
+  result$price_change_pct * result$share_post
+), outside_share_post = 1 - sum(result$share_post))
+```
+
+In **Summary**, positive **Consumer Harm** means consumers lose; a negative
+number means benefit. Positive **Producer Benefit** means producers gain.
+Parentheses report these measures as percentages of post-merger revenues.
+**Elasticities** describes modeled responses, while **Diagnostics** describes
+calibration and solution information. Neither establishes that the assumed
+conduct or demand family is correct for your case.
+
+As one controlled sensitivity, set Prod1's **Cost Changes** to `-.04` and rerun.
+This is a 4% reduction in marginal cost, not four price units. Keep the other
+rows unchanged. Compare the resulting prices with the original merger and
+record which input changed. Each run starts from the entered pre-merger market;
+this edit does not accumulate a second cost change on the previous run.
+
+## Save and replay your analysis
+
+Open **R Code**, copy **all** the text, paste it into a plain text file named
+`merger-example.R`, and save it locally. The app provides copied code, not a
+file download button. The script defines `simdata`, constructs the selected
+model, calibrates `fit`, and computes `simres` without Shiny reactive objects.
+Append this provenance line to the saved script:
+
+```{r provenance, eval=FALSE}
+sessionInfo()
+```
+
+Run the saved file in a fresh R session, including from a directory outside the
+package checkout:
+
+```{bash replay, eval=FALSE}
+Rscript --vanilla /path/to/merger-example.R
+```
+
+Compare prices under identical inputs and controls. The copied script's
+`summary()` defaults to full-market shares, whereas the app's **Details** table
+shows inside-only shares. This is a denominator difference, not a different
+equilibrium. After running the copied script, obtain directly comparable columns:
+
+```{r app-details-comparison}
+raw_share_post <- antitrust::calcShares(simres, preMerger = FALSE)
+data.frame(price_post = antitrust::calcPrices(simres, preMerger = FALSE),
+           app_inside_share_post_pct = 100 * raw_share_post / sum(raw_share_post))
+```
+
+Compare unrounded R values when diagnosing discrepancies, since the screen
+rounds its tables. Save a separate script or clearly named input table
+for the cost-reduction alternative. Copy its updated R Code as well.
+
+If the script fails, first check the **Messages** tab, your installed package
+versions, and that you copied the complete script. If a warning concerns fit,
+inspect the supplied margins and elasticity; changing the model is a substantive
+assumption, not a formatting fix.
+
+## Continue with the relevant economic guide
+
+The app's **Numerical Simulations** tabs browse stored research summaries and
+figures. They do not launch a fresh Monte Carlo study for your current inputs.
+See [Taragin and Loudermilk (2019)](https://doi.org/10.13140/RG.2.2.30872.85760/1)
+and [Sheu and Taragin (2021)](https://doi.org/10.1111/1756-2171.12385)
+for those studies.
+
+For a script-based horizontal workflow, read
+[antitrust's Workflow](https://github.com/luciu5/antitrust/blob/master/vignettes/Workflow.Rmd).
+For other tasks, use the linked supply-chain guides in
+[vertical](https://github.com/luciu5/vertical#readme) or the
+[trade tariff guide](https://github.com/luciu5/trade/blob/master/vignettes/Reference.Rmd).
+These links lead to maintained source guides; they do not require building a
+website to use the package.
