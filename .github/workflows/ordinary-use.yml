@@ -16,8 +16,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    env:
-      R_LIBS_USER: ${{ runner.temp }}/iovrse-library
     defaults:
       run:
         working-directory: competitiontoolbox

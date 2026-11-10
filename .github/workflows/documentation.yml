@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
-      R_LIBS_USER: ${{ runner.temp }}/iovrse-doc-library
-      _R_CHECK_FORCE_SUGGESTS_: false
+      _R_CHECK_FORCE_SUGGESTS_: "false"
       OPENBLAS_NUM_THREADS: 1
       OMP_NUM_THREADS: 1
     defaults:
