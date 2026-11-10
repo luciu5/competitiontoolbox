@@ -57,6 +57,12 @@ jobs:
         with:
           r-version: release
           use-public-rspm: true
+      - name: Install Linux source dependency for fs
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libuv1-dev
       - name: Check installer dependency and no-downgrade behavior
         run: Rscript --vanilla tests/test-install-iovrse.R
       - name: Install the complete source cohort in a clean library
